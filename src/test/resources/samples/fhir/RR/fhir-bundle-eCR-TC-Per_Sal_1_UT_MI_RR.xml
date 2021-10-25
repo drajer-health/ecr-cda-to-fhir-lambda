@@ -1,0 +1,1705 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle xmlns="http://hl7.org/fhir">
+  <id value="RR-collection-bundle-d36e6" />
+  <identifier>
+    <system value="urn:ietf:rfc:3986" />
+    <value value="urn:uuid:4680a891-41d8-4198-adb2-8559f9a94076" />
+  </identifier>
+  <type value="collection" />
+  <timestamp value="2016-12-12T09:44:21.000-07:00" />
+  <entry>
+    <fullUrl value="urn:uuid:8fa6d7b7-6dbb-474a-ab6a-68538a26d0cf" />
+    <resource>
+      <Communication>
+        <id value="RR-communication-d36e6" />
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-communication" />
+          <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.1.2:2017-04-01-->
+        </meta>
+        <text>
+          <status value="generated" />
+          <div xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+            <table class="header_table" style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+              <tbody>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Document Id</span>
+                  </td>
+                  <td class="td_header_role_value"> e3d22592-e240-4f52-a98e-89eab2bfd95a</td>
+                </tr>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Document Created:</span>
+                  </td>
+                  <td class="td_header_role_value">December 12, 2016, 09:44:21, MST </td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="header_table" style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+              <tbody>
+                <!--Author-->
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Author</span>
+                  </td>
+                  <td class="td_header_role_value" />
+                </tr>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Contact info</span>
+                  </td>
+                  <td class="td_header_role_value">8515 Georgia Avenue, Suite 700<br />Silver Spring, MD 20910, US<br />Tel (Work Place): +1(844)836-8377<br />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="header_table" style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+              <tbody>
+                <!--encompassingEncounter-->
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Encounter Id</span>
+                  </td>
+                  <td class="td_header_role_value">9937012 2.16.840.1.113883.19</td>
+                </tr>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Encounter Type</span>
+                  </td>
+                  <td class="td_header_role_value">Office outpatient visit 15 minutes</td>
+                </tr>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Encounter Date</span>
+                  </td>
+                  <td class="td_header_role_value"> From January 4, 2016 to January 4, 2016 </td>
+                </tr>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Encounter Location</span>
+                  </td>
+                  <td class="td_header_role_value">Outpatient Facility</td>
+                </tr>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Responsible party</span>
+                  </td>
+                  <td class="td_header_role_value">Henry Seven, of TBDFacilityName</td>
+                </tr>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Contact info</span>
+                  </td>
+                  <td class="td_header_role_value"> Home:<br />1002 Healthcare Drive<br />TBDProvCity, TBDProvState TBDProvZip, US<br />Tel (Work Place): 555-555-1002 ext 9998<br />Fax (Work Place):
+                    555-555-1003 <br />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="header_table" style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+              <tbody>
+                <!--informationRecipient-->
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Information recipient:</span>
+                  </td>
+                  <td class="td_header_role_value">Henry Seven, </td>
+                </tr>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Contact info</span>
+                  </td>
+                  <td class="td_header_role_value"> Home:<br />1002 Healthcare Drive<br />TBDProvCity, TBDProvState TBDProvZip, US<br />Tel (Work Place): 555-555-1002 ext 9998<br />Fax (Work Place):
+                    555-555-1003 <br />Mail (Work Place): henrysevenmd@email.net<br />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table class="header_table" style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+              <tbody>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Document maintained by</span>
+                  </td>
+                  <td class="td_header_role_value">APHL | Association of Public Health Laboratories.</td>
+                </tr>
+                <tr>
+                  <td class="td_header_role_name" style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                    <span class="td_label">Contact info</span>
+                  </td>
+                  <td class="td_header_role_value">8515 Georgia Avenue, Suite 700<br />Silver Spring, MD 20910, US<br />Tel (Work Place): +1(844)836-8377<br />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div>
+              <br />
+              <p>
+                <span class="Bold">Subject:</span>
+              </p>
+              <p>Public Health Reporting Communication: one or more conditions are reportable, or may be reportable, to public health.</p>
+              <p />
+            </div>
+            <div />
+            <div>
+              <p>
+                <span class="Bold">Summary:</span>
+              </p>
+              <p>Your organization electronically submitted an initial case report to determine if reporting to public health is needed for a patient</p>
+              <p>"Pertussis (disorder)" is reportable to "Utah Department of Health". The initial case report was sent to "Utah Department of Health". Additional information may be required for this
+                report."Salmonella infection (disorder)" is reportable to "Utah Department of Health". The initial case report was sent to "Utah Department of Health". Additional information may be required for
+                this report.<br />
+              </p>
+              <p>"Salmonella infection (disorder)" is reportable to "Michigan". The initial case report was sent to "Michigan". Additional information may be required for this report."Pertussis (disorder)" is
+                reportable to "Michigan". The initial case report was sent to "Michigan". Additional information may be required for this report.<br />
+              </p>
+              <p>
+                <span class="Bold">"Pertussis (disorder)" for "Utah Department of Health" </span>
+              </p>
+              <p>Reporting is required within "3 Day(s)".<br />
+              </p>
+              <p>
+                <span>&gt; The following outbreak recommendations and documents were developed in collaboration with representatives from the Utah Department of Health and Utah's Local Health Departments to
+                  provide statewide consistency in situations involving pertussis outbreaks. The purpose of these guidelines is to provide effective management tools for pertussis outbreak situations. (Action requested)<br />
+                  <br />
+                </span>
+                <span>&gt; Additional information for the required reporting of Pertussis must be submitted to the Utah Department of Health. The additional information can be submitted here. (Action required)<br />
+                  <br />
+                </span>
+                <span>&gt; Best practices for healthcare professionals on the use of Polymerase Chain Reaction (PCR) for diagnosing Pertussis (Information only)<br />
+                  <br />
+                </span>
+                <span>&gt; More information on specimen collection (Information only)<br />
+                  <br />
+                </span>
+                <span>&gt; Recommended antimicrobial therapy and chemoprophylaxis (Information only)<br />
+                  <br />
+                </span>
+                <span>&gt; If you have additional questions regarding Pertussis or reporting, the Utah Department of Health can be reached for 24-Hour Urgent Event &amp; Disease Reporting at 1-888-EPI-UTAH (374-8824).<br />
+                  <br />
+                </span>
+              </p>
+              <p>Additional Resources:<br />
+              </p>
+              <p>
+                <span>&gt; Utah Department of Health's Pertussis Disease Investigation Plan (Information only)<br />
+                  <br />
+                </span>
+                <span>&gt; Pertussis Fact Sheet for Parents (Information only)<br />
+                  <br />
+                </span>
+              </p>
+              <p>
+                <span class="Bold">"Salmonella infection (disorder)" for "Utah Department of Health" </span>
+              </p>
+              <p>Reporting is required within "1 Day(s)".<br />
+              </p>
+              <p>Additional Resources:<br />
+              </p>
+              <p>
+                <span>&gt; Information on salmonellosis surveillance in Utah (Information only)<br />
+                  <br />
+                </span>
+              </p>
+              <p>
+                <span class="Bold">"Salmonella infection (disorder)" for "Michigan" </span>
+              </p>
+              <p>Reporting is required within "1 Day(s)".<br />
+              </p>
+              <p>
+                <span class="Bold">"Pertussis (disorder)" for "Michigan" </span>
+              </p>
+              <p>Reporting is required within "3 Day(s)".<br />
+              </p>
+              <p>Additional Resources:<br />
+              </p>
+              <p>
+                <span>&gt; CDC Reference Guide for Pertussis (Information only)<br />
+                  <br />
+                </span>
+              </p>
+            </div>
+          </div>
+        </text>
+        <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+          <valueCodeableConcept>
+            <coding>
+              <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+              <code value="RRVS14" />
+              <display value="Action required" />
+            </coding>
+          </valueCodeableConcept>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/relates-to-extension">
+          <extension url="type">
+            <valueCode value="transforms" />
+          </extension>
+          <extension url="targetIdentifier">
+            <valueIdentifier>
+              <system value="urn:ietf:rfc:3986" />
+              <value value="urn:uuid:e3d22592-e240-4f52-a98e-89eab2bfd95a" />
+            </valueIdentifier>
+          </extension>
+        </extension>
+        <identifier>
+          <system value="urn:ietf:rfc:3986" />
+          <value value="urn:uuid:8fa6d7b7-6dbb-474a-ab6a-68538a26d0cf" />
+        </identifier>
+        <status value="completed" />
+        <category>
+          <coding>
+            <system value="http://loinc.org" />
+            <code value="88085-6" />
+            <display value="Reportability response report Document Public health" />
+          </coding>
+        </category>
+        <subject>
+          <reference value="urn:uuid:1ef7521a-41b2-4000-8572-fe6c49188b16" />
+        </subject>
+        <topic>
+          <text value="Subject: Public Health Reporting Communication: one or more conditions are reportable, or may be reportable, to public health." />
+        </topic>
+        <encounter>
+          <reference value="urn:uuid:4692d952-c006-4689-b7d9-0b86a321afd5" />
+        </encounter>
+        <sent value="2016-12-12T09:44:21.000-07:00" />
+        <recipient>
+          <reference value="urn:uuid:722d7a78-d8df-4527-9b95-d730a852b72b" />
+        </recipient>
+        <sender>
+          <reference value="urn:uuid:c7f45a4d-981c-4f2c-b736-134421af9349" />
+        </sender>
+        <payload id="reportability-response-summary">
+          <contentString value="Your organization electronically submitted an initial case report to determine if reporting to public health is needed for a patient. " />
+        </payload>
+        <payload id="eicr-information">
+          <extension id="eicr-processing-status" url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-eicr-processing-status-extension">
+            <extension url="eICRProcessingStatus">
+              <valueReference>
+                <reference value="urn:uuid:1a6341e1-ea7f-4fb4-a90d-e7955633d907" />
+              </valueReference>
+            </extension>
+          </extension>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-eicr-receipt-time-extension">
+            <valueDateTime value="2016-12-12T15:20:00.000-07:00" />
+          </extension>
+          <contentReference>
+            <identifier>
+              <system value="urn:ietf:rfc:3986" />
+              <value value="urn:uuid:e6394f95-9dfc-4cb7-8592-8bfafd067286" />
+            </identifier>
+          </contentReference>
+        </payload>
+        <payload id="relevant-reportable-condition">
+          <contentReference>
+            <reference value="urn:uuid:1e0f15dd-72f1-4478-9863-07de2fe2fd82" />
+          </contentReference>
+        </payload>
+        <payload id="relevant-reportable-condition">
+          <contentReference>
+            <reference value="urn:uuid:9ca745f9-46d3-4c6f-9c93-257fa75e060d" />
+          </contentReference>
+        </payload>
+        <payload id="relevant-reportable-condition">
+          <contentReference>
+            <reference value="urn:uuid:e8f39f76-f54a-4267-9fd8-599dcddc2b8d" />
+          </contentReference>
+        </payload>
+        <payload id="relevant-reportable-condition">
+          <contentReference>
+            <reference value="urn:uuid:a998caf5-5e67-4f2c-9d50-4b7eb7daa029" />
+          </contentReference>
+        </payload>
+      </Communication>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:1ef7521a-41b2-4000-8572-fe6c49188b16" />
+    <resource>
+      <Patient>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/ecr-patient" />
+          <!--CDA participant: ClinicalDocument[templateId/@root='2.16.840.1.113883.10.20.15.2.1.2']/recordTarget-->
+        </meta>
+        <text>
+          <status value="generated" />
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <h1>Kidd, Kari</h1>
+            <p>Telecom: tel:555-555-2005</p>
+            <p>Telecom: mailto:kkkidd@email.com</p>
+            <p>Address: 288 North 1460 West<br />Salt Lake City<br />UT<br />84116<br />Salt Lake<br />US</p>
+            <p>Gender: F</p>
+            <p>Birthdate: 2014-01-01</p>
+            <p>Language: en</p>
+          </div>
+        </text>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-race">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238" />
+              <code value="2028-9" />
+              <display value="ASIAN" />
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="ASIAN" />
+          </extension>
+        </extension>
+        <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity">
+          <extension url="ombCategory">
+            <valueCoding>
+              <system value="urn:oid:2.16.840.1.113883.6.238" />
+              <code value="2186-5" />
+              <display value="Not Hispanic or Latino" />
+            </valueCoding>
+          </extension>
+          <extension url="text">
+            <valueString value="Not Hispanic or Latino" />
+          </extension>
+        </extension>
+        <identifier>
+          <system value="urn:oid:2.16.840.1.113883.19.5" />
+          <value value="PT-002597" />
+        </identifier>
+        <name>
+          <use value="usual" />
+          <text value="Kidd, Kari (usual name)" />
+          <family value="Kidd" />
+          <given value="Kari" />
+        </name>
+        <telecom>
+          <system value="phone" />
+          <value value="555-555-2005" />
+          <use value="home" />
+        </telecom>
+        <telecom>
+          <system value="email" />
+          <value value="kkkidd@email.com" />
+          <use value="home" />
+        </telecom>
+        <gender value="female" />
+        <birthDate value="2014-01-01" />
+        <deceasedBoolean value="false" />
+        <address>
+          <use value="home" />
+          <line value="288 North 1460 West" />
+          <city value="Salt Lake City" />
+          <district value="Salt Lake" />
+          <state value="UT" />
+          <postalCode value="84116" />
+          <country value="US" />
+        </address>
+        <contact>
+          <relationship>
+            <coding>
+              <system value="http://terminology.hl7.org/CodeSystem/v3-RoleClass" />
+              <code value="GUARD" />
+            </coding>
+          </relationship>
+          <name>
+            <use value="usual" />
+            <text value="Mum, Martha (usual name)" />
+            <family value="Mum" />
+            <given value="Martha" />
+          </name>
+          <telecom>
+            <system value="email" />
+            <value value="mmmum@email.com" />
+            <use value="home" />
+          </telecom>
+          <address>
+            <use value="home" />
+            <line value="288 North 1460 West" />
+            <city value="Salt Lake City" />
+            <district value="Salt Lake" />
+            <state value="UT" />
+            <postalCode value="84116" />
+            <country value="US" />
+          </address>
+        </contact>
+        <communication>
+          <language>
+            <coding>
+              <system value="urn:ietf:bcp:47" />
+              <code value="en" />
+            </coding>
+          </language>
+          <preferred value="true" />
+        </communication>
+      </Patient>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:4692d952-c006-4689-b7d9-0b86a321afd5" />
+    <resource>
+      <Encounter>
+        <!--No profiles found for any of the following templates: -->
+        <identifier>
+          <system value="urn:oid:2.16.840.1.113883.19" />
+          <value value="9937012" />
+        </identifier>
+        <status value="finished" />
+        <class>
+          <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode" />
+          <code value="AMB" />
+        </class>
+        <type>
+          <coding>
+            <system value="http://www.ama-assn.org/go/cpt" />
+            <code value="99213" />
+            <display value="Office outpatient visit 15 minutes" />
+          </coding>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode" />
+            <code value="AMB" />
+            <display value="Ambulatory" />
+          </coding>
+        </type>
+        <subject>
+          <reference value="urn:uuid:1ef7521a-41b2-4000-8572-fe6c49188b16" />
+        </subject>
+        <participant>
+          <individual>
+            <reference value="urn:uuid:16066637-35bb-426e-a461-eb9478d0185d" />
+          </individual>
+        </participant>
+        <period>
+          <start value="2016-01-04" />
+          <end value="2016-01-04" />
+        </period>
+        <location>
+          <location>
+            <reference value="urn:uuid:f13be874-9308-4def-936b-3cb9a662d540" />
+          </location>
+        </location>
+        <serviceProvider>
+          <reference value="urn:uuid:aa193afc-b9c8-4a78-9fa4-87708250f781" />
+        </serviceProvider>
+      </Encounter>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:16066637-35bb-426e-a461-eb9478d0185d" />
+    <resource>
+      <PractitionerRole>
+        <!--responsibleParty/assignedEntity-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="66666666666" />
+        </identifier>
+        <practitioner>
+          <reference value="urn:uuid:a5e69622-7c72-4b5f-8ea0-4ea8f83ad670" />
+        </practitioner>
+        <organization>
+          <reference value="urn:uuid:29658c49-6d64-47cc-b89b-e591651edfbf" />
+        </organization>
+        <telecom>
+          <system value="phone" />
+          <value value="555-555-1002 ext 9998" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="fax" />
+          <value value="555-555-1003" />
+          <use value="work" />
+        </telecom>
+      </PractitionerRole>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:a5e69622-7c72-4b5f-8ea0-4ea8f83ad670" />
+    <resource>
+      <Practitioner>
+        <!--assignedEntity[cda:id[@root="2.16.840.1.113883.4.6"]]/assignedPerson-->
+        <meta>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner" />
+        </meta>
+        <text>
+          <status value="generated" />
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>Name: Seven, Henry</p>
+            <p>---TODO: ID info---</p>
+            <p>Telephone: tel:555-555-1002 ext 9998 fax:555-555-1003 </p>
+          </div>
+        </text>
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="66666666666" />
+        </identifier>
+        <name>
+          <text value="Seven, , Henry" />
+          <family value="Seven" />
+          <given value="Henry" />
+        </name>
+        <telecom>
+          <system value="phone" />
+          <value value="555-555-1002 ext 9998" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="fax" />
+          <value value="555-555-1003" />
+          <use value="work" />
+        </telecom>
+        <address>
+          <use value="home" />
+          <line value="1002 Healthcare Drive" />
+          <city value="TBDProvCity" />
+          <district value="Salt Lake" />
+          <state value="TBDProvState" />
+          <postalCode value="TBDProvZip" />
+          <country value="US" />
+        </address>
+      </Practitioner>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:29658c49-6d64-47cc-b89b-e591651edfbf" />
+    <resource>
+      <Organization>
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="TBDFacility#" />
+        </identifier>
+        <active value="true" />
+        <name value="TBDFacilityName" />
+        <telecom>
+          <system value="phone" />
+          <value value="555-555-1002 ext 9998" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="fax" />
+          <value value="555-555-1003" />
+          <use value="work" />
+        </telecom>
+        <address>
+          <use value="work" />
+          <line value="120 W Saginaw St" />
+          <city value="East Lansing" />
+          <state value="MI" />
+          <postalCode value="48823" />
+        </address>
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:f13be874-9308-4def-936b-3cb9a662d540" />
+    <resource>
+      <Location>
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="8299" />
+        </identifier>
+        <name value="TBD" />
+        <type>
+          <coding>
+            <system value="http://terminology.hl7.org/CodeSystem/v3-RoleCode" />
+            <code value="OF" />
+            <display value="Outpatient Facility" />
+          </coding>
+        </type>
+        <telecom>
+          <system value="phone" />
+          <value value="TBDFacilityPhone" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="fax" />
+          <value value="TBDFacilityFax" />
+          <use value="work" />
+        </telecom>
+        <address>
+          <use value="work" />
+          <line value="120 W Saginaw St" />
+          <city value="East Lansing" />
+          <state value="MI" />
+          <postalCode value="48823" />
+        </address>
+      </Location>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:aa193afc-b9c8-4a78-9fa4-87708250f781" />
+    <resource>
+      <Organization>
+        <identifier>
+          <system value="urn:ietf:rfc:3986" />
+          <value value="urn:uuid:aa193afc-b9c8-4a78-9fa4-87708250f781" />
+        </identifier>
+        <active value="true" />
+        <name value="TBD" />
+        <telecom>
+          <system value="phone" />
+          <value value="TBDFacilityPhone" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="fax" />
+          <value value="TBDFacilityFax" />
+          <use value="work" />
+        </telecom>
+        <address>
+          <use value="work" />
+          <line value="120 W Saginaw St" />
+          <city value="East Lansing" />
+          <state value="MI" />
+          <postalCode value="48823" />
+        </address>
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:121fdabb-fe20-4a89-adb5-f27e7d83c355" />
+    <resource>
+      <Location>
+        <!--cda:assignedAuthor[cda:assignedAuthoringDevice]-->
+        <telecom>
+          <system value="phone" />
+          <value value="+1(844)836-8377" />
+          <use value="work" />
+        </telecom>
+        <address>
+          <line value="8515 Georgia Avenue, Suite 700" />
+          <city value="Silver Spring" />
+          <state value="MD" />
+          <postalCode value="20910" />
+          <country value="US" />
+        </address>
+      </Location>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:c7f45a4d-981c-4f2c-b736-134421af9349" />
+    <resource>
+      <Device>
+        <identifier>
+          <system value="urn:ietf:rfc:3986" />
+          <value value="urn:oid:2.16.840.1.114222.4.1.217446" />
+        </identifier>
+        <!--cda:assignedAuthoringDevice-->
+        <modelNumber value="APHL" />
+        <version>
+          <value value="AIMS" />
+        </version>
+        <location>
+          <reference value="urn:uuid:121fdabb-fe20-4a89-adb5-f27e7d83c355" />
+        </location>
+      </Device>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:272125b4-1407-4aa1-b1ab-2e27400adae4" />
+    <resource>
+      <Organization>
+        <identifier>
+          <system value="urn:ietf:rfc:3986" />
+          <value value="urn:oid:2.16.840.1.114222.4.1.217446" />
+        </identifier>
+        <active value="true" />
+        <name value="APHL | Association of Public Health Laboratories." />
+        <telecom>
+          <system value="phone" />
+          <value value="+1(844)836-8377" />
+          <use value="work" />
+        </telecom>
+        <address>
+          <line value="8515 Georgia Avenue, Suite 700" />
+          <city value="Silver Spring" />
+          <state value="MD" />
+          <postalCode value="20910" />
+          <country value="US" />
+        </address>
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:722d7a78-d8df-4527-9b95-d730a852b72b" />
+    <resource>
+      <PractitionerRole>
+        <!--informationRecipient/intendedRecipient-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="66666666666" />
+        </identifier>
+        <practitioner>
+          <reference value="urn:uuid:33b0319a-1873-4df0-a2ba-d04a1a9b9783" />
+        </practitioner>
+        <organization>
+          <reference value="urn:uuid:e7ce1bd1-80e5-452a-94c7-7fec56df3809" />
+        </organization>
+        <telecom>
+          <system value="phone" />
+          <value value="555-555-1002 ext 9998" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="fax" />
+          <value value="555-555-1003" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="email" />
+          <value value="henrysevenmd@email.net" />
+          <use value="work" />
+        </telecom>
+      </PractitionerRole>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:33b0319a-1873-4df0-a2ba-d04a1a9b9783" />
+    <resource>
+      <Practitioner>
+        <!--intendedRecipient[cda:id[@root="2.16.840.1.113883.4.6"]]/informationRecipient-->
+        <meta>
+          <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner" />
+        </meta>
+        <text>
+          <status value="generated" />
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>Name: Seven, Henry</p>
+            <p>---TODO: ID info---</p>
+            <p>Telephone: tel:555-555-1002 ext 9998 fax:555-555-1003 mailto:henrysevenmd@email.net</p>
+          </div>
+        </text>
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="66666666666" />
+        </identifier>
+        <name>
+          <text value="Seven, , Henry" />
+          <family value="Seven" />
+          <given value="Henry" />
+        </name>
+        <telecom>
+          <system value="phone" />
+          <value value="555-555-1002 ext 9998" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="fax" />
+          <value value="555-555-1003" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="email" />
+          <value value="henrysevenmd@email.net" />
+          <use value="work" />
+        </telecom>
+        <address>
+          <use value="home" />
+          <line value="1002 Healthcare Drive" />
+          <city value="TBDProvCity" />
+          <district value="Salt Lake" />
+          <state value="TBDProvState" />
+          <postalCode value="TBDProvZip" />
+          <country value="US" />
+        </address>
+      </Practitioner>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:e7ce1bd1-80e5-452a-94c7-7fec56df3809" />
+    <resource>
+      <Organization>
+        <identifier>
+          <system value="urn:ietf:rfc:3986" />
+          <value value="urn:uuid:e7ce1bd1-80e5-452a-94c7-7fec56df3809" />
+        </identifier>
+        <active value="true" />
+        <name value="TBDFacilityName" />
+        <telecom>
+          <system value="phone" />
+          <value value="555-555-1002 ext 9998" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="fax" />
+          <value value="555-555-1003" />
+          <use value="work" />
+        </telecom>
+        <telecom>
+          <system value="email" />
+          <value value="henrysevenmd@email.net" />
+          <use value="work" />
+        </telecom>
+        <address>
+          <use value="work" />
+          <line value="120 W Saginaw St" />
+          <city value="East Lansing" />
+          <state value="MI" />
+          <postalCode value="48823" />
+        </address>
+      </Organization>
+    </resource>
+  </entry>
+  <entry xmlns:lcg="http://www.lantanagroup.com">
+    <fullUrl value="urn:uuid:4b525ff7-5323-40b7-9b1e-e055eec36c60" />
+    <resource>
+      <DocumentReference>
+        <masterIdentifier>
+          <system value="urn:ietf:rfc:3986" />
+          <value value="urn:uuid:e6394f95-9dfc-4cb7-8592-8bfafd067286" />
+        </masterIdentifier>
+        <status value="current" />
+        <type>
+          <coding>
+            <system value="http://loinc.org" />
+            <code value="55751-2" />
+            <display value="Public Health Case Report (eICR)" />
+          </coding>
+        </type>
+        <content>
+          <attachment>
+            <url><!--URL cannot be determined because CDA document does not have a cda:setId for the cda:externalDocument--></url>
+          </attachment>
+        </content>
+      </DocumentReference>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:1a6341e1-ea7f-4fb4-a90d-e7955633d907" />
+    <resource>
+      <Observation>
+        <!--Processing Status-->
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-eicr-processing-status-observation" />
+          <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.3.29:2017-04-01-->
+        </meta>
+        <status value="final" />
+        <code>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+            <code value="RRVS19" />
+            <display value="eICR processed" />
+          </coding>
+        </code>
+      </Observation>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:1e0f15dd-72f1-4478-9863-07de2fe2fd82" />
+    <resource>
+      <PlanDefinition>
+        <id value="RR-plandefinition-d36e421" />
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-relevant-reportable-condition-plandefinition" />
+          <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.3.13:2017-04-01-->
+        </meta>
+        <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-determination-of-reportability-extension">
+          <valueCodeableConcept>
+            <coding>
+              <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+              <code value="RRVS1" />
+              <display value="Reportable" />
+            </coding>
+          </valueCodeableConcept>
+        </extension>
+        <url value="RR-plandefinition-d36e421" />
+        <status value="active" />
+        <publisher>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-rules-authoring-agency-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:f4e968c4-d6d3-43d3-af61-af3bd7ddcf62" />
+            </valueReference>
+          </extension>
+        </publisher>
+        <jurisdiction>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-location-relevance-extension">
+            <valueCodeableConcept>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-NullFlavor" />
+                <code value="NI" />
+                <display value="NoInformation" />
+              </coding>
+            </valueCodeableConcept>
+          </extension>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-routing-entity-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:a8b70234-765f-4e47-a713-af8f96d7df6d" />
+            </valueReference>
+          </extension>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-responsible-agency-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:228dde14-440b-4fb6-8950-59b91ce34300" />
+            </valueReference>
+          </extension>
+          <coding>
+            <system value="urn:iso:std:iso:3166" />
+            <code value="US" />
+            <display value="United States of America" />
+          </coding>
+        </jurisdiction>
+        <goal>
+          <description>
+            <text value="Reportability Feedback" />
+          </description>
+          <addresses>
+            <coding>
+              <system value="http://snomed.info/sct" />
+              <code value="27836007" />
+              <display value="Pertussis (disorder)" />
+            </coding>
+          </addresses>
+        </goal>
+        <action>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS13" />
+                  <display value="Outbreak- or cluster related" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS16" />
+                  <display value="Action requested" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display
+              value="The following outbreak recommendations and documents were developed in collaboration with representatives from the Utah Department of Health and Utah's Local Health&#xA;                                  Departments to provide statewide consistency in situations involving pertussis outbreaks. The purpose of these guidelines is to provide effective management tools for pertussis&#xA;                                  outbreak situations." />
+            <url value="http://health.utah.gov/epi/diseases/pertussis/outbreak_recommend" />
+          </documentation>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS8" />
+                  <display value="Additional reporting needs" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS14" />
+                  <display value="Action required" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display
+              value="Additional information for the required reporting of Pertussis must be submitted to the Utah Department of Health. The additional information can be submitted here.&#xA;                                " />
+            <url value="https://pappsnodts04.cap.org/SDCApp/services/FormManager.asmx" />
+          </documentation>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS9" />
+                  <display value="Additional detection and/or laboratory testing needs" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS15" />
+                  <display value="Information only" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display value="Best practices for healthcare professionals on the use of Polymerase Chain Reaction (PCR) for diagnosing Pertussis" />
+            <url value="https://www.cdc.gov/pertussis/clinical/diagnostic-testing/diagnosis-pcr-bestpractices.html" />
+          </documentation>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS10" />
+                  <display value="Treatment and/or prevention" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS15" />
+                  <display value="Information only" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display value="More information on specimen collection" />
+            <url value="https://www.cdc.gov/pertussis/clinical/diagnostic-testing/specimen-collection.html" />
+          </documentation>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS10" />
+                  <display value="Treatment and/or prevention" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS15" />
+                  <display value="Information only" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display value="Recommended antimicrobial therapy and chemoprophylaxis" />
+            <url value="https://www.cdc.gov/pertussis/clinical/treatment.html" />
+          </documentation>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS12" />
+                  <display value="PHA contact info" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS15" />
+                  <display value="Information only" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display
+              value="If you have additional questions regarding Pertussis or reporting, the Utah Department of Health can be reached for 24-Hour Urgent Event &amp; Disease Reporting at&#xA;                                  1-888-EPI-UTAH (374-8824)."
+             />
+          </documentation>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS11" />
+                  <display value="Additional resources" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS15" />
+                  <display value="Information only" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display value="Utah Department of Health's Pertussis Disease Investigation Plan" />
+            <url value="http://health.utah.gov/epi/diseases/pertussis/plan.pdf" />
+          </documentation>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS11" />
+                  <display value="Additional resources" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS15" />
+                  <display value="Information only" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display value="Pertussis Fact Sheet for Parents" />
+            <url value="http://health.utah.gov/epi/diseases/pertussis/factsheet_parents.pdf" />
+          </documentation>
+          <timingDuration>
+            <value value="3" />
+            <unit value="d" />
+          </timingDuration>
+        </action>
+      </PlanDefinition>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:9ca745f9-46d3-4c6f-9c93-257fa75e060d" />
+    <resource>
+      <PlanDefinition>
+        <id value="RR-plandefinition-d36e586" />
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-relevant-reportable-condition-plandefinition" />
+          <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.3.13:2017-04-01-->
+        </meta>
+        <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-determination-of-reportability-extension">
+          <valueCodeableConcept>
+            <coding>
+              <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+              <code value="RRVS1" />
+              <display value="Reportable" />
+            </coding>
+          </valueCodeableConcept>
+        </extension>
+        <url value="RR-plandefinition-d36e586" />
+        <status value="active" />
+        <publisher>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-rules-authoring-agency-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:ea4443af-d11c-45df-a0a6-29a1e0dd2ebf" />
+            </valueReference>
+          </extension>
+        </publisher>
+        <jurisdiction>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-location-relevance-extension">
+            <valueCodeableConcept>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-NullFlavor" />
+                <code value="NI" />
+                <display value="NoInformation" />
+              </coding>
+            </valueCodeableConcept>
+          </extension>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-routing-entity-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:a9168ae1-cf3c-4182-a515-b06fe737b860" />
+            </valueReference>
+          </extension>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-responsible-agency-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:8325d133-b308-49b5-80fd-0198af59fc02" />
+            </valueReference>
+          </extension>
+          <coding>
+            <system value="urn:iso:std:iso:3166" />
+            <code value="US" />
+            <display value="United States of America" />
+          </coding>
+        </jurisdiction>
+        <goal>
+          <description>
+            <text value="Reportability Feedback" />
+          </description>
+          <addresses>
+            <coding>
+              <system value="http://snomed.info/sct" />
+              <code value="302231008" />
+              <display value="Salmonella infection (disorder)" />
+            </coding>
+          </addresses>
+        </goal>
+        <action>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS11" />
+                  <display value="Additional resources" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS15" />
+                  <display value="Information only" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display value="Information on salmonellosis surveillance in Utah" />
+            <url value="http://health.utah.gov/epi/diseases/salmonellosis/plan.pdf" />
+          </documentation>
+          <timingDuration>
+            <value value="1" />
+            <unit value="d" />
+          </timingDuration>
+        </action>
+      </PlanDefinition>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:e8f39f76-f54a-4267-9fd8-599dcddc2b8d" />
+    <resource>
+      <PlanDefinition>
+        <id value="RR-plandefinition-d36e654" />
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-relevant-reportable-condition-plandefinition" />
+          <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.3.13:2017-04-01-->
+        </meta>
+        <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-determination-of-reportability-extension">
+          <valueCodeableConcept>
+            <coding>
+              <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+              <code value="RRVS1" />
+              <display value="Reportable" />
+            </coding>
+          </valueCodeableConcept>
+        </extension>
+        <url value="RR-plandefinition-d36e654" />
+        <status value="active" />
+        <publisher>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-rules-authoring-agency-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:173e3d08-7aca-4e22-b6fb-17f7d5859902" />
+            </valueReference>
+          </extension>
+        </publisher>
+        <jurisdiction>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-location-relevance-extension">
+            <valueCodeableConcept>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-NullFlavor" />
+                <code value="NI" />
+                <display value="NoInformation" />
+              </coding>
+            </valueCodeableConcept>
+          </extension>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-routing-entity-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:3aa3c3ca-bca5-4461-97e3-6ffb44889228" />
+            </valueReference>
+          </extension>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-responsible-agency-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:6d3dd9f0-c7df-4086-8dfa-1d7dd2e54431" />
+            </valueReference>
+          </extension>
+          <coding>
+            <system value="urn:iso:std:iso:3166" />
+            <code value="US" />
+            <display value="United States of America" />
+          </coding>
+        </jurisdiction>
+        <goal>
+          <description>
+            <text value="Reportability Feedback" />
+          </description>
+          <addresses>
+            <coding>
+              <system value="http://snomed.info/sct" />
+              <code value="302231008" />
+              <display value="Salmonella infection (disorder)" />
+            </coding>
+          </addresses>
+        </goal>
+        <action>
+          <timingDuration>
+            <value value="1" />
+            <unit value="d" />
+          </timingDuration>
+        </action>
+      </PlanDefinition>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:a998caf5-5e67-4f2c-9d50-4b7eb7daa029" />
+    <resource>
+      <PlanDefinition>
+        <id value="RR-plandefinition-d36e708" />
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-relevant-reportable-condition-plandefinition" />
+          <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.3.13:2017-04-01-->
+        </meta>
+        <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-determination-of-reportability-extension">
+          <valueCodeableConcept>
+            <coding>
+              <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+              <code value="RRVS1" />
+              <display value="Reportable" />
+            </coding>
+          </valueCodeableConcept>
+        </extension>
+        <url value="RR-plandefinition-d36e708" />
+        <status value="active" />
+        <publisher>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-rules-authoring-agency-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:372b5f44-4eaf-4392-ace9-d7d727f2e5fa" />
+            </valueReference>
+          </extension>
+        </publisher>
+        <jurisdiction>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-location-relevance-extension">
+            <valueCodeableConcept>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-NullFlavor" />
+                <code value="NI" />
+                <display value="NoInformation" />
+              </coding>
+            </valueCodeableConcept>
+          </extension>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-routing-entity-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:c2e54974-46e8-40fb-9885-8a2a8ed9cd1c" />
+            </valueReference>
+          </extension>
+          <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-responsible-agency-organization-extension">
+            <valueReference>
+              <reference value="urn:uuid:76c0c4d3-7ac0-4c41-a74a-00da45dc035c" />
+            </valueReference>
+          </extension>
+          <coding>
+            <system value="urn:iso:std:iso:3166" />
+            <code value="US" />
+            <display value="United States of America" />
+          </coding>
+        </jurisdiction>
+        <goal>
+          <description>
+            <text value="Reportability Feedback" />
+          </description>
+          <addresses>
+            <coding>
+              <system value="http://snomed.info/sct" />
+              <code value="27836007" />
+              <display value="Pertussis (disorder)" />
+            </coding>
+          </addresses>
+        </goal>
+        <action>
+          <documentation>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-external-resource-type-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS11" />
+                  <display value="Additional resources" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-priority-extension">
+              <valueCodeableConcept>
+                <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274" />
+                  <code value="RRVS15" />
+                  <display value="Information only" />
+                </coding>
+              </valueCodeableConcept>
+            </extension>
+            <type value="documentation" />
+            <display value="CDC Reference Guide for Pertussis" />
+            <url value="http://www.cdc.gov/pertussis/" />
+          </documentation>
+          <timingDuration>
+            <value value="3" />
+            <unit value="d" />
+          </timingDuration>
+        </action>
+      </PlanDefinition>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:f4e968c4-d6d3-43d3-af61-af3bd7ddcf62" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-rules-authoring-agency-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="ut" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR12" />
+            <display value="Rules Authoring Agency" />
+          </coding>
+        </type>
+        <name value="Utah Department of Health" />
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:a8b70234-765f-4e47-a713-af8f96d7df6d" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-routing-entity-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="ut" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR7" />
+            <display value="Routing Entity" />
+          </coding>
+        </type>
+        <name value="Utah Department of Health" />
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:228dde14-440b-4fb6-8950-59b91ce34300" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-responsible-agency-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="ut" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR8" />
+            <display value="Responsible Agency" />
+          </coding>
+        </type>
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:ea4443af-d11c-45df-a0a6-29a1e0dd2ebf" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-rules-authoring-agency-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="ut" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR12" />
+            <display value="Rules Authoring Agency" />
+          </coding>
+        </type>
+        <name value="Utah Department of Health" />
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:a9168ae1-cf3c-4182-a515-b06fe737b860" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-routing-entity-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="ut" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR7" />
+            <display value="Routing Entity" />
+          </coding>
+        </type>
+        <name value="Utah Department of Health" />
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:8325d133-b308-49b5-80fd-0198af59fc02" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-responsible-agency-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="ut" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR8" />
+            <display value="Responsible Agency" />
+          </coding>
+        </type>
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:173e3d08-7aca-4e22-b6fb-17f7d5859902" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-rules-authoring-agency-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="mi" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR12" />
+            <display value="Rules Authoring Agency" />
+          </coding>
+        </type>
+        <name value="Michigan" />
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:3aa3c3ca-bca5-4461-97e3-6ffb44889228" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-routing-entity-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="mi" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR7" />
+            <display value="Routing Entity" />
+          </coding>
+        </type>
+        <name value="Michigan" />
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:6d3dd9f0-c7df-4086-8dfa-1d7dd2e54431" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-responsible-agency-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="mi" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR8" />
+            <display value="Responsible Agency" />
+          </coding>
+        </type>
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:372b5f44-4eaf-4392-ace9-d7d727f2e5fa" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-rules-authoring-agency-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="mi" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR12" />
+            <display value="Rules Authoring Agency" />
+          </coding>
+        </type>
+        <name value="Michigan" />
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:c2e54974-46e8-40fb-9885-8a2a8ed9cd1c" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-routing-entity-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="mi" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR7" />
+            <display value="Routing Entity" />
+          </coding>
+        </type>
+        <name value="Michigan" />
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="urn:uuid:76c0c4d3-7ac0-4c41-a74a-00da45dc035c" />
+    <resource>
+      <Organization>
+        <meta>
+          <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-responsible-agency-organization" />
+        </meta>
+        <!--participant[LOC]-->
+        <identifier>
+          <system value="http://hl7.org/fhir/sid/us-npi" />
+          <value value="mi" />
+        </identifier>
+        <active value="true" />
+        <type>
+          <coding>
+            <system value="urn:oid:2.16.840.1.114222.4.5.232" />
+            <code value="RR8" />
+            <display value="Responsible Agency" />
+          </coding>
+        </type>
+        <!--Omitting null telecom-->
+      </Organization>
+    </resource>
+  </entry>
+</Bundle>
