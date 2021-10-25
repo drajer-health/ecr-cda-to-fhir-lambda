@@ -138,7 +138,7 @@ Lambda function needs to be triggered, for this we need to add and configure the
 
 4. From the `Bucket` drop down select your bucket that this lambda function will listen.
 
-5. Add the `Suffix` to add filter to the function. For example `EICR_CDA.xml`
+5. Add the `Suffix` to add filter to the function. For example `RR_CDA.xml`
 
 6. Select the acknowledgement and click Add.
 
