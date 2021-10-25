@@ -189,7 +189,7 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 			meta.setContentType("text/xml");
 
 			// Uploading to S3 destination bucket
-			s3Client.putObject(theBucketName, theKeyPrefix + "EICR_FHIR.xml", is, meta);
+			s3Client.putObject(theBucketName, theKeyPrefix + "RR_FHIR.xml", is, meta);
 			is.close();
 		} catch (Exception e) {
 			context.getLogger().log("ERROR:" + e.getMessage());
