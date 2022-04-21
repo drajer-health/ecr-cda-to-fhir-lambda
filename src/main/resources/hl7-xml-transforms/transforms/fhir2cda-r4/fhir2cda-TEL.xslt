@@ -19,7 +19,7 @@ limitations under the License.
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="urn:hl7-org:v3" xmlns:lcg="http://www.lantanagroup.com"  xmlns:cda="urn:hl7-org:v3"
   xmlns:fhir="http://hl7.org/fhir" version="2.0" exclude-result-prefixes="lcg xsl cda fhir">
 
-  <xsl:template match="fhir:telecom">
+  <xsl:template match="fhir:telecom | fhir:contact">
     <xsl:param name="elementName" select="'telecom'" />
     <xsl:variable name="uri-prefix">
       <xsl:choose>

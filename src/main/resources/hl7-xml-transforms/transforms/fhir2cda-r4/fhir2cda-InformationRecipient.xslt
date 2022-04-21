@@ -22,8 +22,27 @@ limitations under the License.
   <xsl:import href="fhir2cda-utility.xslt" />
   <xsl:import href="fhir2cda-TS.xslt" />
 
-  <!-- fhir:recipient -> get referenced resource entry url and process -->
-  <xsl:template match="fhir:recipient">
+
+    <!-- C-CDA and eCR Information Recipient extensions (Composition)-> get referenced resource entry url and process -->
+    <xsl:template match="fhir:extension[@url='http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-information-recipient-extension'] | fhir:extension[@url='http://hl7.org/fhir/us/ccda/StructureDefinition/InformationRecipientExtension']">
+        <xsl:param name="pPosition"/>
+        <xsl:for-each select="fhir:valueReference/fhir:reference">
+            <xsl:variable name="referenceURI">
+                <xsl:call-template name="resolve-to-full-url">
+                    <xsl:with-param name="referenceURI" select="@value" />
+                </xsl:call-template>
+            </xsl:variable>
+            <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">
+                <xsl:apply-templates select="fhir:resource/fhir:*" >
+                    <xsl:with-param name="pPosition" select="$pPosition"/>
+                </xsl:apply-templates>
+            </xsl:for-each>
+        </xsl:for-each>
+    </xsl:template>
+    
+    <!-- Obsolete code from old RR Communication -->
+  <!-- fhir:recipient (Communication)-> get referenced resource entry url and process -->
+  <!--<xsl:template match="fhir:recipient">
     <xsl:param name="pPosition"/>
     <xsl:for-each select="fhir:reference">
       <xsl:variable name="referenceURI">
@@ -37,7 +56,7 @@ limitations under the License.
         </xsl:apply-templates>
       </xsl:for-each>
     </xsl:for-each>
-  </xsl:template>
+  </xsl:template>-->
 
   <xsl:template match="fhir:entry/fhir:resource/fhir:PractitionerRole">
     <xsl:param name="pPosition" />

@@ -4,7 +4,61 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:lcg="http://www.lantanagroup.com" exclude-result-prefixes="lcg xsl cda fhir xs xsi sdtc xhtml" version="2.0">
 
   <xsl:import href="c-to-fhir-utility.xslt" />
-
+  
+  <!-- MD: substanceAdministraion inside a Admission Medication -->
+  <xsl:template
+    match="cda:substanceAdministration[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.16'][@moodCode = 'EVN'][ancestor::*/cda:templateId[@root = '2.16.840.1.113883.10.20.22.2.44']]">
+    <xsl:variable name="dateAsserted">
+      <xsl:choose>
+        <xsl:when test="ancestor-or-self::cda:*/cda:author/cda:time/@value">
+          <xsl:value-of select="ancestor-or-self::cda:*[cda:author/cda:time/@value][1]/cda:author/cda:time/@value" />
+        </xsl:when>
+        <xsl:when test="ancestor-or-self::cda:*/cda:effectiveTime/@value">
+          <xsl:value-of select="ancestor-or-self::cda:*[cda:effectiveTime/@value][1]/cda:effectiveTime/@value" />
+        </xsl:when>
+        <xsl:when test="ancestor-or-self::cda:*/cda:effectiveTime/cda:low/@value">
+          <xsl:value-of select="ancestor-or-self::cda:*[cda:effectiveTime/cda:low/@value][1]/cda:effectiveTime/cda:low/@value" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="/cda:ClinicalDocument/cda:effectiveTime/@value" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <MedicationAdministration>
+      <xsl:call-template name="add-meta" />
+      <!-- Therapeutic Response to Medication -->
+      <xsl:apply-templates select="cda:entryRelationship/cda:observation[cda:templateId/@root='2.16.840.1.113883.10.20.15.2.3.37']" mode='extension'/>
+      <xsl:apply-templates select="cda:id" />
+      <status value="completed" />
+      
+      <xsl:apply-templates select="cda:consumable" mode="medication-administration" />
+      <xsl:call-template name="subject-reference" />
+      <xsl:apply-templates select="cda:effectiveTime" mode="instant">
+        <xsl:with-param name="pElementName">effectiveDateTime</xsl:with-param>
+      </xsl:apply-templates>
+      <performer>
+        <xsl:call-template name="author-reference">
+          <xsl:with-param name="pElementName">actor</xsl:with-param>
+        </xsl:call-template>
+      </performer>
+      <dosage>
+        <xsl:apply-templates select="cda:routeCode">
+          <xsl:with-param name="pElementName">route</xsl:with-param>
+        </xsl:apply-templates>
+        
+        <xsl:apply-templates select="cda:approachSiteCode">
+          <xsl:with-param name="pElementName">method</xsl:with-param>
+        </xsl:apply-templates>
+        
+        <xsl:apply-templates select="cda:doseQuantity">
+          <xsl:with-param name="pElementName">dose</xsl:with-param>
+          <xsl:with-param name="pSimpleQuantity" select="true()" />
+        </xsl:apply-templates>
+        
+      </dosage>
+    </MedicationAdministration>
+  </xsl:template>
+  
   <!-- SG: Match if this is a substanceAdministration inside a Medication Administered section -->
   <xsl:template
     match="cda:substanceAdministration[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.16'][@moodCode = 'EVN'][ancestor::*/cda:templateId[@root = '2.16.840.1.113883.10.20.22.2.38']]"

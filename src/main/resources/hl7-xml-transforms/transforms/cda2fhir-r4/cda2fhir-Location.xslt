@@ -10,6 +10,14 @@
   </xsl:template>
 
   <xsl:template match="cda:location">
+      <!-- Variable for identification of IG - moved out of Global var because XSpec can't deal with global vars -->
+      <xsl:variable name="vCurrentIg">
+          <xsl:choose>
+              <xsl:when test="/cda:ClinicalDocument[cda:templateId/@root = '2.16.840.1.113883.10.20.15.2']">eICR</xsl:when>
+              <xsl:when test="/cda:ClinicalDocument[cda:templateId/@root = '2.16.840.1.113883.10.20.15.2.1.2']">RR</xsl:when>
+              <xsl:otherwise>NA</xsl:otherwise>
+          </xsl:choose>
+      </xsl:variable>
     <Location>
       <!-- SG 20191211: Add meta.profile -->
       <xsl:call-template name="add-participant-meta" />
@@ -34,7 +42,7 @@
           <xsl:with-param name="pElementName" select="'type'"/>
         </xsl:apply-templates>
         <!-- If this is eICR let's see if there is another type in the Encounter Activities -->
-        <xsl:if test="$gvCurrentIg='eICR'">
+        <xsl:if test="$vCurrentIg='eICR'">
           <xsl:for-each select="//cda:encounter[cda:templateId/@root='2.16.840.1.113883.10.20.22.4.49']/cda:participant[@typeCode='LOC']/cda:participantRole[@classCode='SDLOC']/cda:code">
             <xsl:apply-templates select="." >
               <xsl:with-param name="pElementName" select="'type'"/>

@@ -17,7 +17,7 @@ limitations under the License.
 
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="urn:hl7-org:v3"
-  xmlns:lcg="http://www.lantanagroup.com" xmlns:xslt="http://www.w3.org/1999/XSL/Transform"
+  xmlns:lcg="http://www.lantanagroup.com"
   xmlns:cda="urn:hl7-org:v3" xmlns:fhir="http://hl7.org/fhir" version="2.0"
   exclude-result-prefixes="lcg xsl cda fhir">
 
@@ -25,19 +25,68 @@ limitations under the License.
   <xsl:import href="fhir2cda-TS.xslt" />
 
   <xsl:template match="fhir:attester[parent::fhir:Composition]">
-    <xsl:for-each select="fhir:party/fhir:reference">
-      <xsl:variable name="referenceURI">
-        <xsl:call-template name="resolve-to-full-url">
-          <xsl:with-param name="referenceURI" select="@value" />
-        </xsl:call-template>
-      </xsl:variable>
-      <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">
-        <xsl:apply-templates select="fhir:resource/fhir:*" mode="legal" />
-      </xsl:for-each>
-    </xsl:for-each>
+    <xsl:choose>
+      <xsl:when test="fhir:mode/@value='legal'">
+        <xsl:for-each select="fhir:party/fhir:reference">
+          <xsl:variable name="referenceURI">
+            <xsl:call-template name="resolve-to-full-url">
+              <xsl:with-param name="referenceURI" select="@value" />
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">          
+            <xsl:apply-templates select="fhir:resource/fhir:*" mode="legal" />
+          </xsl:for-each>
+        </xsl:for-each>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
-
-  <xsl:template match="fhir:entry/fhir:resource/fhir:Practitioner" mode="legal">
+  
+  <!-- MD: for ettester.mode can be legal, personal, professtional or official
+    now we just handle the case with mode is legal, with party as Pracitioner and PractitionerRole
+    the other possible cases are Patient, ReleatedPerson, or Organization -->
+  <xsl:template match="fhir:Practitioner" mode="legal">
+    <legalAuthenticator>
+      <time>
+        <xsl:attribute name="value">
+          <xsl:call-template name="Date2TS">
+            <xsl:with-param name="date"
+              select="//fhir:Composition[1]/fhir:attester/fhir:time/@value" />
+            <xsl:with-param name="includeTime" select="true()" />
+          </xsl:call-template>
+        </xsl:attribute>
+      </time>
+      
+      <signatureCode code="S" />
+      <assignedEntity>
+        <xsl:choose>
+          <xsl:when test="fhir:identifier">
+            <xsl:apply-templates select="fhir:identifier" />
+          </xsl:when>
+          <xsl:otherwise>
+            <id nullFlavor="NI" />
+          </xsl:otherwise>
+        </xsl:choose>
+        
+        <xsl:call-template name="get-addr"/>
+       
+        <xsl:for-each select="fhir:telecom">
+          <xsl:apply-templates select="."/>
+        </xsl:for-each>
+        
+        <assignedPerson>
+          <xsl:for-each select="fhir:name">
+            <xsl:apply-templates select="."/>  
+          </xsl:for-each>       
+        </assignedPerson>
+      </assignedEntity>
+    </legalAuthenticator>
+  </xsl:template>
+<!--  
+  For now just using PractitionerRole, we may need to relate it to organization. 
+  older standard, the legal was with Practitioner. See we still need to support it 
+  <xsl:template match="//fhir:entry/fhir:resource/fhir:Practitioner" mode="legal">
+ -->
+  <xsl:template match="fhir:PractitionerRole" mode="legal">
     <xsl:call-template name="make-legal-authenticator" />
   </xsl:template>
 
@@ -62,52 +111,77 @@ limitations under the License.
             <id nullFlavor="NI" />
           </xsl:otherwise>
         </xsl:choose>
-
-        <xsl:choose>
-          <xsl:when test="fhir:address">
-            <xsl:apply-templates select="fhir:address" />
-          </xsl:when>
-          <xsl:otherwise>
-            <addr nullFlavor="NI" />
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:call-template name="get-addr"/>
         <xsl:for-each select="fhir:telecom">
           <xsl:apply-templates select="."/>
-          <!--<telecom value="{fhir:value/@value}">
-            <xsl:call-template name="telecomUse" />
-          </telecom>-->
         </xsl:for-each>
-        <assignedPerson>
-          <xsl:for-each select="fhir:name">
-            <xsl:variable name="use">
-              <xsl:choose>
-                <xsl:when test="fhir:use/@value = 'usual'">L</xsl:when>
-                <xsl:when test="fhir:use/@value = 'nickname'">P</xsl:when>
-                <!-- Not sure of the exact condition of when to use this label -->
-                <!-- xsl:when test="fhir:use/@value = 'maiden'">BR</xsl:when -->
-              </xsl:choose>
-            </xsl:variable>
-            <name>
-              <xsl:if test="string-length($use) > 0">
-                <xsl:attribute name="use">
-                  <xsl:value-of select="$use" />
-                </xsl:attribute>
-              </xsl:if>
-              <xsl:for-each select="fhir:given">
-                <given>
-                  <xsl:value-of select="@value" />
-                </given>
-              </xsl:for-each>
-              <family>
-                <xsl:value-of select="fhir:family/@value" />
-              </family>
-              <suffix>
-                <xsl:value-of select="fhir:suffix/@value" />
-              </suffix>
-            </name>
-          </xsl:for-each>
-        </assignedPerson>
+        
+        <!-- MD: assignedPerson  -->
+        <xsl:variable name="referenceURI">
+          <xsl:call-template name="resolve-to-full-url">
+            <xsl:with-param name="referenceURI" 
+              select="fhir:practitioner/fhir:reference/@value" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:comment>Processing entry <xsl:value-of select="$referenceURI"/></xsl:comment>
+       
+        <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">             
+          <xsl:apply-templates select="fhir:resource/fhir:*" mode="legalAuthenticator-assignedPerson"/>
+        </xsl:for-each>  
+        
+        <!-- MD: representedOrganization  -->
+        <xsl:variable name="referenceURI">
+          <xsl:call-template name="resolve-to-full-url">
+            <xsl:with-param name="referenceURI" 
+              select="fhir:organization/fhir:reference/@value" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:comment>Processing entry <xsl:value-of select="$referenceURI"/></xsl:comment>
+        
+        <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">             
+          <xsl:apply-templates select="fhir:resource/fhir:*" mode="legalAuthenticator-representedOrganization"/>
+        </xsl:for-each>  
+        
       </assignedEntity>
     </legalAuthenticator>
+  </xsl:template>
+  
+  <xsl:template match="fhir:Practitioner" mode="legalAuthenticator-assignedPerson">
+    <assignedPerson>
+     <xsl:apply-templates select="fhir:name"/>
+    </assignedPerson>
+  </xsl:template>
+  
+  <xsl:template match="fhir:Organization" mode="legalAuthenticator-representedOrganization">
+    <representedOrganization>
+      <xsl:choose>
+        <xsl:when test="fhir:identifier">
+          <xsl:apply-templates select="fhir:identifier" />
+        </xsl:when>
+        <xsl:otherwise>
+          <id nullFlavor="NI" />
+        </xsl:otherwise>
+      </xsl:choose>
+      
+      <xsl:choose>
+        <xsl:when test="fhir:name">
+          <xsl:call-template name="get-org-name"/>     
+        </xsl:when>
+      </xsl:choose>
+      <xsl:apply-templates select="fhir:name"/>
+      <xsl:for-each select="fhir:telecom">
+        <xsl:apply-templates select="."/>
+      </xsl:for-each>
+      
+      <xsl:choose>
+        <xsl:when test="fhir:address">
+          <xsl:apply-templates select="fhir:address" />
+        </xsl:when>
+        <xsl:otherwise>
+          <addr nullFlavor="NI" />
+        </xsl:otherwise>
+      </xsl:choose>
+      
+    </representedOrganization>
   </xsl:template>
 </xsl:stylesheet>

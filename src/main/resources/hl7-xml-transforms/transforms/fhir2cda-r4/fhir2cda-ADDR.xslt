@@ -20,20 +20,28 @@ limitations under the License.
   exclude-result-prefixes="lcg xsl cda fhir">
 
   <!-- (Generic) Addr -->
-  <xsl:template match="fhir:address">
+  <xsl:template match="fhir:address | fhir:valueAddress">
     <xsl:param name="elementName" select="'addr'" />
     <xsl:element name="{$elementName}">
-      <xsl:if test="fhir:use">
-        <xsl:attribute name="use">
-          <xsl:choose>
-            <xsl:when test="fhir:use/@value = 'home'">H</xsl:when>
-            <xsl:when test="fhir:use/@value = 'work'">WP</xsl:when>
-            <xsl:when test="fhir:use/@value = 'mobile'">MC</xsl:when>
-            <!-- default to work -->
-            <xsl:otherwise>WP</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="fhir:use">
+          <xsl:attribute name="use">
+            <xsl:choose>
+              <xsl:when test="fhir:use/@value = 'home'">H</xsl:when>
+              <xsl:when test="fhir:use/@value = 'work'">WP</xsl:when>
+              <xsl:when test="fhir:use/@value = 'mobile'">MC</xsl:when>
+              <xsl:when test="fhir:use/@value = 'temp'">TMP</xsl:when>
+              <!-- default to work -->
+              <xsl:otherwise>WP</xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:attribute name="use">
+            <xsl:value-of select="'WP'"/>
+          </xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
       <!-- Setting order for consistency and easier testing/compares -->
       <xsl:apply-templates select="fhir:line" mode="address">
         <xsl:with-param name="pElementName" select="'streetAddressLine'" />

@@ -21,6 +21,8 @@ limitations under the License.
   exclude-result-prefixes="lcg xsl cda fhir xhtml uuid sdtc">
 
   <xsl:include href="fhir2cda-includes.xslt" />
+    
+  <xsl:param name="gParamCDAeICRVersion"/>
 
   <xsl:output method="xml" indent="yes" encoding="UTF-8" />
 

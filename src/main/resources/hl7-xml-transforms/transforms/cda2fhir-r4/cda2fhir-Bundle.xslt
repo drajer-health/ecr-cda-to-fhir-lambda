@@ -6,12 +6,18 @@
   <xsl:import href="c-to-fhir-utility.xslt" />
 
   <xsl:template match="/" mode="convert">
-    <!-- Adding parameter that uses global var so we can do unit testing properly -->
-    <xsl:param name="pCurrentIg" as="xs:string" select="$gvCurrentIg"/>
+      <!-- Variable for identification of IG - moved out of Global var because XSpec can't deal with global vars -->
+      <xsl:variable name="vCurrentIg">
+          <xsl:choose>
+              <xsl:when test="/cda:ClinicalDocument[cda:templateId/@root = '2.16.840.1.113883.10.20.15.2']">eICR</xsl:when>
+              <xsl:when test="/cda:ClinicalDocument[cda:templateId/@root = '2.16.840.1.113883.10.20.15.2.1.2']">RR</xsl:when>
+              <xsl:otherwise>NA</xsl:otherwise>
+          </xsl:choose>
+      </xsl:variable>
     <Bundle>
       <!-- Generates an id that is unique for the node. It will always be the same for the same id. Should be unique across 
            documents as the CDA document id should be unique-->
-      <id value="{concat($pCurrentIg, '-collection-bundle-', generate-id(cda:ClinicalDocument/cda:id))}" />
+      <id value="{concat($vCurrentIg, '-bundle-', generate-id(cda:ClinicalDocument/cda:id))}" />
 
       <!-- Adding meta for eICR - needs to conform to eICR document bundle profile 
            **TODO** hard coding these for now - because the bundles are usually one level
@@ -19,9 +25,12 @@
            but need to add in more scaleable solution -->
       <xsl:variable name="vBundleProfile" as="xs:string">
         <xsl:choose>
-          <xsl:when test="$pCurrentIg = 'eICR'">
+          <xsl:when test="$vCurrentIg = 'eICR'">
             <xsl:text>http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-document-bundle</xsl:text>
           </xsl:when>
+            <xsl:when test="$vCurrentIg = 'RR'">
+                <xsl:text>http://hl7.org/fhir/us/ecr/StructureDefinition/rr-document-bundle</xsl:text>
+            </xsl:when>
           <xsl:otherwise>
             <xsl:text />
           </xsl:otherwise>
@@ -32,23 +41,24 @@
           <profile value="{$vBundleProfile}" />
         </meta>
       </xsl:if>
-      <identifier>
-        <system value="urn:ietf:rfc:3986" />
-        <value value="urn:uuid:{cda:ClinicalDocument/cda:id/@lcg:uuid}" />
-      </identifier>
-      <type>
-        <xsl:attribute name="value">
-          <xsl:choose>
-            <!-- when RR, it is a Communication, which is a bundle collection -->
-            <xsl:when test="$pCurrentIg = 'RR'">collection</xsl:when>
-            <!-- otherwise it is a document, starting with a Composition -->
-            <xsl:otherwise>document</xsl:otherwise>
-          </xsl:choose>
-        </xsl:attribute>
-      </type>
+<!--      <identifier>-->
+          <xsl:apply-templates select="cda:ClinicalDocument/cda:id"/>
+        <!--<system value="urn:ietf:rfc:3986" />
+        <!-\-<value value="urn:uuid:{cda:ClinicalDocument/cda:id/@lcg:uuid}" /> -\->
+        <value value="urn:uuid:{cda:ClinicalDocument/cda:id/@root}"/>-->
+      <!--</identifier>-->
+      <type value="document"/>
       <timestamp>
         <xsl:attribute name="value">
-          <xsl:value-of select="lcg:cdaTS2date(cda:ClinicalDocument/cda:effectiveTime/@value)" />
+          <xsl:choose>
+            <xsl:when test="cda:ClinicalDocument/cda:effectiveTime/@value">
+              <xsl:value-of select="lcg:cdaTS2date(cda:ClinicalDocument/cda:effectiveTime/@value)" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'NI'"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          
         </xsl:attribute>
       </timestamp>
       <xsl:apply-templates select="cda:ClinicalDocument" mode="bundle-entry" />
@@ -65,6 +75,4 @@
       </xsl:for-each>
     </Bundle>
   </xsl:template>
-
-
 </xsl:stylesheet>

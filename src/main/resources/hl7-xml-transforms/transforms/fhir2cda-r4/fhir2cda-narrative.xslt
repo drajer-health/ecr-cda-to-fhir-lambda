@@ -32,13 +32,41 @@ limitations under the License.
 	
 	
 	<xsl:template match="fhir:text" mode="narrative"><xsl:apply-templates mode="narrative"/></xsl:template>
+	<xsl:template match="fhir:text" mode="narrative-footnote"><xsl:apply-templates mode="narrative-footnote"/></xsl:template>
+	<xsl:template match="fhir:text" mode="narrative-text-no-entries">
+		
+		<xsl:choose>
+			<xsl:when test="xhtml:div/xhtml:table/xhtml:tr/xhtml:td/@class='text-no-entries'">
+				<paragraph>
+					<xsl:choose>
+						<xsl:when test="xhtml:div/xhtml:table/xhtml:tr/xhtml:td[@class='text-no-entries']/xhtml:p">
+							<xsl:value-of select="xhtml:div/xhtml:table/xhtml:tr/xhtml:td[@class='text-no-entries']/xhtml:p"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="xhtml:div/xhtml:table/xhtml:tr/xhtml:td[@class='text-no-entries']"/>
+						</xsl:otherwise>
+					</xsl:choose>				
+				</paragraph>
+			</xsl:when>
+			<xsl:when test="xhtml:div/xhtml:p">
+				<paragraph>
+					<xsl:value-of select="xhtml:div/xhtml:p"/>
+				</paragraph>
+			</xsl:when>
+		</xsl:choose>
+	</xsl:template>
 	
 	<xsl:template match="xhtml:div"  mode="narrative"><xsl:apply-templates mode="narrative"/></xsl:template>
+	<xsl:template match="xhtml:div"  mode="narrative-footnote"><xsl:apply-templates mode="narrative-footnote"/></xsl:template>
 	
 	
 	<xsl:template match="xhtml:p"  mode="narrative">
 		<paragraph><xsl:apply-templates select="@*" mode="narrative"/><xsl:apply-templates mode="narrative"/></paragraph>
 	 </xsl:template>
+	
+	<xsl:template match="xhtml:p"  mode="narrative-footnote">
+		<paragraph ID="HealthConcerns"><xsl:apply-templates select="@*" mode="narrative-footnote"/><xsl:apply-templates mode="narrative-footnote"/></paragraph>
+	</xsl:template>
 	
 	<xsl:template match="xhtml:ol"  mode="narrative">
 		<list listType="ordered"><xsl:apply-templates select="@*" mode="narrative"/><xsl:apply-templates mode="narrative"/></list>
@@ -74,11 +102,29 @@ limitations under the License.
 				<xsl:element name="{local-name()}"><xsl:apply-templates select="@*" mode="table-atts"/><xsl:apply-templates mode="narrative"/></xsl:element>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:element name="{local-name()}">
-					<tbody>
-						<xsl:apply-templates select="@*" mode="table-atts"/><xsl:apply-templates mode="narrative"/>
-					</tbody>
-				</xsl:element>
+				<!-- MD: fix table within table schema validation error -->
+				<xsl:choose>
+					<xsl:when test="../local-name()='td' and local-name()='table'">
+						<list>
+							<item>
+								<xsl:element name="{local-name()}">
+									<tbody>
+										<xsl:apply-templates select="@*" mode="table-atts"/>
+										<xsl:apply-templates mode="narrative"/>
+									</tbody>
+								</xsl:element>
+							</item>
+						</list>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:element name="{local-name()}">
+							<tbody>
+								<xsl:apply-templates select="@*" mode="table-atts"/>
+								<xsl:apply-templates mode="narrative"/>
+							</tbody>
+						</xsl:element>
+					</xsl:otherwise>
+				</xsl:choose>		
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
@@ -93,7 +139,11 @@ limitations under the License.
 			xhtml:tr | 
 			xhtml:th | 
 			xhtml:td" mode="narrative">
-		<xsl:element name="{local-name()}"><xsl:apply-templates select="@*" mode="table-atts"/><xsl:apply-templates mode="narrative"/></xsl:element>
+		<xsl:element name="{local-name()}">			
+			<xsl:apply-templates select="@*" mode="table-atts"/>
+			<xsl:apply-templates mode="narrative"/>		
+		</xsl:element>
+		
 	</xsl:template>
 
 	<xsl:template match="@class" mode="narrative">
@@ -175,8 +225,8 @@ limitations under the License.
 		<xsl:choose>
 			<!-- Suppress defaulted colspan and rowspan attributes. XMLSpy adds them when the FHIR schema is attached, causing problems.  -->
 			<xsl:when test="(local-name() = 'colspan' or local-name() = 'rowspan') and $attval='1'"></xsl:when>
-			<!-- Suppress @class in tables  -->
-			<xsl:when test="(local-name() = 'class')"></xsl:when>
+			<!-- MD: Suppress @class, @style, @lang in tables  -->
+			<xsl:when test="(local-name() = 'class'or local-name() = 'style' or local-name() = 'lang')"></xsl:when>
 			<xsl:otherwise><xsl:copy/></xsl:otherwise>
 		</xsl:choose>		
 	</xsl:template>

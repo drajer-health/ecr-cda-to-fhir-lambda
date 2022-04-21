@@ -19,12 +19,17 @@ limitations under the License.
 <xsl:stylesheet xmlns="urn:hl7-org:v3" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:lcg="http://www.lantanagroup.com" xmlns:cda="urn:hl7-org:v3" xmlns:fhir="http://hl7.org/fhir" version="2.0"
   exclude-result-prefixes="lcg xsl cda fhir">
 
+
   <xsl:import href="fhir2cda-utility.xslt" />
   <xsl:import href="fhir2cda-ADDR.xslt" />
   <xsl:import href="fhir2cda-TS.xslt" />
+  
 
   <!-- fhir:author[parent::fhir:Composition] | fhir:sender[parent::fhir:Communication] | fhir:author[parent::fhir:QuestionnaireResponse] -> get referenced resource entry url and process -->
   <xsl:template match="fhir:author[parent::fhir:Composition] | fhir:sender[parent::fhir:Communication] | fhir:author[parent::fhir:QuestionnaireResponse]">
+    <!-- check author Parent Resource -->
+    <xsl:variable name="vAuthorParent" select="../local-name()"/>
+   
     <xsl:for-each select="fhir:reference">
       <xsl:variable name="referenceURI">
         <xsl:call-template name="resolve-to-full-url">
@@ -33,15 +38,20 @@ limitations under the License.
       </xsl:variable>
       <xsl:comment>Author <xsl:value-of select="$referenceURI" /></xsl:comment>
       <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">
-        <xsl:apply-templates select="fhir:resource/fhir:*" mode="author" />
+        <xsl:apply-templates select="fhir:resource/fhir:*" mode="author" >
+          <xsl:with-param name="pAuthorParent" select="$vAuthorParent"/>       
+        </xsl:apply-templates>
       </xsl:for-each>
     </xsl:for-each>
   </xsl:template>
 
   <!-- fhir:Practitioner -> cda:author -->
   <xsl:template match="fhir:entry/fhir:resource/fhir:Practitioner" mode="author">
+    <xsl:param name="pAuthorParent" />
     <xsl:param name="pPractitionerRole" />
-    <xsl:call-template name="make-author" />
+    <xsl:call-template name="make-author" >
+      <xsl:with-param name="pAuthorParent" select="$pAuthorParent"/>
+    </xsl:call-template>
   </xsl:template>
 
   <!-- fhir:PractitionerRole -> cda:author -->
@@ -69,10 +79,35 @@ limitations under the License.
     <xsl:variable name="vOrganization" select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]/fhir:resource/fhir:Organization" />
 
     <author>
+      <xsl:choose>
+        <xsl:when test="//fhir:Composition/fhir:date">
+          <xsl:call-template name="get-time">
+            <!-- Assuming we are never going to have more than one of these at a time in one bundle.. Could be wrong though! -->
+            <xsl:with-param name="pElement" select="//fhir:Composition/fhir:date" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="//fhir:QuestionnaireResponse/fhir:authored">
+          <xsl:call-template name="get-time">
+            <!-- Assuming we are never going to have more than one of these at a time in one bundle.. Could be wrong though! -->
+            <xsl:with-param name="pElement" select="//fhir:QuestionnaireResponse/fhir:authored" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:when test="//fhir:Communication/fhir:sent">
+          <xsl:call-template name="get-time">
+            <!-- Assuming we are never going to have more than one of these at a time in one bundle.. Could be wrong though! -->
+            <xsl:with-param name="pElement" select="//fhir:Communication/fhir:sent" />
+          </xsl:call-template>
+        </xsl:when>
+       
+      </xsl:choose>
+      <!--  
+      
+      Old comment: Assuming we are never going to have more than one of these at a time in one bundle.. Could be wrong though! 
+      RG: Yup, that was absolutely the case! Had to change to a choice
       <xsl:call-template name="get-time">
-        <!-- Assuming we are never going to have more than one of these at a time in one bundle.. Could be wrong though! -->
         <xsl:with-param name="pElement" select="//fhir:Composition/fhir:date | //fhir:QuestionnaireResponse/fhir:authored | //fhir:Communication/fhir:sent" />
       </xsl:call-template>
+      -->
       <assignedAuthor>
         <xsl:call-template name="get-id">
           <xsl:with-param name="pElement" select="fhir:identifier | $vPractitioner/fhir:identifier" />
@@ -157,8 +192,17 @@ limitations under the License.
       <assignedAuthor>
         <!-- id comes from Device -->
         <xsl:call-template name="get-id" />
-        <!-- addr, and telecom come from contained Location -->
-        <xsl:apply-templates select="fhir:location" mode="author" />
+          <xsl:choose>
+              <!-- if there's a location get addr, and telecom from there -->
+              <xsl:when test="fhir:location">
+                  <xsl:apply-templates select="fhir:location" mode="author" />
+              </xsl:when>
+              <xsl:when test="fhir:contact">
+                  <xsl:apply-templates select="fhir:contact" />
+              </xsl:when>
+          </xsl:choose>
+          
+        
         <assignedAuthoringDevice>
           <xsl:if test="fhir:modelNumber[@value]">
             <manufacturerModelName displayName="{fhir:modelNumber/@value}" />
@@ -193,15 +237,34 @@ limitations under the License.
   <xsl:template name="make-author">
     <xsl:param name="pElementName">author</xsl:param>
     <xsl:param name="pPractitionerRoleTelecom" />
+    <xsl:param name="pAuthorParent" />
 
     <xsl:element name="{$pElementName}">
-      <xsl:call-template name="get-time">
-        <!-- Assuming we are never going to have more than one of these at a time in one bundle.. Could be wrong though! -->
-        <xsl:with-param name="pElement" select="//fhir:Composition/fhir:date | //fhir:QuestionnaireResponse/fhir:authored | //fhir:Communication/fhir:sent" />
-      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="$pAuthorParent='Composition'">
+          <xsl:call-template name="get-time">
+            <!-- Assuming we are never going to have more than one of these at a time in one bundle.. Could be wrong though! -->        
+            <!-- Add check for the parent resource, to avoid multiple time validation error. We may need to do some more for
+              the otherwise branch. for now just fix for Composition author. 
+              <xsl:with-param name="pElement" select="//fhir:Composition/fhir:date | 
+              //fhir:QuestionnaireResponse/fhir:authored |
+              //fhir:Communication/fhir:sent" /> 
+            -->
+            <xsl:with-param name="pElement" select="//fhir:Composition/fhir:date"/>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="get-time">
+            <!-- Assuming we are never going to have more than one of these at a time in one bundle.. Could be wrong though! -->
+            <!-- with //fhir:Communication/fhir:sent cause more time entry  for now just pass //fhir:Conposition/fhir:date -->
+            <xsl:with-param name="pElement" select="//fhir:QuestionnaireResponse/fhir:authored | //fhir:Communication/fhir:sent" />        
+          </xsl:call-template>
+        </xsl:otherwise>
+      </xsl:choose>
+      
       <assignedAuthor>
         <xsl:call-template name="get-id" />
-        <xsl:call-template name="get-addr" />
+        <xsl:call-template name="get-addr"/>
         <xsl:call-template name="get-telecom" />
         <assignedPerson>
           <xsl:apply-templates select="fhir:name" />

@@ -21,14 +21,22 @@ limitations under the License.
 
   <xsl:import href="fhir2cda-utility.xslt" />
   <xsl:import href="fhir2cda-TS.xslt" />
+  
 
   <!-- fhir:event[parent::fhir:Composition] -> cda:documentationOf/cda:serviceEvent -->
   <xsl:template match="fhir:event[parent::fhir:Composition]">
     <documentationOf>
       <serviceEvent classCode="PCPR">
+        
+        <!-- MD: add handle fhir:event/fhir:code -->
+        <xsl:for-each select="fhir:code">
+          <xsl:call-template name="CodeableConcept2CD" />
+        </xsl:for-each>
+        
         <xsl:call-template name="get-effective-time">
           <xsl:with-param name="pElement" select="fhir:period"/>
         </xsl:call-template>
+        
         <xsl:choose>
           <xsl:when test="fhir:extension[@url = 'http://hl7.org/fhir/ccda/StructureDefinition/CCDA-on-FHIR-Performer']/fhir:valueReference">
             <xsl:for-each select="fhir:extension[@url = 'http://hl7.org/fhir/ccda/StructureDefinition/CCDA-on-FHIR-Performer']/fhir:valueReference">
@@ -42,6 +50,8 @@ limitations under the License.
               </xsl:for-each>
             </xsl:for-each>
           </xsl:when>
+          
+          <!-- MD: Not sure we need <performer> it cause cda2fhir issue comment it for now
           <xsl:otherwise>
             <performer typeCode="PRF" nullFlavor="NI">
               <assignedEntity nullFlavor="NI">
@@ -49,7 +59,8 @@ limitations under the License.
                 <assignedPerson nullFlavor="NI" />
               </assignedEntity>
             </performer>
-          </xsl:otherwise>
+          </xsl:otherwise>-->
+          
         </xsl:choose>
 
       </serviceEvent>

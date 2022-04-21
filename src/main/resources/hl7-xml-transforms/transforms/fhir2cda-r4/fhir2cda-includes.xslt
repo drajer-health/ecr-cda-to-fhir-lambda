@@ -54,10 +54,13 @@ limitations under the License.
   <xsl:include href="fhir2cda-Observation.xslt" />
   <xsl:include href="fhir2cda-Organizer.xslt" />
   <xsl:include href="fhir2cda-Procedure.xslt" />
+  <xsl:include href="fhir2cda-Coverage.xslt"/>
+  <xsl:include href="fhir2cda-Instruction.xslt"/>
 
   <xsl:include href="native-xslt-uuid.xslt" />
   <xsl:include href="fhir2cda-utility.xslt" />
   <xsl:include href="fhir2cda-narrative.xslt" />
   <xsl:include href="fhir2cda-mapProfileToTemplate.xslt" />
+  
 
 </xsl:stylesheet>

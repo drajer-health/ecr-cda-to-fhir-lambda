@@ -11,7 +11,39 @@
 
   <xsl:template match="cda:recordTarget">
     <Patient>
-      <xsl:call-template name="add-participant-meta" />
+      
+      <!--MD: Check current Ig -->
+      <xsl:variable name="vCurrentIg">
+        <xsl:apply-templates select="/" mode="currentIg"/>
+      </xsl:variable>
+      
+      <!--MD: set meta profile based on Ig -->
+      <xsl:choose>
+        <xsl:when test="$vCurrentIg='NA'">
+          <xsl:call-template name="add-meta"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="vProfileValue">
+            <xsl:call-template name="get-profile-for-ig">
+              <xsl:with-param name="pIg" select="$vCurrentIg"/>
+              <xsl:with-param name="pResource" select="'Patient'"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="$vProfileValue ne 'NA'">
+              <meta>
+                <profile>
+                  <xsl:attribute name="value">
+                    <xsl:value-of select="$vProfileValue"/>
+                  </xsl:attribute>
+                </profile>
+              </meta>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+      
+      <!-- <xsl:call-template name="add-participant-meta" /> --> 
 
       <xsl:call-template name="generate-text-patient" />
       <xsl:call-template name="add-race-codes" />
@@ -41,6 +73,15 @@
         </xsl:when>
       </xsl:choose>
       <xsl:apply-templates select="cda:patientRole/cda:addr" />
+      
+      <xsl:choose>
+      <xsl:when test="cda:patientRole/cda:patient/cda:maritalStatusCode">
+        <xsl:apply-templates select="cda:patientRole/cda:patient/cda:maritalStatusCode">
+          <xsl:with-param name="pElementName">maritalStatus</xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:when>
+      </xsl:choose>
+        
       <xsl:for-each select="cda:patientRole/cda:patient/cda:guardian">
         <contact>
           <relationship>
@@ -54,6 +95,7 @@
           <xsl:apply-templates select="cda:addr" />
         </contact>
       </xsl:for-each>
+     
       <!-- Adding Communication -->
       <xsl:if test="cda:patientRole/cda:patient/cda:languageCommunication/cda:languageCode/@code">
         <communication>
@@ -72,8 +114,28 @@
           </xsl:if>
         </communication>
       </xsl:if>
+      
+      <!-- MD: Add transform RelatedPerson -->
+      <xsl:choose>
+        <xsl:when test="//cda:section/cda:templateId[@root='2.16.840.1.113883.10.20.22.2.15']/
+          following-sibling::cda:entry/cda:organizer/cda:subject/cda:relatedSubject[@classCode='PRS']">
+          <link>
+            <other>
+              <reference value="urn:uuid:{//cda:section/cda:templateId[@root='2.16.840.1.113883.10.20.22.2.15']/
+                following-sibling::cda:entry/cda:organizer/cda:subject/cda:relatedSubject[@classCode='PRS']/@lcg:uuid}">
+              </reference>
+            </other>
+            <type value="seealso"/>
+          </link>
+        </xsl:when>
+      </xsl:choose>
+        
+      
+    
     </Patient>
+    
   </xsl:template>
+  
 
   <xsl:template name="add-race-codes">
     <!-- Race -->
@@ -114,6 +176,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
+         
           <extension url="ombCategory">
             <valueCoding>
               <system value="{$codeSystemUri}" />
@@ -123,9 +186,11 @@
               </xsl:if>
             </valueCoding>
           </extension>
+          <!--MD: this only work if patient has only one race. only one <extension url="text"> is allowed
           <extension url="text">
             <valueString value="{$text}" />
           </extension>
+           -->
 
         </xsl:for-each>
         <xsl:for-each select="cda:patientRole/cda:patient/sdtc:raceCode[not(@nullFlavor)]">
@@ -163,19 +228,65 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          <extension url="detailed">
-            <valueCoding>
-              <system value="{$codeSystemUri}" />
-              <code value="{$code}" />
-              <xsl:if test="@displayName">
-                <display value="{@displayName}" />
-              </xsl:if>
-            </valueCoding>
-          </extension>
+          <xsl:choose>
+            <!--MD: for file OMB category race code must use extension ombCategory -->
+            <xsl:when test="$code='1002-5' or $code='2028-9'or $code='2054-5'or $code='2076-8'or $code='2106-3'">
+              <extension url="ombCategory">
+                <valueCoding>
+                  <system value="{$codeSystemUri}" />
+                  <code value="{$code}" />
+                  <xsl:if test="@displayName">
+                    <display value="{@displayName}" />
+                  </xsl:if>
+                </valueCoding>
+              </extension>
+            </xsl:when>
+            <xsl:otherwise>
+              <extension url="detailed">
+                <valueCoding>
+                  <system value="{$codeSystemUri}" />
+                  <code value="{$code}" />
+                  <xsl:if test="@displayName">
+                    <display value="{@displayName}" />
+                  </xsl:if>
+                </valueCoding>
+              </extension>
+            </xsl:otherwise>
+          </xsl:choose>
+          
+          
+          <!--MD  only one <extension url="text"> is allowed
           <extension url="text">
             <valueString value="{$text}" />
           </extension>
+          -->
         </xsl:for-each>
+        
+        <!--MD: if patient has more than one race set the text as Mixed  -->
+        <xsl:choose>
+          <xsl:when test="//cda:patientRole/cda:patient/sdtc:raceCode[not(@nullFlavor)] ">
+            <extension url="text">
+              <valueString value="'Mixed'" />
+            </extension>
+          </xsl:when>
+          <xsl:otherwise>
+            <extension url="text">
+              <valueString>
+                <xsl:attribute name="value">
+                  <xsl:choose>
+                    <xsl:when test="//cda:patientRole/cda:patient/cda:raceCode[@nullFlavor]">
+                      <xsl:value-of select="//cda:patientRole/cda:patient/cda:raceCode/@nullFlavor"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="cda:patientRole/cda:patient/cda:raceCode/@displayName"/>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  
+                </xsl:attribute>
+              </valueString>
+            </extension>
+          </xsl:otherwise>
+        </xsl:choose>       
       </extension>
     </xsl:if>
   </xsl:template>

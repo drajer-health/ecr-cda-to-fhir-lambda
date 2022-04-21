@@ -59,5 +59,97 @@ limitations under the License.
         </xsl:for-each>
       </xsl:for-each>
   </xsl:template>
-
+  
+  <xsl:template name="create-encounters-section">
+    <section>
+      <xsl:comment select="' [C-CDA R2.1] Encounters Section (entries optional) (V3) '" />
+      <templateId root="2.16.840.1.113883.10.20.22.2.22" extension="2015-08-01" />
+      <id root="{lower-case(uuid:get-uuid())}"/>
+      <code code="46240-8" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="History of encounters" />
+      
+      <title>Encounters</title>
+      <xsl:choose>
+        <xsl:when test="fhir:text">
+          <text>
+            <xsl:if test="normalize-space(fhir:text/xhtml:div/xhtml:div[@class = 'custom']) != 'No information.'">
+              <xsl:apply-templates select="fhir:text" mode="narrative" />
+            </xsl:if>
+          </text>
+        </xsl:when>
+      </xsl:choose>
+     
+      <!-- for now we only handle the encounter reference in the ServiceRequest. In the future we may do for other resources -->
+      <xsl:for-each-group select="//fhir:ServiceRequest/fhir:encounter/fhir:reference"
+        group-by="@value">
+        <xsl:variable name="vTest" select="@value"/>
+        <entry>
+          <encounter moodCode="INT" classCode="ENC">
+            <xsl:comment select="' Planned  Encounter V2 '" />
+            <templateId root="2.16.840.1.113883.10.20.22.4.40" extension="2014-06-09"/>
+            <!-- <templateId root="2.16.840.1.113883.11.20.9.23" extension="2014-09-01"/> -->
+            <id root="{lower-case(uuid:get-uuid())}"/>
+            
+            <xsl:variable name="referenceURI">
+              <xsl:call-template name="resolve-to-full-url">
+                <xsl:with-param name="referenceURI" 
+                  select="@value" />
+                <!--  select="//fhir:ServiceRequest/fhir:encounterfhir/fhir:reference/@value" />-->
+              </xsl:call-template>
+            </xsl:variable>
+            <xsl:comment>Processing entry <xsl:value-of select="$referenceURI"/></xsl:comment>
+            <xsl:variable name="vTest" select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]"/>
+            <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">
+              <xsl:apply-templates select="fhir:resource/fhir:*" mode="serviceRequest"/>
+            </xsl:for-each> 
+            
+          </encounter>
+          
+        </entry>
+        
+      </xsl:for-each-group>
+    </section>
+   
+  </xsl:template>
+  
+  <xsl:template match="fhir:Encounter" mode="serviceRequest">
+    <xsl:variable name="mapping" select="document('../oid-uri-mapping-r4.xml')/mapping" />
+    
+    <code>
+      <xsl:apply-templates select="fhir:class" />
+      <xsl:for-each select="fhir:type">
+        <xsl:apply-templates select=".">
+          <xsl:with-param name="pElementName" select="'translation'" />
+        </xsl:apply-templates>
+      </xsl:for-each>  
+    </code>
+    
+    <statusCode>
+      <xsl:attribute name="code" select="fhir:status/@value"/>
+    </statusCode>
+    
+    <effectiveTime>
+      <xsl:attribute name="value">
+        <xsl:call-template name="Date2TS">
+          <xsl:with-param name="date" select="fhir:period/fhir:start/@value"/>
+          <xsl:with-param name="includeTime" select="true()"/>
+        </xsl:call-template>
+      </xsl:attribute>
+    </effectiveTime>
+    
+    <priorityCode>
+      <xsl:attribute name="code">
+        <xsl:value-of select="fhir:priority/fhir:coding/fhir:code/@value"/> 
+      </xsl:attribute>    
+      <xsl:variable name="vCodeSystemUri" select="fhir:priority/fhir:coding/fhir:system/@value"/>                    
+      <xsl:choose>
+        <xsl:when test="$mapping/map[@uri=$vCodeSystemUri]">
+          <xsl:attribute name="codeSystem">
+            <xsl:value-of select="$mapping/map[@uri=$vCodeSystemUri][1]/@oid"/> 
+          </xsl:attribute>
+        </xsl:when>
+      </xsl:choose>    
+      <xsl:apply-templates select="fhir:priority/fhir:coding/fhir:display" mode="display"/>    
+    </priorityCode>   
+  </xsl:template>
+   
 </xsl:stylesheet>

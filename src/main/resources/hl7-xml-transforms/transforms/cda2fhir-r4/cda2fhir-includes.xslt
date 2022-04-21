@@ -36,5 +36,6 @@
   <xsl:include href="cda2fhir-Device.xslt" />
   <xsl:include href="cda2fhir-Extension.xslt" />
   <xsl:include href="cda2fhir-PlanDefinition.xslt" />
+  <xsl:include href="cda2fhir-RelatedPerson.xslt"/>
 
 </xsl:stylesheet>

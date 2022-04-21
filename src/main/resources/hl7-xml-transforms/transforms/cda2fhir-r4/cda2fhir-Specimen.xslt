@@ -6,11 +6,11 @@
   <xsl:import href="c-to-fhir-utility.xslt" />
 
   <!-- Specimen Collection Procedure -> FHIR Specimen -->
-  <xsl:template match="cda:procedure[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.315']]" mode="bundle-entry">
+  <xsl:template match="cda:organizer/cda:component/cda:procedure[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.415']]" mode="bundle-entry">
     <xsl:call-template name="create-bundle-entry" />
   </xsl:template>
 
-  <xsl:template match="cda:procedure[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.315']]">
+  <xsl:template match="cda:organizer/cda:component/cda:procedure[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.415']]">
     <Specimen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://hl7.org/fhir">
       <xsl:call-template name="add-meta" />
       <xsl:apply-templates select="cda:participant/cda:participantRole/cda:id" />

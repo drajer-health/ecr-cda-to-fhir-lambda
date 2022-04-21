@@ -53,7 +53,8 @@
             <xsl:call-template name="author-reference">
                 <xsl:with-param name="pElementName">asserter</xsl:with-param>
             </xsl:call-template>
-
+            <!-- RG: Commented out for demo -->
+            <!--
             <xsl:if test="cda:performer">
                 <performer>
                     <xsl:call-template name="performer-reference">
@@ -61,6 +62,7 @@
                     </xsl:call-template>
                 </performer>
             </xsl:if>
+            -->
         </Procedure>
     </xsl:template>
 
@@ -80,6 +82,14 @@
             <xsl:call-template name="author-reference">
                 <xsl:with-param name="pElementName">asserter</xsl:with-param>
             </xsl:call-template>
+            
+            <!-- MD: Add BodySite -->
+            <xsl:apply-templates select="cda:targetSiteCode">
+                <xsl:with-param name="pElementName" select="'bodySite'" />
+            </xsl:apply-templates>
+                
+            <!-- RG: Commented out for demo -->
+            <!--
             <xsl:if test="cda:performer">
                 <performer>
                     <xsl:call-template name="performer-reference">
@@ -87,8 +97,11 @@
                     </xsl:call-template>
                 </performer>
             </xsl:if>
+            -->
         </Procedure>
     </xsl:template>
+    
+   
 
     <xsl:template
         match="cda:observation[@moodCode = 'EVN'][cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.13']]">
@@ -106,6 +119,8 @@
             <xsl:call-template name="author-reference">
                 <xsl:with-param name="pElementName">asserter</xsl:with-param>
             </xsl:call-template>
+            <!-- RG: Commented out for demo -->
+            <!--
             <xsl:if test="cda:performer">
                 <performer>
                     <xsl:call-template name="performer-reference">
@@ -113,6 +128,7 @@
                     </xsl:call-template>
                 </performer>
             </xsl:if>
+            -->
             <xsl:if test="cda:value[@code or @nullFlavor]">
                 <!-- Only process value elements that actually have some content, not empty stuff like <value xsi:type="CD"/> -->
                 <xsl:choose>
@@ -137,11 +153,10 @@
                     <xsl:attribute name="value">in-progress</xsl:attribute>
                 </xsl:when>
                 <xsl:when test="@code = 'cancelled'">
-                    <!-- Should really map to "not-done" but due to a FHIR bug that is not showing as valid in the schema even though it is in the Event Status value set -->
-                    <!-- 
                     <xsl:attribute name="value">not-done</xsl:attribute>
-                    -->
-                    <xsl:attribute name="value">aborted</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@code = 'aborted'">
+                    <xsl:attribute name="value">stopped</xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="value" select="@code"/>

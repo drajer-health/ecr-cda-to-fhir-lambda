@@ -1,0 +1,785 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bundle xmlns="http://hl7.org/fhir">
+   <id value="RR-bundle-d38e11"/>
+   <meta>
+      <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-document-bundle"/>
+   </meta>
+   <identifier>
+      <system value="urn:ietf:rfc:3986"/>
+      <value value="urn:uuid:4ba7d975-3a01-4554-9db2-758ab26b4192"/>
+   </identifier>
+   <type value="document"/>
+   <timestamp value="2022-02-14T16:24:42.000+00:00"/>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Composition>
+            <meta>
+               <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-composition"/>
+               <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.1.2:2017-04-01-->
+            </meta>
+            <language value="en-US"/>
+            <text>
+               <status value="generated"/>
+               <div xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+                  <table class="header_table"
+                          style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+                     <tbody>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Document Id</span>
+                           </td>
+                           <td class="td_header_role_value"> 4ba7d975-3a01-4554-9db2-758ab26b4192</td>
+                        </tr>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Document Created:</span>
+                           </td>
+                           <td class="td_header_role_value">February 14, 2022, 16:24:42 +0000 </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <table class="header_table"
+                          style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+                     <tbody><!--Author-->
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Author</span>
+                           </td>
+                           <td class="td_header_role_value">Seven Henry, M.D., Salem Medical Center</td>
+                        </tr>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Contact info</span>
+                           </td>
+                           <td class="td_header_role_value">BMass Doctors<br/>2100 North Ave<br/>Burlington, MA 02368, US<br/>Mail (Work Place):  henry.seven@example.com<br/>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <table class="header_table"
+                          style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+                     <tbody><!--encompassingEncounter-->
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Encounter Id</span>
+                           </td>
+                           <td class="td_header_role_value">9937012 http://hospital.smarthealthit.org</td>
+                        </tr>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Encounter Type</span>
+                           </td>
+                           <td class="td_header_role_value">ambulatory</td>
+                        </tr>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Encounter Date</span>
+                           </td>
+                           <td class="td_header_role_value"> From April 1, 2018, 10:00:00, EST  to April 2, 2018, 10:15:00, EST </td>
+                        </tr>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Encounter Location</span>
+                           </td>
+                           <td class="td_header_role_value">Clinic Bldg A, Salem Medical Center of </td>
+                        </tr>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Responsible party</span>
+                           </td>
+                           <td class="td_header_role_value">Seven Henry, M.D. of Salem Medical Center</td>
+                        </tr>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Contact info</span>
+                           </td>
+                           <td class="td_header_role_value">BMass Doctors<br/>2100 North Ave<br/>Burlington, MA 02368, US<br/>Mail (Work Place):  henry.seven@example.com<br/>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <table class="header_table"
+                          style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+                     <tbody><!--informationRecipient-->
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Information recipient:</span>
+                           </td>
+                           <td class="td_header_role_value"> </td>
+                        </tr>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Contact info</span>
+                           </td>
+                           <td class="td_header_role_value">
+                              <br/>
+                              <br/>
+                              <br/>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <table class="header_table"
+                          style="border: 1pt inset #00008b; line-height: 10pt; width: 100%;">
+                     <tbody>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Document maintained by</span>
+                           </td>
+                           <td class="td_header_role_value">Salem Medical Center</td>
+                        </tr>
+                        <tr>
+                           <td class="td_header_role_name"
+                                style="width: 20%; background-color: #3399ff; padding: 0.1cm 0.2cm; vertical-align: top; background-color: #ffffcc;">
+                              <span class="td_label">Contact info</span>
+                           </td>
+                           <td class="td_header_role_value">22222 Health Authority Drive<br/>Ann Arbor, MI 99999<br/>Tel (Work Place):  +1-555-555-1111<br/>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+                  <h3/>
+                  <div>
+                     <span class="Bold">eICR Information:</span>
+                     <p>An initial report for a possible reportable condition was received, but it was not able to be processed.<br/>
+                        <br/>eICR was not processed due to an error of: fatal problem with the eICR that was received</p>
+                  </div>
+               </div>
+            </text>
+            <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-information-recipient-extension">
+               <valueReference>
+                  <reference value="urn:uuid:"/>
+               </valueReference>
+            </extension>
+            <status value="final"/>
+            <type>
+               <coding>
+                  <system value="http://loinc.org"/>
+                  <code value="88085-6"/>
+                  <display value="Reportability response report Document Public health"/>
+               </coding>
+            </type>
+            <subject>
+               <reference value="urn:uuid:"/>
+            </subject>
+            <encounter>
+               <reference value="urn:uuid:"/>
+            </encounter>
+            <date value="2022-02-14T16:24:42.000+00:00"/>
+            <author>
+               <reference value="urn:uuid:"/>
+            </author>
+            <title value="Reportability Response"/>
+            <confidentiality value="N"/>
+            <custodian>
+               <reference value="urn:uuid:"/>
+            </custodian>
+            <relatesTo>
+               <code value="transforms"/>
+               <targetIdentifier>
+                  <system value="urn:ietf:rfc:3986"/>
+                  <value value="urn:uuid:4ba7d975-3a01-4554-9db2-758ab26b4192"/>
+               </targetIdentifier>
+            </relatesTo>
+            <section>
+               <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-eicr-processing-status-extension">
+                  <extension url="eICRProcessingStatus">
+                     <valueReference>
+                        <reference value="urn:uuid:"/>
+                     </valueReference>
+                  </extension>
+                  <extension url="eICRValidationOutput"/>
+               </extension>
+               <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-eicr-receipt-time-extension">
+                  <valueDateTime value="2017-12-12T20:00:00.000-07:00"/>
+               </extension>
+               <code>
+                  <coding>
+                     <system value="http://loinc.org"/>
+                     <code value="88082-3"/>
+                     <display value="Initial case report processing information Document"/>
+                  </coding>
+               </code>
+               <text>
+                  <status value="additional"/>
+                  <div xmlns="http://www.w3.org/1999/xhtml">
+                     <span class="Bold">eICR Information:</span>
+                     <p>An initial report for a possible reportable condition was received, but it was not able to be processed.<br/>
+                        <br/>eICR was not processed due to an error of: fatal problem with the eICR that was received</p>
+                  </div>
+               </text>
+               <!--2.16.840.1.113883.10.20.15.2.3.9:2017-04-01-->
+               <entry>
+                  <reference value="urn:uuid:"/>
+                  <identifier>
+                     <system value="urn:ietf:rfc:3986"/>
+                     <value value="urn:uuid:927b1e21-8db2-11ec-1905-09173f13e4c5"/>
+                  </identifier>
+                  <display value="Eicr_Filename.xml"/>
+               </entry>
+            </section>
+         </Composition>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Patient>
+            <meta>
+               <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-patient"/>
+            </meta>
+            <text>
+               <status value="generated"/>
+               <div xmlns="http://www.w3.org/1999/xhtml">
+                  <h1>Everywoman, Eve L</h1>
+                  <p>Telecom: tel:1-(404)555-1212</p>
+                  <p>Telecom: mailto:eve.everywoman@example.com</p>
+                  <p>Address: 5101 Peachtree St NE<br/>Atlanta<br/>GA<br/>30302<br/>US</p>
+                  <p>Gender: F</p>
+                  <p>Birthdate: 1974-11-24</p>
+               </div>
+            </text>
+            <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-race">
+               <extension url="ombCategory">
+                  <valueCoding>
+                     <system value="urn:oid:2.16.840.1.113883.6.238"/>
+                     <code value="2106-3"/>
+                     <display value="White"/>
+                  </valueCoding>
+               </extension>
+               <extension url="text">
+                  <valueString value="White"/>
+               </extension>
+            </extension>
+            <extension url="http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity">
+               <extension url="ombCategory">
+                  <valueCoding>
+                     <system value="urn:oid:2.16.840.1.113883.6.238"/>
+                     <code value="2186-5"/>
+                     <display value="Not Hispanic or Latino"/>
+                  </valueCoding>
+               </extension>
+               <extension url="text">
+                  <valueString value="Not Hispanic or Latino"/>
+               </extension>
+            </extension>
+            <identifier>
+               <system value="urn:oid:http://hospital.smarthealthit.org"/>
+               <value value="1032702"/>
+            </identifier>
+            <name>
+               <text value="Everywoman, Eve L"/>
+               <family value="Everywoman"/>
+               <given value="Eve"/>
+               <given value="L"/>
+            </name>
+            <telecom>
+               <system value="phone"/>
+               <value value="1-(404)555-1212"/>
+               <use value="home"/>
+            </telecom>
+            <telecom>
+               <system value="email"/>
+               <value value="eve.everywoman@example.com"/>
+               <use value="work"/>
+            </telecom>
+            <gender value="female"/>
+            <birthDate value="1974-11-24"/>
+            <deceasedBoolean value="false"/>
+            <address>
+               <line value="5101 Peachtree St NE"/>
+               <city value="Atlanta"/>
+               <state value="GA"/>
+               <postalCode value="30302"/>
+               <country value="US"/>
+            </address>
+         </Patient>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Encounter><!--In Encounter-->
+            <meta>
+               <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-encounter"/>
+            </meta>
+            <identifier>
+               <system value="urn:oid:http://hospital.smarthealthit.org"/>
+               <value value="9937012"/>
+            </identifier>
+            <status value="finished"/>
+            <class>
+               <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+               <code value="AMB"/>
+            </class>
+            <type>
+               <coding>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
+                  <code value="AMB"/>
+                  <display value="ambulatory"/>
+               </coding>
+               <coding>
+                  <system value="http://www.ama-assn.org/go/cpt"/>
+                  <code value="99201"/>
+                  <display value="Office Visit"/>
+               </coding>
+            </type>
+            <subject>
+               <reference value="urn:uuid:"/>
+            </subject>
+            <participant><!--In participant-->
+               <type>
+                  <coding>
+                     <system value="http://terminology.hl7.org/CodeSystem/v3-ParticipationType"/>
+                     <code value="ATND"/>
+                  </coding>
+               </type>
+               <individual>
+                  <reference value="urn:uuid:"/>
+               </individual>
+            </participant>
+            <period>
+               <start value="2018-04-01T10:00:00.000-05:00"/>
+               <end value="2018-04-02T10:15:00.000-05:00"/>
+            </period>
+            <location>
+               <location>
+                  <reference value="urn:uuid:"/>
+               </location>
+            </location>
+            <serviceProvider>
+               <reference value="urn:uuid:"/>
+            </serviceProvider>
+         </Encounter>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <PractitionerRole>
+            <meta>
+               <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-practitionerrole"/>
+            </meta>
+            <!--responsibleParty/assignedEntity-->
+            <identifier>
+               <system value="http://hl7.org/fhir/sid/us-npi"/>
+               <value value="9941339108"/>
+            </identifier>
+            <practitioner>
+               <reference value="urn:uuid:"/>
+            </practitioner>
+            <organization>
+               <reference value="urn:uuid:"/>
+            </organization>
+            <telecom>
+               <system value="email"/>
+               <value value="henry.seven@example.com"/>
+               <use value="work"/>
+            </telecom>
+         </PractitionerRole>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Practitioner><!--assignedEntity[cda:id[@root="2.16.840.1.113883.4.6"]]/assignedPerson-->
+            <meta>
+               <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner"/>
+            </meta>
+            <text>
+               <status value="generated"/>
+               <div xmlns="http://www.w3.org/1999/xhtml">
+                  <p>Name: Henry, Seven</p>
+                  <p>---TODO: ID info---</p>
+                  <p>Telephone: mailto:henry.seven@example.com</p>
+               </div>
+            </text>
+            <identifier>
+               <system value="http://hl7.org/fhir/sid/us-npi"/>
+               <value value="9941339108"/>
+            </identifier>
+            <name>
+               <text value="Henry, M.D., Seven"/>
+               <family value="Henry"/>
+               <given value="Seven"/>
+               <suffix value="M.D."/>
+            </name>
+            <telecom>
+               <system value="email"/>
+               <value value="henry.seven@example.com"/>
+               <use value="work"/>
+            </telecom>
+            <address>
+               <line value="BMass Doctors"/>
+               <line value="2100 North Ave"/>
+               <city value="Burlington"/>
+               <state value="MA"/>
+               <postalCode value="02368"/>
+               <country value="US"/>
+            </address>
+         </Practitioner>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Organization>
+            <identifier>
+               <system value="urn:oid:http://hl7.org.fhir/sid/us-npi"/>
+               <value value="55555555"/>
+            </identifier>
+            <active value="true"/>
+            <name value="Salem Medical Center"/>
+            <telecom>
+               <system value="phone"/>
+               <value value="+1-555-555-1111"/>
+               <use value="work"/>
+            </telecom>
+            <telecom>
+               <system value="email"/>
+               <value value="mail@salemmedicalcenter.com"/>
+               <use value="work"/>
+            </telecom>
+            <address>
+               <line value="22222 Health Authority Drive"/>
+               <city value="Ann Arbor"/>
+               <state value="MI"/>
+               <postalCode value="99999"/>
+            </address>
+         </Organization>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Location>
+            <identifier>
+               <system value="urn:oid:http://hl7.org.fhir/sid/us-npi"/>
+               <value value="55555555"/>
+            </identifier>
+            <name value="Clinic Bldg A, Salem Medical Center"/>
+            <type>
+               <coding>
+                  <system value="http://terminology.hl7.org/CodeSystem/v3-RoleCode"/>
+                  <code value="HOSP"/>
+                  <display value="Hospital"/>
+               </coding>
+            </type>
+            <telecom>
+               <system value="phone"/>
+               <value value="+1-555-555-1111"/>
+               <use value="work"/>
+            </telecom>
+            <telecom>
+               <system value="email"/>
+               <value value="mail@salemmedicalcenter.com"/>
+               <use value="work"/>
+            </telecom>
+            <address>
+               <line value="Clinic Bldg A"/>
+               <line value="4444 Healthcare Drive"/>
+               <city value="Ann Arbor"/>
+               <state value="MI"/>
+               <postalCode value="99999"/>
+            </address>
+         </Location>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Organization>
+            <identifier>
+               <system value="urn:ietf:rfc:3986"/>
+               <value value="urn:uuid:"/>
+            </identifier>
+            <active value="true"/>
+            <name value="Salem Medical Center"/>
+            <telecom>
+               <system value="phone"/>
+               <value value="+1-555-555-1111"/>
+               <use value="work"/>
+            </telecom>
+            <telecom>
+               <system value="email"/>
+               <value value="mail@salemmedicalcenter.com"/>
+               <use value="work"/>
+            </telecom>
+            <address>
+               <line value="22222 Health Authority Drive"/>
+               <city value="Ann Arbor"/>
+               <state value="MI"/>
+               <postalCode value="99999"/>
+            </address>
+         </Organization>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <PractitionerRole>
+            <meta>
+               <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-practitionerrole"/>
+            </meta>
+            <!--author/assignedAuthor-->
+            <identifier>
+               <system value="http://hl7.org/fhir/sid/us-npi"/>
+               <value value="9941339108"/>
+            </identifier>
+            <practitioner>
+               <reference value="urn:uuid:"/>
+            </practitioner>
+            <organization>
+               <reference value="urn:uuid:"/>
+            </organization>
+            <code>
+               <coding>
+                  <system value="http://nucc.org/provider-taxonomy"/>
+                  <code value="261QP2300X"/>
+                  <display value="Primary Care"/>
+               </coding>
+            </code>
+            <telecom>
+               <system value="email"/>
+               <value value="henry.seven@example.com"/>
+               <use value="work"/>
+            </telecom>
+         </PractitionerRole>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Practitioner><!--assignedAuthor[cda:id[@root="2.16.840.1.113883.4.6"]]/assignedPerson-->
+            <meta>
+               <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner"/>
+            </meta>
+            <text>
+               <status value="generated"/>
+               <div xmlns="http://www.w3.org/1999/xhtml">
+                  <p>Name: Henry, Seven</p>
+                  <p>---TODO: ID info---</p>
+                  <p>Telephone: mailto:henry.seven@example.com</p>
+               </div>
+            </text>
+            <identifier>
+               <system value="http://hl7.org/fhir/sid/us-npi"/>
+               <value value="9941339108"/>
+            </identifier>
+            <name>
+               <text value="Henry, M.D., Seven"/>
+               <family value="Henry"/>
+               <given value="Seven"/>
+               <suffix value="M.D."/>
+            </name>
+            <telecom>
+               <system value="email"/>
+               <value value="henry.seven@example.com"/>
+               <use value="work"/>
+            </telecom>
+            <address>
+               <line value="BMass Doctors"/>
+               <line value="2100 North Ave"/>
+               <city value="Burlington"/>
+               <state value="MA"/>
+               <postalCode value="02368"/>
+               <country value="US"/>
+            </address>
+         </Practitioner>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Organization>
+            <identifier>
+               <system value="urn:oid:http://hl7.org.fhir/sid/us-npi"/>
+               <value value="55555555"/>
+            </identifier>
+            <active value="true"/>
+            <name value="Salem Medical Center"/>
+            <telecom>
+               <system value="email"/>
+               <value value="henry.seven@example.com"/>
+               <use value="work"/>
+            </telecom>
+            <address>
+               <line value="BMass Doctors"/>
+               <line value="2100 North Ave"/>
+               <city value="Burlington"/>
+               <state value="MA"/>
+               <postalCode value="02368"/>
+               <country value="US"/>
+            </address>
+         </Organization>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Organization>
+            <identifier>
+               <system value="urn:oid:http://hl7.org.fhir/sid/us-npi"/>
+               <value value="55555555"/>
+            </identifier>
+            <active value="true"/>
+            <name value="Salem Medical Center"/>
+            <telecom>
+               <system value="phone"/>
+               <value value="+1-555-555-1111"/>
+               <use value="work"/>
+            </telecom>
+            <address>
+               <line value="22222 Health Authority Drive"/>
+               <city value="Ann Arbor"/>
+               <state value="MI"/>
+               <postalCode value="99999"/>
+            </address>
+         </Organization>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <PractitionerRole>
+            <meta>
+               <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-practitionerrole"/>
+            </meta>
+            <!--informationRecipient/intendedRecipient-->
+            <practitioner>
+               <reference value="urn:uuid:"/>
+            </practitioner>
+            <!--Omitting null telecom-->
+         </PractitionerRole>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Practitioner><!--intendedRecipient[cda:id[@root="2.16.840.1.113883.4.6"]]/informationRecipient-->
+            <meta>
+               <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-practitioner"/>
+            </meta>
+            <text>
+               <status value="generated"/>
+               <div xmlns="http://www.w3.org/1999/xhtml">
+                  <p>Name: , </p>
+                  <p>---TODO: ID info---</p>
+                  <p>Telephone: </p>
+               </div>
+            </text>
+            <!--Omitting null telecom-->
+         </Practitioner>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <DocumentReference>
+            <meta>
+               <profile value="http://hl7.org/fhir/us/core/StructureDefinition/us-core-documentreference"/>
+               <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.3.10:2017-04-01-->
+            </meta>
+            <masterIdentifier>
+               <system value="urn:ietf:rfc:3986"/>
+               <value value="urn:uuid:927b1e21-8db2-11ec-1905-09173f13e4c5"/>
+            </masterIdentifier>
+            <identifier>
+               <system value="urn:ietf:rfc:3986"/>
+               <value value="urn:uuid:0070d7b2-9893-4044-b255-73da1649c9fe"/>
+            </identifier>
+            <status value="current"/>
+            <type>
+               <coding>
+                  <system value="http://loinc.org"/>
+                  <code value="55751-2"/>
+                  <display value="Public Health Case Report (eICR)"/>
+               </coding>
+            </type>
+            <category>
+               <coding>
+                  <system value="http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category"/>
+                  <code value="clinical-note"/>
+                  <display value="Clinical Note"/>
+               </coding>
+               <text value="Clinical Note"/>
+            </category>
+            <subject>
+               <reference value="urn:uuid:"/>
+            </subject>
+            <content>
+               <attachment>
+                  <contentType value="text/plain"/>
+                  <url value="urn:hl7ii:0070d7b2-9893-4044-b255-73da1649c9fe:1"/>
+               </attachment>
+            </content>
+         </DocumentReference>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Observation><!--Processing Status Reason-->
+            <meta>
+               <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-eicr-processing-status-reason-observation"/>
+               <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.3.21:2017-04-01-->
+            </meta>
+            <identifier>
+               <system value="urn:ietf:rfc:3986"/>
+               <value value="urn:uuid:e39d6ae2-8c6e-4638-9b33-412996586f42"/>
+            </identifier>
+            <status value="final"/>
+            <code>
+               <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.232"/>
+                  <code value="RR6"/>
+                  <display value="eICR processing status reason"/>
+               </coding>
+            </code>
+            <valueCodeableConcept>
+               <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274"/>
+                  <code value="RRVS23"/>
+                  <display value="eICR was not processed due to an error of: fatal problem with the eICR that was received"/>
+               </coding>
+            </valueCodeableConcept>
+         </Observation>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:"/>
+      <resource>
+         <Observation><!--Processing Status-->
+            <meta>
+               <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/rr-eicr-processing-status-observation"/>
+               <!--CDA templateId: urn:hl7ii:2.16.840.1.113883.10.20.15.2.3.29:2017-04-01-->
+            </meta>
+            <status value="final"/>
+            <code>
+               <coding>
+                  <system value="urn:oid:2.16.840.1.114222.4.5.274"/>
+                  <code value="RRVS22"/>
+                  <display value="eICR was not processed - error"/>
+               </coding>
+            </code>
+            <hasMember>
+               <reference value="urn:uuid:"/>
+            </hasMember>
+         </Observation>
+      </resource>
+   </entry>
+</Bundle>

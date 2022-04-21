@@ -24,6 +24,7 @@ limitations under the License.
     <xsl:param name="pIncludeDatatype" select="true()"/>
     <xsl:element name="{$pElementName}">
       <xsl:if test="$pIncludeDatatype=true()">
+        <!-- PQ means physical quantity valid attribute for PQ are value and unit -->
         <xsl:attribute name="xsi:type">PQ</xsl:attribute>
       </xsl:if>
       <xsl:choose>
@@ -37,6 +38,9 @@ limitations under the License.
       <xsl:choose>
         <xsl:when test="fhir:unit">
           <xsl:attribute name="unit" select="fhir:unit/@value" />
+        </xsl:when>
+        <xsl:when test="fhir:system/@value ='http://unitsofmeasure.org'">
+          <xsl:attribute name="unit" select="fhir:code/@value"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:attribute name="unit">1</xsl:attribute>

@@ -13,12 +13,48 @@
         <xsl:call-template name="create-bundle-entry"/>
         <xsl:apply-templates select="cda:author" mode="bundle-entry"/>
     </xsl:template>
+    
+    
 
     <xsl:template match="cda:observation[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.4']]">
+        
 
         <Condition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://hl7.org/fhir">
-
+            
+            <!-- Check current Ig -->
+            <xsl:variable name="vCurrentIg">
+                <xsl:apply-templates select="/" mode="currentIg"/>
+            </xsl:variable>
+            
+            <!-- Set profiles based on Ig and Resource if it is needed -->
+            <xsl:choose>
+                <xsl:when test="$vCurrentIg='NA'">
+                    <xsl:call-template name="add-meta"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:variable name="vProfileValue">
+                        <xsl:call-template name="get-profile-for-ig">
+                            <xsl:with-param name="pIg" select="$vCurrentIg"/>
+                            <xsl:with-param name="pResource" select="'Condition'"/>
+                        </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:choose>
+                        <xsl:when test="$vProfileValue ne 'NA'">
+                            <meta>
+                                <profile>
+                                    <xsl:attribute name="value">
+                                        <xsl:value-of select="$vProfileValue"/>
+                                    </xsl:attribute>
+                                </profile>
+                            </meta>
+                        </xsl:when>
+                    </xsl:choose>
+                </xsl:otherwise>
+            </xsl:choose>
+            
+            <!-- 
             <xsl:call-template name="add-meta"/>
+             -->
             <xsl:apply-templates select="cda:id"/>
             <xsl:choose>
                 <xsl:when
@@ -28,10 +64,22 @@
                         mode="condition"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:apply-templates select="ancestor::cda:entry/cda:act/cda:statusCode"
-                        mode="condition"/>
+                    <!-- Observation could be in Encounter entryRelationship, there is no statusCode in ancestor::cda:entry/cda:act/cda:statusCode
+                        in the context of encounter, the cda:statusCode is in cda:entryRelationship level. Not sure we need enforce this by the 
+                        for cda2fhir in xSpec since clinicalStatus is option in fhir -->
+                    <xsl:choose>
+                        <xsl:when test="ancestor::cda:entry/cda:act/cda:statusCode">
+                            <xsl:apply-templates select="ancestor::cda:entry/cda:act/cda:statusCode"
+                                mode="condition"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="cda:statusCode"
+                                mode="condition"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
+            
             <xsl:if test="@negationInd = 'true' and not(cda:value/@code = '55607006')">
                 <verificationStatus>
                     <coding>
@@ -50,8 +98,23 @@
                         </coding>
                     </category>
                 </xsl:when>
+                <xsl:when test="ancestor::cda:act[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.132']]">
+                    <xsl:apply-templates select="ancestor::cda:act[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.132']]/cda:code">
+                        <xsl:with-param name="pElementName">category</xsl:with-param>
+                    </xsl:apply-templates>
+                </xsl:when>
+                
+                <xsl:when test="ancestor::cda:act[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.3']]">
+                    <xsl:apply-templates select="ancestor::cda:act[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.3']]/cda:code">
+                        <xsl:with-param name="pElementName">category</xsl:with-param>
+                    </xsl:apply-templates>
+                </xsl:when>
+                
+                <xsl:otherwise>
+                    <xsl:apply-templates select="cda:code" mode="condition"/>
+                </xsl:otherwise>
             </xsl:choose>
-            <xsl:apply-templates select="cda:code" mode="condition"/>
+            
             <xsl:apply-templates select="cda:value" mode="condition"/>
 
             <xsl:call-template name="subject-reference"/>

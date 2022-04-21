@@ -32,7 +32,38 @@
     <PractitionerRole>
 
       <!-- SG 20191204: Add meta.profile -->
-      <xsl:call-template name="add-participant-meta" />
+      <!-- <xsl:call-template name="add-participant-meta" /> -->
+      
+      <!-- Check current Ig -->
+      <xsl:variable name="vCurrentIg">
+        <xsl:apply-templates select="/" mode="currentIg"/>
+      </xsl:variable>
+      
+      <!-- Set profiles based on Ig and Resource if it is needed -->
+      <xsl:choose>
+        <xsl:when test="$vCurrentIg='NA'">
+          <xsl:call-template name="add-meta"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="vProfileValue">
+            <xsl:call-template name="get-profile-for-ig">
+              <xsl:with-param name="pIg" select="$vCurrentIg"/>
+              <xsl:with-param name="pResource" select="'PractitionerRole'"/>
+            </xsl:call-template>
+          </xsl:variable>
+          <xsl:choose>
+            <xsl:when test="$vProfileValue ne 'NA'">
+              <meta>
+                <profile>
+                  <xsl:attribute name="value">
+                    <xsl:value-of select="$vProfileValue"/>
+                  </xsl:attribute>
+                </profile>
+              </meta>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
 
       <xsl:call-template name="breadcrumb-comment" />
       <xsl:apply-templates select="cda:id" />

@@ -53,11 +53,16 @@
                 </xsl:choose>
             </xsl:if>
             <!-- TODO: move Goal to RequestGroup.reason and remove as an action -->
+            <!-- RG: Commented out for demo -->
+            <!--
             <xsl:for-each select="cda:entryRelationship[@typeCode='RSON'][cda:*[not(@nullFlavor)]]">
                 <xsl:apply-templates select="cda:*" mode="reference">
                     <xsl:with-param name="wrapping-elements">reasonReference</xsl:with-param>
                 </xsl:apply-templates>
             </xsl:for-each>
+            -->
+            <!-- RG: Commented out for demo -->
+            <!--
             <xsl:for-each select="cda:entryRelationship[not(@typeCode='RSON')][cda:*[not(@nullFlavor)]]">
                 <xsl:for-each select="cda:*">
                     <xsl:apply-templates select="." mode="reference">
@@ -72,6 +77,7 @@
                     </xsl:if>
                 </xsl:for-each>
             </xsl:for-each>
+            -->
         </RequestGroup>
     </xsl:template>
 

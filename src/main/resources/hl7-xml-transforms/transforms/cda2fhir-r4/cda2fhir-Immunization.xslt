@@ -4,7 +4,7 @@
   exclude-result-prefixes="lcg xsl cda fhir xs xsi sdtc xhtml" version="2.0">
 
   <xsl:import href="c-to-fhir-utility.xslt" />
-
+    
   <xsl:template match="cda:substanceAdministration[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.52'][@moodCode = 'EVN']" mode="bundle-entry">
     <xsl:call-template name="create-bundle-entry" />
   </xsl:template>
@@ -43,6 +43,8 @@
         <xsl:with-param name="pElementName">doseQuantity</xsl:with-param>
         <xsl:with-param name="pSimpleQuantity" select="true()" />
       </xsl:apply-templates>
+      <!-- RG: Commented out for demo -->
+      <!--
       <xsl:if test="cda:performer">
         <performer>
           <xsl:call-template name="performer-reference">
@@ -50,6 +52,7 @@
           </xsl:call-template>
         </performer>
       </xsl:if>
+      -->
     </Immunization>
   </xsl:template>
 

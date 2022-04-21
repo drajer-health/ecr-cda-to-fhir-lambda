@@ -17,7 +17,8 @@
 
 
   <xsl:template
-    match="cda:substanceAdministration[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.16'][@moodCode = 'EVN'][not(ancestor::*/cda:templateId[@root = '2.16.840.1.113883.10.20.22.2.38'])]">
+    match="cda:substanceAdministration[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.16'][@moodCode = 'EVN']
+    [not(ancestor::*/cda:templateId[@root = '2.16.840.1.113883.10.20.22.2.38']) and not(ancestor::*/cda:templateId[@root = '2.16.840.1.113883.10.20.22.2.44'])]">
     <xsl:variable name="dateAsserted">
       <xsl:choose>
         <xsl:when test="ancestor-or-self::cda:*/cda:author/cda:time/@value">
