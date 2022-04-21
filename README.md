@@ -108,15 +108,13 @@ com.drajer.ecr.cda2fhir.converter.CDA2FHIRConverterLambdaFunctionHandler::handle
 ### Lambda Configuration
 To process the file from the S3 bucket, lambda function needs to be configured to process from the specified folder. Add the ***Environment Variable*** to the lambda function specifying the S3 bucket folder name.
 
-1.  Click on "Configuration" tab and then "Environment Variables"
+1.  Click on "Configuration" tab and then "Environment Variables" 
 
-2.  Under the General Configuration, click on "Edit" and set the timeout to 1 min  
-
-3.  Click on "Edit" to add new environment variable
+2.  Click on "Edit" to add new environment variable
     
-4.  Click on "Add new environment variable"
+3.  Click on "Add new environment variable"
     
-5.  Enter
+4.  Enter
     
 
 |Environment Variable| Value |
