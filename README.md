@@ -20,11 +20,6 @@ Clone the repository using the below command in command prompt
 
 Import Project as Maven Project Build:
 
-### Setting Saxon PE license:
-1. Go to the `/src/main/resources` folder.
-
-2. Replace the licence `saxon-license.lic` file actual license file.
-
 Navigate to `ecr-cda-to-fhir-lambda` directory  `..../` and run Maven build to build lambda jar file.
 
 ```
@@ -114,12 +109,14 @@ com.drajer.ecr.cda2fhir.converter.CDA2FHIRConverterLambdaFunctionHandler::handle
 To process the file from the S3 bucket, lambda function needs to be configured to process from the specified folder. Add the ***Environment Variable*** to the lambda function specifying the S3 bucket folder name.
 
 1.  Click on "Configuration" tab and then "Environment Variables"
+
+2.  Under the General Configuration, click on "Edit" and set the timeout to 1 min  
+
+3.  Click on "Edit" to add new environment variable
     
-2.  Click on "Edit" to add new environment variable
+4.  Click on "Add new environment variable"
     
-3.  Click on "Add new environment variable"
-    
-4.  Enter
+5.  Enter
     
 
 |Environment Variable| Value |
