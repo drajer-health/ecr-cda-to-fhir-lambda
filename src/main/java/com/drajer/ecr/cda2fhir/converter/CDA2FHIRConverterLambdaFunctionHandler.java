@@ -86,14 +86,15 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 			context.getLogger().log("---- s3Object-Content....:" + s3Object.getObjectMetadata().getContentType());
 
 			UUID randomUUID = UUID.randomUUID();
-			File xsltFile = ResourceUtils.getFile("classpath:hl7-xml-transforms/transforms/cda2fhir-r4/SaxonPE-cda2fhir.xslt");
+			File xsltFile = ResourceUtils.getFile("classpath:hl7-xml-transforms/transforms/cda2fhir-r4/cda2fhir.xslt");
 
 			context.getLogger().log("--- Before Transformation XSLT---::" + xsltFile.getAbsolutePath());
 			context.getLogger().log("--- Before Transformation OUTPUT---::" + outputFile.getAbsolutePath());
 			context.getLogger().log("--- Before Transformation UUID---::" + randomUUID);
 
 			xsltTransformation(xsltFile.getAbsolutePath(), outputFile.getAbsolutePath(), randomUUID, context);
-
+			
+			
 			String responseXML = getFileContentAsString(randomUUID, context);
 
 			if (StringUtils.isNullOrEmpty(responseXML)) {
@@ -101,11 +102,13 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 			} else {
 				context.getLogger().log("Writing output file ");
 				this.writeFhirFile(responseXML, bucket, keyPrefix, context);
+				context.getLogger().log("Output Generated  "+bucket+"/"+keyPrefix);
 
 			}
 			return "SUCCESS";
 		} catch (Exception e) {
 			context.getLogger().log(e.getMessage());
+			context.getLogger().log("Exception in CDA2FHIR ");
 			e.printStackTrace();
 			return "ERROR:" + e.getMessage();
 		} finally {
@@ -166,16 +169,19 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 
 		try {
 
-			String[] commandLineArguments = new String[4];
+			String[] commandLineArguments = new String[3];
 
 			commandLineArguments[0] = "-xsl:" + xslFilePath;
 			commandLineArguments[1] = "-s:" + sourceXml;
-			commandLineArguments[2] = "-license:on";
-			commandLineArguments[3] = "-o:" + "/tmp/" + outputFileName + ".xml";
+			//commandLineArguments[2] = "-license:on";
+			commandLineArguments[2] = "-o:" + "/tmp/" + outputFileName + ".xml";
 
 			Transform.main(commandLineArguments);
+			
+			context.getLogger().log("Transformation Complete");
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			context.getLogger().log("ERROR: Transformation Failed with exception " + e.getMessage());
 		}
 	}
