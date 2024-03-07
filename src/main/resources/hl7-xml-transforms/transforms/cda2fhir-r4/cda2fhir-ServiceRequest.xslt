@@ -18,7 +18,9 @@
 
     <!-- MD: add transfer Planned Procedure (request or intent) to fhir ServiceRequest -->
     <xsl:template match="cda:procedure[@moodCode = 'RQO' or @moodCode = 'INT'][cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.41']]" mode="bundle-entry">
+        <xsl:comment>Planned Procedure</xsl:comment>
         <xsl:call-template name="create-bundle-entry" />
+        <xsl:apply-templates select="cda:performer" mode="bundle-entry"/>
     </xsl:template>
 
     <!-- Planned Procedure (request or intent) -->
@@ -41,6 +43,10 @@
             <!-- MD: add Occured time -->
             <xsl:apply-templates select="cda:effectiveTime" mode="instant">
                 <xsl:with-param name="pElementName">occurrenceDateTime</xsl:with-param>
+            </xsl:apply-templates>
+            <!-- SG 20231122: add ServiceRequest.authoredOn -->
+            <xsl:apply-templates select="cda:author/cda:time" mode="instant">
+                <xsl:with-param name="pElementName">authoredOn</xsl:with-param>
             </xsl:apply-templates>
             <xsl:call-template name="author-reference">
                 <xsl:with-param name="pElementName">requester</xsl:with-param>
@@ -111,8 +117,6 @@
                 </xsl:otherwise>
             </xsl:choose>
             
-            
-
             <xsl:apply-templates select="cda:priorityCode" mode="priorityCode" />
             <xsl:apply-templates select="cda:code" mode="procedure-request" />
             <xsl:call-template name="subject-reference" />
@@ -214,6 +218,10 @@
             <xsl:call-template name="subject-reference" />
             <xsl:apply-templates select="cda:effectiveTime" mode="instant">
                 <xsl:with-param name="pElementName" select="'occurrenceDateTime'" />
+            </xsl:apply-templates>
+            <!-- SG 20231122: add ServiceRequest.authoredOn -->
+            <xsl:apply-templates select="cda:author/cda:time" mode="instant">
+                <xsl:with-param name="pElementName">authoredOn</xsl:with-param>
             </xsl:apply-templates>
             <xsl:if test="cda:author">
                 <xsl:call-template name="author-reference">

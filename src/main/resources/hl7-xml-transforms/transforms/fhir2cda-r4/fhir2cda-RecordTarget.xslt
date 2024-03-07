@@ -16,8 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="urn:hl7-org:v3" xmlns:lcg="http://www.lantanagroup.com" xmlns:cda="urn:hl7-org:v3" xmlns:fhir="http://hl7.org/fhir" xmlns:sdtc="urn:hl7-org:sdtc"
-    version="2.0" exclude-result-prefixes="lcg xsl cda fhir sdtc">
+<xsl:stylesheet exclude-result-prefixes="lcg xsl cda fhir sdtc" version="2.0" xmlns="urn:hl7-org:v3" xmlns:cda="urn:hl7-org:v3" xmlns:fhir="http://hl7.org/fhir" xmlns:lcg="http://www.lantanagroup.com" xmlns:sdtc="urn:hl7-org:sdtc" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:import href="fhir2cda-utility.xslt" />
     <xsl:import href="fhir2cda-TS.xslt" />
@@ -32,7 +31,7 @@ limitations under the License.
                 </xsl:call-template>
             </xsl:variable>
             <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">
-                <xsl:apply-templates select="fhir:resource/fhir:*" mode="record-target" />
+                <xsl:apply-templates mode="record-target" select="fhir:resource/fhir:*" />
             </xsl:for-each>
         </xsl:for-each>
     </xsl:template>
@@ -48,12 +47,30 @@ limitations under the License.
     </xsl:template>
 
     <xsl:template name="make-record-target">
+        <!-- Variable for identification of IG - moved out of Global var because XSpec can't deal with global vars -->
+        <xsl:variable name="vCurrentIg">
+            <xsl:call-template name="get-current-ig" />
+        </xsl:variable>
         <recordTarget>
             <patientRole>
 
                 <xsl:call-template name="get-id" />
-                <xsl:call-template name="get-addr" />
-                <xsl:call-template name="get-telecom" />
+                <xsl:variable name="vNoNullAllowed">
+                    <xsl:choose>
+                        <xsl:when test="$vCurrentIg = 'HAI'">true</xsl:when>
+                        <xsl:otherwise>false</xsl:otherwise>
+                    </xsl:choose>
+
+                </xsl:variable>
+                <!-- SG NOTE: Address isn't required for HAI IGs like it is for US Realm Header based IGs and US Realm Header only has address as MS -->
+                <xsl:call-template name="get-addr">
+                    <xsl:with-param name="pNoNullAllowed" select="$vNoNullAllowed" />
+                </xsl:call-template>
+                <!-- SG NOTE: Telecom isn't required for HAI IGs like it is for US Realm Header based IGs and US Realm Header only has address as MS -->
+                <xsl:call-template name="get-telecom">
+                    <xsl:with-param name="pNoNullAllowed" select="$vNoNullAllowed" />
+                </xsl:call-template>
+
 
                 <patient>
                     <xsl:call-template name="get-person-name" />
@@ -74,26 +91,36 @@ limitations under the License.
                             </xsl:when>
                         </xsl:choose>
                     </administrativeGenderCode>
-                    
+
                     <xsl:call-template name="get-time">
                         <xsl:with-param name="pElement" select="fhir:birthDate" />
                         <xsl:with-param name="pElementName" select="'birthTime'" />
                     </xsl:call-template>
-                    
+
+                    <!-- SG 2023-06-05 update to deal with data-absent-reason -->
                     <xsl:choose>
                         <xsl:when test="fhir:deceasedDateTime">
                             <sdtc:deceasedInd value="true" />
-                            <xsl:call-template name="get-time">
-                                <xsl:with-param name="pElement" select="fhir:deceasedDateTime" />
-                                <xsl:with-param name="pElementName" select="'sdtc:deceasedTime'" />
-                            </xsl:call-template>
+                            <xsl:choose>
+                                <xsl:when test="fhir:deceasedDateTime/fhir:extension[@url = 'http://hl7.org/fhir/StructureDefinition/data-absent-reason']">
+                                    <sdtc:deceasedTime>
+                                        <xsl:apply-templates select="fhir:deceasedDateTime/fhir:extension[@url = 'http://hl7.org/fhir/StructureDefinition/data-absent-reason']" />
+                                    </sdtc:deceasedTime>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:call-template name="get-time">
+                                        <xsl:with-param name="pElement" select="fhir:deceasedDateTime" />
+                                        <xsl:with-param name="pElementName" select="'sdtc:deceasedTime'" />
+                                    </xsl:call-template>
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:when>
                         <!-- Assume when deceasedDateTime isn't present that the patient is still alive -->
                         <xsl:otherwise>
                             <sdtc:deceasedInd value="false" />
                         </xsl:otherwise>
                     </xsl:choose>
-                    
+
                     <xsl:choose>
                         <xsl:when test="fhir:maritalStatus">
                             <xsl:apply-templates select="fhir:maritalStatus">
@@ -101,11 +128,14 @@ limitations under the License.
                             </xsl:apply-templates>
                         </xsl:when>
                     </xsl:choose>
-                    
+
                     <xsl:apply-templates select="fhir:extension[@url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race']" />
                     <xsl:apply-templates select="fhir:extension[@url = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity']" />
+
+
                     <!-- Check for guardian information -->
-                    <xsl:for-each select="fhir:contact[fhir:relationship/fhir:coding/fhir:code/@value = 'GUARD']">
+                    <!-- Added Cerner local code (1156) for Guardian -->
+                    <xsl:for-each select="fhir:contact[fhir:relationship/fhir:coding/fhir:code[@value = 'GUARD' or @value = '1156']]">
                         <guardian>
                             <xsl:apply-templates select="fhir:address" />
                             <xsl:apply-templates select="fhir:telecom" />
@@ -114,6 +144,9 @@ limitations under the License.
                             </guardianPerson>
                         </guardian>
                     </xsl:for-each>
+                    
+                    <xsl:apply-templates select="fhir:extension[@url = 'http://hl7.org/fhir/StructureDefinition/patient-birthPlace']" />
+
                     <xsl:choose>
                         <xsl:when test="fhir:communication">
                             <!-- SG 20210802: Added for-each - there can be multiple languages unfortunately some of them are going to be in local code systems - if they 
@@ -193,6 +226,17 @@ limitations under the License.
                 <xsl:with-param name="pElementName" select="'sdtc:ethnicGroupCode'" />
             </xsl:apply-templates>
         </xsl:for-each>
+    </xsl:template>
+
+    <!-- SG 20231123: Add birthplace -->
+    <xsl:template match="fhir:extension[@url = 'http://hl7.org/fhir/StructureDefinition/patient-birthPlace']">
+<!--        <xsl:for-each select="fhir:address">        -->
+            <birthplace>
+                <place>
+                    <xsl:call-template name="get-addr" />
+                </place>
+            </birthplace>
+        <!--</xsl:for-each>-->
     </xsl:template>
 
 </xsl:stylesheet>

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns="http://hl7.org/fhir" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:cda="urn:hl7-org:v3" xmlns:fhir="http://hl7.org/fhir" xmlns:sdtc="urn:hl7-org:sdtc"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:lcg="http://www.lantanagroup.com"
+<xsl:stylesheet xmlns="http://hl7.org/fhir" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:cda="urn:hl7-org:v3"
+    xmlns:fhir="http://hl7.org/fhir" xmlns:sdtc="urn:hl7-org:sdtc" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:lcg="http://www.lantanagroup.com"
     xmlns:b64="https://github.com/ilyakharlamov/xslt_base64" version="2.0" exclude-result-prefixes="lcg cda fhir xs xsi sdtc xhtml b64">
 
     <xsl:include href="../base64.xsl" />
@@ -10,15 +11,46 @@
     <xsl:param name="template-subprofile-mapping-file">../template-subprofile-mapping.xml</xsl:param>
     <xsl:param name="lab-obs-status-mapping-file">../lab-obs-status-mapping.xml</xsl:param>
     <xsl:param name="lab-status-mapping-file">../lab-status-mapping.xml</xsl:param>
+    <xsl:param name="code-display-mapping-file">../code-display-mapping.xml</xsl:param>
 
     <xsl:variable name="template-profile-mapping" select="document($template-profile-mapping-file)/mapping" />
     <xsl:variable name="participant-profile-mapping" select="document($participant-profile-mapping-file)/mapping" />
     <xsl:variable name="template-subprofile-mapping" select="document($template-subprofile-mapping-file)/mapping" />
     <xsl:variable name="lab-status-mapping" select="document($lab-status-mapping-file)/mapping" />
     <xsl:variable name="lab-obs-status-mapping" select="document($lab-obs-status-mapping-file)/mapping" />
+    <xsl:variable name="code-display-mapping" select="document($code-display-mapping-file)/mapping" />
 
     <xsl:key name="referenced-acts" match="cda:*[not(cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.122'])]" use="cda:id/@root" />
 
+    <xsl:template name="breadcrumb-comment">
+        <xsl:comment>
+            <xsl:call-template name="breadcrumb-path-walker" />
+        </xsl:comment>
+    </xsl:template>
+
+    <xsl:template name="breadcrumb-path-walker">
+        <xsl:for-each select="parent::cda:*">
+            <xsl:call-template name="breadcrumb-path-walker" />
+        </xsl:for-each>
+        <xsl:text>/</xsl:text>
+        <xsl:value-of select="local-name(.)" />
+        <xsl:for-each select="cda:id">
+            <xsl:text>[cda:id</xsl:text>
+            <xsl:if test="@root">
+                <xsl:text>[@root="</xsl:text>
+                <xsl:value-of select="@root" />
+                <xsl:text>"]</xsl:text>
+            </xsl:if>
+            <xsl:if test="@extension">
+                <xsl:text>[@extension="</xsl:text>
+                <xsl:value-of select="@extension" />
+                <xsl:text>"]</xsl:text>
+            </xsl:if>
+            <xsl:text>]</xsl:text>
+        </xsl:for-each>
+    </xsl:template>
+
+    <!--
     <xsl:template name="breadcrumb-comment">
         <xsl:comment>
       <xsl:value-of select="local-name(parent::cda:*)" />
@@ -35,6 +67,7 @@
       <xsl:value-of select="local-name(.)" />
     </xsl:comment>
     </xsl:template>
+    -->
 
     <!-- TEMPLATE: Create the bundle entry -->
     <xsl:template name="create-bundle-entry">
@@ -146,20 +179,30 @@
         <xsl:variable name="profiles">
             <xsl:apply-templates select="cda:templateId" mode="template2profile" />
         </xsl:variable>
-        <xsl:choose>
-            <xsl:when test="$profiles/fhir:profile">
-                <meta>
-                    <xsl:apply-templates select="cda:templateId" mode="template2profile" />
-                </meta>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:comment>No profiles found for any of the following templates: <xsl:for-each select="cda:templateId">
-            <xsl:variable name="vTemplateURI" select="lcg:fcnGetTemplateURI(.)" />
-            <xsl:value-of select="$vTemplateURI" />
-          </xsl:for-each>
-        </xsl:comment>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:if test="$profiles/fhir:profile or cda:confidentialityCode[not(@nullFlavor)]">
+
+            <meta>
+                <xsl:choose>
+                    <xsl:when test="$profiles/fhir:profile">
+                        <xsl:apply-templates select="cda:templateId" mode="template2profile" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:comment>No profiles found for any of the following templates:
+                        <xsl:for-each select="cda:templateId">
+                            <xsl:variable name="vTemplateURI" select="lcg:fcnGetTemplateURI(.)" />
+                            <xsl:value-of select="$vTemplateURI" />
+                        </xsl:for-each>
+                    </xsl:comment>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:if test="cda:confidentialityCode[not(@nullFlavor)]">
+                    <security>
+                        <system value="http://terminology.hl7.org/CodeSystem/v3-Confidentiality" />
+                        <code value="{cda:confidentialityCode/@code}" />
+                    </security>
+                </xsl:if>
+            </meta>
+        </xsl:if>
     </xsl:template>
 
     <!-- TEMPLATE: Uses the template to profile file imported at the top of this file to match template oids with their structureDefinition profile -->
@@ -182,8 +225,8 @@
         <!-- If this is eCR or RR don't want to add CCDA-on-FHIR-US-Realm-Header conformance so skip those -->
         <xsl:choose>
             <xsl:when test="$vCurrentIg = 'eICR' or $vCurrentIg = 'RR'">
-
-                <xsl:for-each select="$template-profile-mapping/map[@templateURI = $vTemplateURI][not(contains(@templateURI, '2.16.840.1.113883.10.20.22.1.1'))]">
+                <xsl:for-each
+                    select="$template-profile-mapping/map[@templateURI = $vTemplateURI][not(contains(@templateURI, '2.16.840.1.113883.10.20.22.1.1'))]">
                     <profile value="{@profileURI}" />
                     <xsl:comment>CDA templateId: <xsl:value-of select="$vTemplateURI" /></xsl:comment>
                 </xsl:for-each>
@@ -239,7 +282,8 @@
             <xsl:variable name="vClinicalDocument">
                 <xsl:choose>
                     <xsl:when test="@extension">
-                        <xsl:value-of select="concat('ClinicalDocument[templateId/@root=''', @root, '''][templateId/@extension=''', @extension, ''']/')" />
+                        <xsl:value-of
+                            select="concat('ClinicalDocument[templateId/@root=''', @root, '''][templateId/@extension=''', @extension, ''']/')" />
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="concat('ClinicalDocument[templateId/@root=''', @root, ''']/')" />
@@ -344,10 +388,14 @@
                 <xsl:variable name="timezone" as="xs:string">
                     <xsl:choose>
                         <xsl:when test="contains($cdaTS, '-')">
-                            <xsl:sequence select="concat('-', substring(substring-after($cdaTS, '-'), 1, 2), ':', substring(substring-after($cdaTS, '-'), 3, 2))" />
+                            <xsl:sequence
+                                select="concat('-', substring(substring-after($cdaTS, '-'), 1, 2), ':', substring(substring-after($cdaTS, '-'), 3, 2))"
+                             />
                         </xsl:when>
                         <xsl:when test="contains($cdaTS, '+')">
-                            <xsl:sequence select="concat('+', substring(substring-after($cdaTS, '+'), 1, 2), ':', substring(substring-after($cdaTS, '+'), 3, 2))" />
+                            <xsl:sequence
+                                select="concat('+', substring(substring-after($cdaTS, '+'), 1, 2), ':', substring(substring-after($cdaTS, '+'), 3, 2))"
+                             />
                         </xsl:when>
                     </xsl:choose>
                 </xsl:variable>
@@ -355,7 +403,8 @@
             </xsl:when>
             <xsl:when test="string-length($cdaTS) > 8">
                 <xsl:variable name="time" as="xs:time">
-                    <xsl:sequence select="adjust-time-to-timezone(xs:time(concat(substring($cdaTS, 9, 2), ':', substring($cdaTS, 11, 2), ':00.000')))" />
+                    <xsl:sequence select="adjust-time-to-timezone(xs:time(concat(substring($cdaTS, 9, 2), ':', substring($cdaTS, 11, 2), ':00.000')))"
+                     />
                 </xsl:variable>
                 <xsl:sequence select="concat($date, 'T', format-time($time, '[H01]:[m01]:[s01][Z]'))" />
             </xsl:when>
@@ -837,8 +886,26 @@
         <xsl:param name="pElementName">identifier</xsl:param>
         <xsl:variable name="mapping" select="document('../oid-uri-mapping-r4.xml')/mapping" />
         <xsl:variable name="oid" select="@root" />
+        <xsl:variable name="value">
+            <xsl:choose>
+                <xsl:when test="$oid = '2.16.840.1.113883.4.873'">
+                    <xsl:call-template name="get-substring-after-last">
+                        <xsl:with-param name="pString" select="@extension" />
+                        <xsl:with-param name="pDelimiter" select="'/'" />
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="lower-case(@extension)"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <xsl:variable name="root-uri">
             <xsl:choose>
+                <!-- SG 2023-11-15: Updating the below based on the rules here: 
+                    https://build.fhir.org/ig/HL7/ccda-on-fhir/mappingGuidance.html (see: CDA id → FHIR Identifier with Example Mapping) Case: "Root = URI OID, Value = URL"--> 
+                <xsl:when test="$oid = '2.16.840.1.113883.4.873'">
+                    <xsl:value-of select="substring-before(@extension, concat('/', $value))"/>
+                </xsl:when>
                 <xsl:when test="$mapping/map[@oid = $oid]">
                     <xsl:value-of select="$mapping/map[@oid = $oid][1]/@uri" />
                 </xsl:when>
@@ -869,8 +936,8 @@
             <!-- MD: if no assigningAuthorityName do this -->
             <xsl:when test="@root and @extension">
                 <xsl:element name="{$pElementName}">
-                    <system value="{$root-uri}" />
-                    <value value="{@extension}" />
+                    <system value="{lower-case($root-uri)}" />
+                    <value value="{$value}" />
                 </xsl:element>
             </xsl:when>
 
@@ -892,7 +959,7 @@
     <xsl:template match="
             cda:code | cda:confidentialityCode | cda:maritalStatusCode | cda:routeCode | cda:raceCode | sdtc:raceCode |
             cda:ethnicGroupCode | cda:religiousAffiliationCode | cda:targetSiteCode | cda:priorityCode | cda:translation |
-            cda:methodCode | cda:approachSiteCode">
+            cda:methodCode | cda:approachSiteCode | sdtc:functionCode">
         <xsl:param name="pElementName" select="'CodeableConcept'" />
         <xsl:param name="includeCoding" select="true()" />
         <xsl:call-template name="newCreateCodableConcept">
@@ -927,8 +994,14 @@
             </xsl:choose>
         </xsl:variable>
         <xsl:variable name="isValue" select="false()" />
+        <xsl:variable name="vCode" select="@code" />
         <xsl:variable name="display">
             <xsl:choose>
+                <!-- SG 202304: Adding code/display mapping checks for FHIR's more stringent display checks - obviously this isn't going to catch everything,
+                     but will clean up our testing warnings -->
+                <xsl:when test="$code-display-mapping/map[@code = $vCode]">
+                    <xsl:value-of select="$code-display-mapping/map[@code = $vCode]/@display" />
+                </xsl:when>
                 <xsl:when test="@displayName">
                     <xsl:value-of select="@displayName" />
                 </xsl:when>
@@ -958,8 +1031,12 @@
 
         <xsl:variable name="translations">
             <xsl:for-each select="cda:translation">
-                <xsl:variable name="this-display">
+                <xsl:variable name="vTranslationCode" select="@code" />
+                <xsl:variable name="vTranslationDisplay">
                     <xsl:choose>
+                        <xsl:when test="$code-display-mapping/map[@code = $vTranslationCode]">
+                            <xsl:value-of select="$code-display-mapping/map[@code = $vTranslationCode]/@display" />
+                        </xsl:when>
                         <xsl:when test="@displayName">
                             <xsl:value-of select="normalize-space(@displayName)" />
                         </xsl:when>
@@ -980,7 +1057,7 @@
                     <xsl:call-template name="createCodeableConceptContent">
                         <xsl:with-param name="codeSystem" select="@codeSystem" />
                         <xsl:with-param name="code" select="@code" />
-                        <xsl:with-param name="displayName" select="$this-display" />
+                        <xsl:with-param name="displayName" select="$vTranslationDisplay" />
                         <xsl:with-param name="isValue" select="$isValue" />
                         <xsl:with-param name="pNullFlavor" select="$vNullFlavorInTranslation" />
                     </xsl:call-template>
@@ -1122,7 +1199,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="cda:birthTime">
+    <xsl:template match="cda:birthTime | sdtc:birthTime">
         <xsl:param name="pElementName">birthDate</xsl:param>
         <xsl:if test="not(@nullFlavor)">
             <xsl:element name="{$pElementName}">
@@ -1163,6 +1240,15 @@
         <xsl:element name="{$pElementName}">
             <xsl:attribute name="value">
                 <xsl:value-of select="lcg:cdaTS2date(@value)" />
+            </xsl:attribute>
+        </xsl:element>
+    </xsl:template>
+
+    <xsl:template match="cda:value[@xsi:type = 'BL']">
+        <xsl:param name="pElementName" select="'valueBoolean'" />
+        <xsl:element name="{$pElementName}">
+            <xsl:attribute name="value">
+                <xsl:value-of select="@value" />
             </xsl:attribute>
         </xsl:element>
     </xsl:template>
@@ -1253,7 +1339,8 @@
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="cda:effectiveTime[@value or cda:low/@value or cda:high/@value] | cda:time[@value or cda:low/@value or cda:high/@value]" mode="period">
+    <xsl:template match="cda:effectiveTime[@value or cda:low/@value or cda:high/@value] | cda:time[@value or cda:low/@value or cda:high/@value]"
+        mode="period">
         <xsl:param name="pElementName">period</xsl:param>
         <xsl:element name="{$pElementName}">
             <xsl:call-template name="effectiveTimeInner" />
@@ -1341,7 +1428,8 @@
     <xsl:template name="effectiveTimeInner">
         <xsl:if test="cda:width/@value and cda:width/@unit = 'weeks' and cda:high">
             <!-- Convert date string into date - only care about the first 8 chars -->
-            <xsl:variable name="vDate" select="xs:date(concat(substring(cda:high/@value, 1, 4), '-', substring(cda:high/@value, 5, 2), '-', substring(cda:high/@value, 7, 2)))" />
+            <xsl:variable name="vDate"
+                select="xs:date(concat(substring(cda:high/@value, 1, 4), '-', substring(cda:high/@value, 5, 2), '-', substring(cda:high/@value, 7, 2)))" />
             <xsl:variable name="vNumDays" select="7 * cda:width/@value" />
             <!-- Subtract number of days from start date -->
             <xsl:variable name="vStartDate" select="format-date(($vDate - $vNumDays * xs:dayTimeDuration('P1D')), '[Y][M][D]')" />
@@ -1561,32 +1649,58 @@
         <!-- SG: Updated to handle no author (default to encompassingEncounter/responsibleParty/assignedEntity and
          if there isn't one of those either, don't create element
          Updating for resources that can't take PractitionerRole (testing for pPractitionerRole) -->
-        <xsl:if
-            test="cda:author/cda:assignedAuthor/cda:assignedPerson or 
-                  ancestor::cda:section[1]/cda:author[1]/cda:assignedAuthor or 
-                  /cda:ClinicalDocument/cda:author[1]/cda:assignedAuthor[cda:assignedPerson] or 
-                  /cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter/cda:responsibleParty">
+        <!-- Well, the xsl:if test is not working properly, and resulting in empty participant elements in Encounter resources. 
+            Going to remove for now, will add back if still needed after I figure out what is going wrong -->
+        <xsl:comment>Author reference</xsl:comment>
+
+        <xsl:if test="
+                cda:author/cda:assignedAuthor/cda:assignedPerson or
+                cda:performer[parent::cda:procedure]/cda:assignedEntity/cda:assignedPerson or
+                ancestor::cda:section[1]/cda:author[1]/cda:assignedAuthor or
+                /cda:ClinicalDocument/cda:author[1]/cda:assignedAuthor or
+                /cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter/cda:responsibleParty">
+
             <xsl:element name="{$pElementName}">
                 <xsl:choose>
                     <xsl:when test="$pPractitionerRole = true() and cda:author/cda:assignedAuthor[cda:assignedPerson]">
                         <!-- TODO: test to see author.id is the same as an ancestor author, if so use that URN -->
                         <reference value="urn:uuid:{cda:author[1]/cda:assignedAuthor[cda:assignedPerson]/@lcg:uuid}" />
                     </xsl:when>
-                    <xsl:when test="$pPractitionerRole = true() and ancestor::cda:section[1]/cda:author[1]/cda:assignedAuthor">
-                        <reference value="urn:uuid:{ancestor::cda:section[1]/cda:author[1]/cda:assignedAuthor/@lcg:uuid}" />
+                    <xsl:when
+                        test="$pPractitionerRole = true() and cda:performer[parent::cda:procedure or parent::cda:observation]/cda:assignedEntity[cda:assignedPerson]">
+                        <!-- TODO: test to see author.id is the same as an ancestor author, if so use that URN -->
+                        <reference value="urn:uuid:{cda:performer[parent::cda:procedure]/cda:assignedEntity[cda:assignedPerson]/@lcg:uuid}" />
                     </xsl:when>
-                    <xsl:when test="$pPractitionerRole = true() and /cda:ClinicalDocument/cda:author[1]/cda:assignedAuthor[cda:assignedPerson]">
-                        <reference value="urn:uuid:{/cda:ClinicalDocument/cda:author[1]/cda:assignedAuthor[cda:assignedPerson]/@lcg:uuid}" />
+                    <xsl:when test="$pPractitionerRole = true() and ancestor::cda:section[1]/cda:author[cda:assignedAuthor][1]/cda:assignedAuthor">
+                        <reference value="urn:uuid:{ancestor::cda:section[1]/cda:author[cda:assignedAuthor][1]/cda:assignedAuthor/@lcg:uuid}" />
                     </xsl:when>
-                    <xsl:when test="$pPractitionerRole = true() and /cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter/cda:responsibleParty/cda:assignedEntity">
-                        <reference value="urn:uuid:{/cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter/cda:responsibleParty/cda:assignedEntity/@lcg:uuid}" />
+                    <xsl:when
+                        test="$pPractitionerRole = true() and /cda:ClinicalDocument/cda:author[cda:assignedAuthor[cda:assignedPerson]][1]/cda:assignedAuthor[cda:assignedPerson]">
+                        <reference
+                            value="urn:uuid:{/cda:ClinicalDocument/cda:author[cda:assignedAuthor[cda:assignedPerson]][1]/cda:assignedAuthor[cda:assignedPerson]/@lcg:uuid}"
+                         />
                     </xsl:when>
-                    <xsl:when test="$pPractitionerRole = false() and /cda:ClinicalDocument/cda:author/cda:assignedAuthor/cda:assignedPerson[1]">
-                        <reference value="urn:uuid:{/cda:ClinicalDocument/cda:author/cda:assignedAuthor/cda:assignedPerson[1]/@lcg:uuid}" />
+                    <xsl:when
+                        test="$pPractitionerRole = false() and /cda:ClinicalDocument/cda:author[cda:assignedAuthor/cda:assignedAuthoringDevice][1]/cda:assignedAuthor/cda:assignedAuthoringDevice">
+                        <reference value="urn:uuid:{/cda:ClinicalDocument/cda:author[1]/cda:assignedAuthor/cda:assignedAuthoringDevice/@lcg:uuid}" />
                     </xsl:when>
+                    <xsl:when
+                        test="$pPractitionerRole = true() and /cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter/cda:responsibleParty/cda:assignedEntity">
+                        <reference
+                            value="urn:uuid:{/cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter/cda:responsibleParty/cda:assignedEntity/@lcg:uuid}"
+                         />
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                            <valueCode value="unknown" />
+                        </extension>
+                        <xsl:comment>No author reference found</xsl:comment>
+                    </xsl:otherwise>
                 </xsl:choose>
             </xsl:element>
+
         </xsl:if>
+
     </xsl:template>
 
     <xsl:template name="performer-reference">
@@ -1606,10 +1720,13 @@
                         <reference value="urn:uuid:{ancestor::cda:section[1]/cda:performer/cda:assignedEntity/@lcg:uuid}" />
                     </xsl:when>
                     <xsl:when test="/cda:ClinicalDocument/cda:documentation/cda:serviceEvent/cda:performer/cda:assignedEntity">
-                        <reference value="urn:uuid:{/cda:ClinicalDocument/cda:documentation/cda:serviceEvent/cda:performer/cda:assignedEntity/@lcg:uuid}" />
+                        <reference
+                            value="urn:uuid:{/cda:ClinicalDocument/cda:documentation/cda:serviceEvent/cda:performer/cda:assignedEntity/@lcg:uuid}" />
                     </xsl:when>
                     <xsl:when test="/cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter/cda:responsibleParty/cda:assignedEntity">
-                        <reference value="urn:uuid:{/cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter/cda:responsibleParty/cda:assignedEntity/@lcg:uuid}" />
+                        <reference
+                            value="urn:uuid:{/cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter/cda:responsibleParty/cda:assignedEntity/@lcg:uuid}"
+                         />
                     </xsl:when>
                 </xsl:choose>
             </xsl:element>
@@ -1625,19 +1742,41 @@
                             <xsl:apply-templates select="cda:low" mode="range" />
                             <xsl:apply-templates select="cda:high" mode="range" />
                         </xsl:when>
+                        <!-- SG 2023-06-04: Remove terminate="yes" - whole transform doesn't need to stop because the reference range type can't be dealt with 
+                             (neither low or high are required in FHIR)
+                             and if it's a string, moving it down to text-->
                         <xsl:otherwise>
-                            <xsl:message terminate="yes"> Unsupported observation reference range type: <xsl:value-of select="@xsi:type" />
+                            <xsl:message> Unsupported observation reference range type: <xsl:value-of select="@xsi:type" />
                             </xsl:message>
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:for-each>
-                <xsl:if test="cda:text">
-                    <text>
-                        <xsl:attribute name="value">
-                            <xsl:value-of select="cda:text" />
-                        </xsl:attribute>
-                    </text>
-                </xsl:if>
+                <!-- Put whatever is in text into a variable -->
+                <xsl:variable name="vText">
+                    <xsl:value-of select="cda:text" />
+                </xsl:variable>
+                <!-- Put whatever is in value with xsi:type = ST into a variable -->
+                <xsl:variable name="vValueST">
+                    <xsl:value-of select="cda:value[@xsi:type = 'ST']" />
+                </xsl:variable>
+
+                <!-- If they are different concatenate, if they are the same just use text -->
+                <xsl:choose>
+                    <xsl:when test="$vText = $vValueST">
+                        <text>
+                            <xsl:attribute name="value">
+                                <xsl:value-of select="$vText" />
+                            </xsl:attribute>
+                        </text>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <text>
+                            <xsl:attribute name="value">
+                                <xsl:value-of select="concat($vText, '; ', $vValueST)" />
+                            </xsl:attribute>
+                        </text>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:for-each>
         </referenceRange>
     </xsl:template>
@@ -1758,10 +1897,11 @@
     <!-- TEMPLATE: Uses the lab-status-mapping file imported at the top of this file to match cda lab status with fhir equivalents -->
     <xsl:template match="cda:value" mode="map-lab-status">
         <xsl:param name="pElementName" select="'status'" />
+        <xsl:variable name="vLabStatus" select="@code" />
         <xsl:element name="{$pElementName}">
             <xsl:choose>
-                <xsl:when test="$lab-status-mapping/map[@cdaLabStatus = cda:value/@code]">
-                    <xsl:attribute name="value" select="@fhirLabStatus" />
+                <xsl:when test="$lab-status-mapping/map[@cdaLabStatus = $vLabStatus]">
+                    <xsl:attribute name="value" select="$lab-status-mapping/map[@cdaLabStatus = $vLabStatus]/@fhirLabStatus" />
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="value" select="'final'" />
@@ -1823,10 +1963,11 @@
     <!-- TEMPLATE: Uses the lab-obs-status-mapping file imported at the top of this file to match cda lab obs status with fhir equivalents -->
     <xsl:template match="cda:value" mode="map-lab-obs-status">
         <xsl:param name="pElementName" select="'status'" />
+        <xsl:variable name="vStatus" select="@code" />
         <xsl:element name="{$pElementName}">
             <xsl:choose>
-                <xsl:when test="$lab-obs-status-mapping/map[@cdaLabObsStatus = cda:value/@code]">
-                    <xsl:attribute name="value" select="@fhirLabObsStatus" />
+                <xsl:when test="$lab-obs-status-mapping/map[@cdaLabObsStatus = $vStatus]">
+                    <xsl:attribute name="value" select="$lab-obs-status-mapping/map[@cdaLabObsStatus = $vStatus]/@fhirLabObsStatus" />
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="value" select="'final'" />
@@ -1914,6 +2055,28 @@
         </xsl:choose>
     </xsl:function>
 
+    
+    
+    
+    <!-- SG 2023-06-05 Returns full data absent reason extension -->
+    <xsl:template match="@nullFlavor" mode="data-absent-reason-extension">
+        <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+            <xsl:element name="valueCode">
+                <xsl:attribute name="value">
+                    <xsl:choose>
+                        <xsl:when test=". = 'UNK'">unknown</xsl:when>
+                        <xsl:when test=". = 'NA'">not-applicable</xsl:when>
+                        <xsl:when test=". = 'MSK'">masked</xsl:when>
+                        <xsl:when test=". = 'NINF'">negative-infinity</xsl:when>
+                        <xsl:when test=". = 'PINF'">positive-infinity</xsl:when>
+                        <xsl:otherwise>unknown</xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+            </xsl:element>
+        </extension>
+    </xsl:template>
+    
+    <!-- This is for Observation.dataAbsentReason only  -->
     <xsl:template match="@nullFlavor" mode="data-absent-reason">
         <dataAbsentReason>
             <coding>
@@ -1926,7 +2089,7 @@
                             <xsl:when test=". = 'MSK'">masked</xsl:when>
                             <xsl:when test=". = 'NINF'">negative-infinity</xsl:when>
                             <xsl:when test=". = 'PINF'">positive-infinity</xsl:when>
-                            <xsl:otherwise>UNK</xsl:otherwise>
+                            <xsl:otherwise>unknown</xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
                 </xsl:element>
@@ -2057,4 +2220,29 @@
         </xsl:call-template>
     </xsl:template>
 
+    <xsl:template name="get-current-ig">
+        <xsl:choose>
+            <xsl:when test="/cda:ClinicalDocument[cda:templateId/@root = '2.16.840.1.113883.10.20.15.2']">eICR</xsl:when>
+            <xsl:when test="/cda:ClinicalDocument[cda:templateId/@root = '2.16.840.1.113883.10.20.15.2.1.2']">RR</xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+
+    <xsl:template name="get-substring-after-last">
+        <xsl:param name="pString" />
+        <xsl:param name="pDelimiter" />
+        <xsl:choose>
+            <xsl:when test="contains($pString, $pDelimiter)">
+                <xsl:call-template name="get-substring-after-last">
+                    <xsl:with-param name="pString"
+                        select="substring-after($pString, $pDelimiter)" />
+                    <xsl:with-param name="pDelimiter" select="$pDelimiter" />
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$pString" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
 </xsl:stylesheet>

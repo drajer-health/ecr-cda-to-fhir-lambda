@@ -30,7 +30,20 @@
     <xsl:template
         match="cda:act[@moodCode = 'EVN'][cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.12']]">
         <Procedure xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://hl7.org/fhir">
-            <xsl:call-template name="add-meta" />
+            <!-- Check current Ig -->
+            <xsl:variable name="vCurrentIg">
+                <xsl:apply-templates select="/" mode="currentIg" />
+            </xsl:variable>
+            <xsl:choose>
+                <xsl:when test="$vCurrentIg='eICR'">
+                    <meta>
+                        <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-procedure"/>
+                    </meta>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:call-template name="add-meta" />
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:apply-templates select="cda:id"/>
             <xsl:apply-templates select="cda:statusCode" mode="procedure"/>
             <xsl:apply-templates select="cda:code">
@@ -69,7 +82,20 @@
     <xsl:template
         match="cda:procedure[@moodCode = 'EVN'][cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.14']]">
         <Procedure xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://hl7.org/fhir">
-            <xsl:call-template name="add-meta" />
+            <!-- Check current Ig -->
+            <xsl:variable name="vCurrentIg">
+                <xsl:apply-templates select="/" mode="currentIg" />
+            </xsl:variable>
+            <xsl:choose>
+                <xsl:when test="$vCurrentIg='eICR'">
+                    <meta>
+                        <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-procedure"/>
+                    </meta>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:call-template name="add-meta" />
+                </xsl:otherwise>
+            </xsl:choose>
             <xsl:apply-templates select="cda:id"/>
             <xsl:apply-templates select="cda:statusCode" mode="procedure"/>
             <xsl:apply-templates select="cda:code">
@@ -87,6 +113,11 @@
             <xsl:apply-templates select="cda:targetSiteCode">
                 <xsl:with-param name="pElementName" select="'bodySite'" />
             </xsl:apply-templates>
+            
+            <!-- SG: Add focalDevice -->
+            <!-- Looking for C-CDA R1.1 Product Instance template -->
+            
+            <xsl:apply-templates select="cda:participant/cda:participantRole/cda:templateId[@root='2.16.840.1.113883.10.20.22.4.37']"/>
                 
             <!-- RG: Commented out for demo -->
             <!--
@@ -101,12 +132,24 @@
         </Procedure>
     </xsl:template>
     
-   
-
     <xsl:template
         match="cda:observation[@moodCode = 'EVN'][cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.13']]">
         <Procedure xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://hl7.org/fhir">
-            <xsl:call-template name="add-meta" />
+            <!-- Check current Ig -->
+            <xsl:variable name="vCurrentIg">
+                <xsl:apply-templates select="/" mode="currentIg" />
+            </xsl:variable>
+            <xsl:choose>
+                <xsl:when test="$vCurrentIg='eICR'">
+                    <meta>
+                        <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-procedure"/>
+                    </meta>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:call-template name="add-meta" />
+                </xsl:otherwise>
+            </xsl:choose>
+            
             <xsl:apply-templates select="cda:id"/>
             <xsl:apply-templates select="cda:statusCode" mode="procedure"/>
             <xsl:apply-templates select="cda:code">
@@ -138,7 +181,7 @@
                         </xsl:apply-templates>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:message>Unknown procedure obeservation procedure value for
+                        <xsl:message>Unknown procedure observation procedure value for
                             <xsl:apply-templates select="cda:id"/></xsl:message>
                     </xsl:otherwise>
                 </xsl:choose>
