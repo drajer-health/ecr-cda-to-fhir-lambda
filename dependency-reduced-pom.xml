@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.drajer.ecr.cda2fhir</groupId>
   <artifactId>ecr-cda-to-fhir-lambda</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.0.1</version>
   <build>
     <plugins>
       <plugin>
@@ -56,6 +56,11 @@
         <version>1.11.256</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>2.17.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
