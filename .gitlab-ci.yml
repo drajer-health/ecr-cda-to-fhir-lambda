@@ -1,0 +1,64 @@
+image: alpine
+
+stages:
+  - build
+  - fhir-sandbox
+  - fhir-onboard
+
+# Lambda Build Stages
+build:
+  stage: build
+  image: maven:3.8-jdk-8-slim
+  script:
+    - mvn clean
+    - mvn clean install
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - target/ecr-cda-to-fhir-lambda-1.0.0.jar
+
+.upload_and_deploy: &upload_and_deploy
+  image: amazon/aws-cli
+  script:
+    - aws sts get-caller-identity
+    - cd target/
+    - aws s3 cp $S3_KEY s3://$S3_BUCKET/
+    - aws lambda update-function-code --region us-east-1 --function-name $FUNCTION_NAME --s3-bucket $S3_BUCKET --s3-key $S3_KEY
+
+
+# Lambda Deploy Stages
+
+##############################################################################
+### ECR on FHIR SANDBOX                                                         ###
+##############################################################################
+
+deploy-lambda-fhir-sandbox:
+  stage: fhir-sandbox
+  <<: *upload_and_deploy
+  variables:
+    AWS_ACCESS_KEY_ID: $FHIR_SANDBOX_AWS_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY: $FHIR_SANDBOX_AWS_SECRET_KEY
+    S3_BUCKET: 	fhir-aims-sandbox-lambda-funcs
+    S3_KEY: ecr-cda-to-fhir-lambda-1.0.0.jar
+    FUNCTION_NAME: fhir-aims-sandbox-cda2fhirlambda
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+
+##############################################################################
+### ECR on FHIR ONBOARD                                                         ###
+##############################################################################
+
+deploy-lambda-fhir-onboard:
+  stage: fhir-onboard
+  <<: *upload_and_deploy
+  variables:
+    AWS_ACCESS_KEY_ID: $FHIR_ONBOARD_AWS_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY: $FHIR_ONBOARD_AWS_SECRET_KEY
+    S3_BUCKET: 	fhir-aims-onboard-lambda-funcs
+    S3_KEY: ecr-cda-to-fhir-lambda-1.0.0.jar
+    FUNCTION_NAME: fhir-aims-onboard-cda2fhirlambda
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+      when: manual
+
