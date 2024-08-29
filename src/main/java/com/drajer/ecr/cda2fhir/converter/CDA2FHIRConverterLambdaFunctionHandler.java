@@ -29,6 +29,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.StringUtils;
 import com.saxonica.config.ProfessionalConfiguration;
 
+import net.sf.saxon.Transform;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;

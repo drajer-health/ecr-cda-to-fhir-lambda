@@ -4,7 +4,7 @@ S3 Trigger to convert FHIR to CDA format
 
 ### Prerequisites:
 
-1.  Java 8 or Higher
+1.  Java 17
 2.  AWS SDK - STS or Eclipse
 3.  AWS Account
 4.  Maven 3.3.x
@@ -47,7 +47,7 @@ Login to your AWS Account
 
 ```
 Function Name: ecrCDA-to-FHIR-lambda
-Runtime: Java 8 on Amazon Linux 1 or any other Java runtimes
+Runtime: Java 17
 Permissions: Create a new role with basic Lambda permissions or select your organization specific security
 ```
 5. Click on "Create Function"
@@ -57,42 +57,50 @@ Permissions: Create a new role with basic Lambda permissions or select your orga
 
 1. Go to the newly created Role.
 
-2. Under `Permissions` tab click on `Add inline Policy`
+2. Under `Permissions` tab click on `Create inline Policy`
 
-3. Click on `{ } JSON` tab and ad the following security policy. Replace the `S3-BUCKET-NAME` with your S3 bucket name.
+3. Click on `{ } JSON` tab and ad the following security policy. Replace the `SQS-NAME` with your SQS name.
 	```
 	{
     "Version": "2012-10-17",
     "Statement": [
-        {
-            "Sid": "ListObjectsInBucket",
-            "Action": [
-                "s3:GetObjectVersion",
-                "s3:GetBucketLocation",
-                "s3:GetObject",
-                "s3:PutObject",
-                "s3:PutObjectAcl"
-            ],
-            "Effect": "Allow",
-            "Resource": [
-                "arn:aws:s3:::S3-BUCKET-NAME/*"
-            ]
-        }
+            {
+                "Sid": "Statement1",
+                "Effect": "Allow",
+                "Action": "sqs:ReceiveMessage",
+                "Resource": "arn:aws:sqs:SQS-NAME"
+            },
+            {
+                "Sid": "Statement2",
+                "Effect": "Allow",
+                "Action": "sqs:DeleteMessage",
+                "Resource": "arn:aws:sqs:SQS-NAME"
+            },
+            {
+                "Sid": "Statement3",
+                "Effect": "Allow",
+                "Action": "sqs:GetQueueAttributes",
+                "Resource": "arn:aws:sqs:SQS-NAME"
+            }
     ]
 }
 	``
 
-4. Click on button `Review policy` and then click `Save changes`
+4. Click on button `Next` 
 
-5. Come back to your AWS Lambda Function and navigate to `Configuration` tab.
+5. Enter policy name `ecrCdaToFhirLamdaPolcy`
 
-6. Go to the `General Configuration` and click on `Edit` button. Increase the Timeout to minimum 1 minute. 
+6. Click on `Create policy`
+
+7. Come back to your AWS Lambda Function and navigate to `Configuration` tab.
+
+8. Go to the `General Configuration` and click on `Edit` button. Increase the Timeout to minimum 1 minute. 
 
 7.  Under the "Code" tab select "Upload from"
 
 8. Select .zip or .jar file option.
 
-9. Click upload and navigate to your local workspace target folder and select ecr-cda-to-fhir-lambda-1.0.0.jar and click "Save".
+9. Click upload and navigate to your local workspace target folder and select ecr-cda-to-fhir-lambda-1.0.1.jar and click "Save".
 
 10. Click on "Edit" on "Runtime Settings".
 
@@ -129,13 +137,11 @@ Lambda function needs to be triggered, for this we need to add and configure the
 2. Click on `Add trigger`
 
 3. From the `Trigger configuration` drop down select
-	`S3` option
+    `SQS` option
 
-4. From the `Bucket` drop down select your bucket that this lambda function will listen.
+4. From the `SQS queque` drop down select your SQS that this lambda function will listen.
 
-5. Add the `Suffix` to add filter to the function. For example `RR_CDA.xml`
-
-6. Select the acknowledgement and click Add.
+6. Click Add.
 
 
 ### At this point the Lambda function is created and configured to listen to the S3 Bucket.
