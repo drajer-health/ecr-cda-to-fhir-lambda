@@ -106,8 +106,11 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
         <configuration>
-          <fork>true</fork>
-          <executable>${javacomplier.location}</executable>
+          <source>17</source>
+          <target>17</target>
+          <encoding>UTF-8</encoding>
+          <forceJavacCompilerUse>true</forceJavacCompilerUse>
+          <includeSystemScope>true</includeSystemScope>
         </configuration>
       </plugin>
       <plugin>
