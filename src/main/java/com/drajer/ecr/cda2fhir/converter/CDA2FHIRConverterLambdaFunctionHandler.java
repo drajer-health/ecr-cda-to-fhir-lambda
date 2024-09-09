@@ -23,9 +23,11 @@ import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.event.S3EventNotification.S3EventNotificationRecord;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.StringUtils;
 import com.saxonica.config.ProfessionalConfiguration;
 
@@ -68,13 +70,33 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 	}	
 	
 	private Processor createSaxonProcessor(String bucketName) throws IOException {
+		String licenseFilePath = "/tmp/saxon-license.lic"; // Ensure temp path is used
 		ProfessionalConfiguration configuration = new ProfessionalConfiguration();
-		ClassLoader classLoader = getClass().getClassLoader();
+		String key = "license/saxon-license.lic";
+
+		// Attempt to retrieve the license file from S3
+		S3Object licenseObj;
+		try {
+			licenseObj = s3Client.getObject(bucketName, key);
+		} catch (AmazonS3Exception e) {
+			throw new IOException("Failed to retrieve the license file from S3 bucket: " + bucketName, e);
+		}
+
+		// Read the license file
+		try (S3ObjectInputStream s3InputStream = licenseObj.getObjectContent();
+				FileOutputStream fos = new FileOutputStream(new File(licenseFilePath))) {
+
+			byte[] readBuf = new byte[DEFAULT_BUFFER_SIZE];
+			int readLen;
+			while ((readLen = s3InputStream.read(readBuf)) > 0) {
+				fos.write(readBuf, 0, readLen);
+			}
+		}
 
 		// Check if the license file was saved correctly
-		File licenseFile = new File(classLoader.getResource("saxon-license.lic").getFile());
+		File licenseFile = ResourceUtils.getFile(licenseFilePath);
 		if (!licenseFile.exists() || licenseFile.length() == 0) {
-			throw new IOException("License file not found or is empty at: ");
+			throw new IOException("License file not found or is empty at: " + licenseFilePath);
 		}
 
 		String saxonLicenseAbsolutePath = licenseFile.getAbsolutePath();
