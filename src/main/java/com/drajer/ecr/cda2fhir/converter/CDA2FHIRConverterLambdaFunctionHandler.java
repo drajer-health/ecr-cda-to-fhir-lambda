@@ -60,17 +60,16 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 	}	
 	
 	public CDA2FHIRConverterLambdaFunctionHandler() throws IOException {
-		String bucketName = System.getenv("SQS_NAME");
+		String bucketName = System.getenv("BUCKET_NAME");
 		if (bucketName == null || bucketName.isEmpty()) {
-			throw new IllegalArgumentException("SQS name is not set in the environment variables.");
+			throw new IllegalArgumentException("S3 bucket name is not set in the environment variables.");
 		}		
 		// Load the Saxon processor and transformer
-		this.processor = createSaxonProcessor();
+		this.processor = createSaxonProcessor(bucketName);
 		this.transformer = initializeTransformer();
 	}	
 	
-	private Processor createSaxonProcessor() throws IOException {
-		String bucketName = System.getenv("BUCKET_NAME");
+	private Processor createSaxonProcessor(String bucketName) throws IOException {
 		String licenseFilePath = "/tmp/saxon-license.lic"; // Ensure temp path is used
 		ProfessionalConfiguration configuration = new ProfessionalConfiguration();
 		String key = "license/saxon-license.lic";
