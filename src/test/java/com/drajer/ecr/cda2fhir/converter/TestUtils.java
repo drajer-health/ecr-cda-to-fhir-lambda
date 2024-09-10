@@ -12,12 +12,11 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.tz.FixedDateTimeZone;
 
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.Record;
-import com.amazonaws.services.dynamodbv2.model.StreamRecord;
 import com.amazonaws.services.lambda.runtime.events.DynamodbEvent;
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import com.amazonaws.services.lambda.runtime.events.SNSEvent;
+import com.amazonaws.services.lambda.runtime.events.models.dynamodb.AttributeValue;
+import com.amazonaws.services.lambda.runtime.events.models.dynamodb.StreamRecord;
 import com.amazonaws.services.s3.event.S3EventNotification;
 import com.amazonaws.util.IOUtils;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -68,30 +67,30 @@ public class TestUtils {
      * @param resource the path to the resource (relative to this class)
      * @param clazz the type to parse the JSON into
      */
-    public static <T> T parse(String resource, Class<T> clazz)
-            throws IOException {
-
-        InputStream stream = TestUtils.class.getResourceAsStream(resource);
-        try {
-            if (clazz == S3Event.class) {
-                String json = IOUtils.toString(stream);
-                S3EventNotification event = S3EventNotification.parseJson(json);
-
-                @SuppressWarnings("unchecked")
-                T result = (T) new S3Event(event.getRecords());
-                return result;
-
-            } else if (clazz == SNSEvent.class) {
-                return snsEventMapper.readValue(stream, clazz);
-            } else if (clazz == DynamodbEvent.class) {
-                return dynamodbEventMapper.readValue(stream, clazz);
-            } else {
-                return mapper.readValue(stream, clazz);
-            }
-        } finally {
-            stream.close();
-        }
-    }
+//    public static <T> T parse(String resource, Class<T> clazz)
+//            throws IOException {
+//
+//        InputStream stream = TestUtils.class.getResourceAsStream(resource);
+//        try {
+//            if (clazz == S3Event.class) {
+//                String json = IOUtils.toString(stream);
+//                S3EventNotification event = S3EventNotification.parseJson(json);
+//
+//                @SuppressWarnings("unchecked")
+//                T result = (T) new S3Event(event.getRecords());
+//                return result;
+//
+//            } else if (clazz == SNSEvent.class) {
+//                return snsEventMapper.readValue(stream, clazz);
+//            } else if (clazz == DynamodbEvent.class) {
+//                return dynamodbEventMapper.readValue(stream, clazz);
+//            } else {
+//                return mapper.readValue(stream, clazz);
+//            }
+//        } finally {
+//            stream.close();
+//        }
+//    }
 
     private static class TestJacksonMapperModule extends SimpleModule {
 
