@@ -60,12 +60,35 @@ Permissions: Create a new role with basic Lambda permissions or select your orga
 2. Under `Permissions` tab click on `Create inline Policy`
 
 3. Click on `{ } JSON` tab and ad the following security policy. 
+
+   Replace the `SQS-NAME` with your SQS name.
+
    Replace the `S3-BUCKET-NAME` with your S3 bucket name.
+
    Replace the `S3-LIC_BUCKET-NAME` with your S3 bucket name for saxon license.
+
 ```
 {
     "Version": "2012-10-17",
     "Statement": [
+        {
+            "Sid": "Statement1",
+            "Effect": "Allow",
+            "Action": "sqs:ReceiveMessage",
+            "Resource": "arn:aws:sqs:SQS-NAME"
+        },
+        {
+            "Sid": "Statement2",
+            "Effect": "Allow",
+            "Action": "sqs:DeleteMessage",
+            "Resource": "arn:aws:sqs:SQS-NAME"
+        },
+        {
+            "Sid": "Statement3",
+            "Effect": "Allow",
+            "Action": "sqs:GetQueueAttributes",
+            "Resource": "arn:aws:sqs:SQS-NAME"
+        },
         {
             "Sid": "ListObjectsInBucket",
             "Effect": "Allow",
@@ -142,7 +165,7 @@ To process the file from the S3 bucket, lambda function needs to be configured t
 ### SQS Queue
 Choose the SQS queue and click `Create Queue` 
 
-1. Select `Standard` and Enter the Name for the Queue as `fhir-ecr1-sqs-queue`
+1. Select `Standard` and Enter the Name for the Queue as `fhir-ecr1-cda-fhir-sqs-queue`
    
 3. Enter 10 minutes as Visibility timeout
    
@@ -152,7 +175,7 @@ Choose the SQS queue and click `Create Queue`
    
 6. Make neccessary changes to below and copy as in-line policy
    ```
-   {
+{
   "Version": "2012-10-17",
   "Id": "__default_policy_ID",
   "Statement": [
@@ -166,7 +189,7 @@ Choose the SQS queue and click `Create Queue`
       "Resource": "arn:aws:sqs:us-east-1:<<AWS_ACCOUNT_INFO>>:<<QUEUE_NAME>>",
       "Condition": {
         "StringEquals": {
-          "aws:SourceAccount": "<<AWS ACCOUNT INFO>> "
+          "aws:SourceAccount": "<<AWS ACCOUNT INFO>>"
         },
         "ArnLike": {
           "aws:SourceArn": "arn:aws:s3:::<<S3 BUCKET NAME>>"
