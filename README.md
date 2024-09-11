@@ -125,7 +125,7 @@ Permissions: Create a new role with basic Lambda permissions or select your orga
 
 7. Come back to your AWS Lambda Function and navigate to `Configuration` tab.
 
-8. Go to the `General Configuration` and click on `Edit` button. Increase the Timeout to minimum 1 minute. 
+8. Go to the `General Configuration` and click on `Edit` button. Increase the Timeout to minimum 10 minute. 
 
 7.  Under the "Code" tab select "Upload from"
 
@@ -165,7 +165,7 @@ To process the file from the S3 bucket, lambda function needs to be configured t
 ### SQS Queue
 Choose the SQS queue and click `Create Queue` 
 
-1. Select `Standard` and Enter the Name for the Queue as `fhir-ecr1-cda-fhir-sqs-queue`
+1. Select `Standard` and Enter the Name for the Queue as `eg: fhir-ecr1-cda-fhir-sqs-queue`
    
 3. Enter 10 minutes as Visibility timeout
    
@@ -187,7 +187,7 @@ Choose the SQS queue and click `Create Queue`
         "Service": "s3.amazonaws.com"
       },
       "Action": "SQS:SendMessage",
-      "Resource": "arn:aws:sqs:us-east-1:<<AWS_ACCOUNT_INFO>>:<<QUEUE_NAME>>",
+      "Resource": "arn:aws:sqs:us-east-1:<<AWS_ACCOUNT_INFO>>:<<QUEUE_NAME (from the SQS Queue Step 1)>>",
       "Condition": {
         "StringEquals": {
           "aws:SourceAccount": "<<AWS ACCOUNT INFO>>"
@@ -226,7 +226,7 @@ Lambda function needs to be triggered, for this we need to add and configure the
 
 2. Scroll down to `Event Notification` and Click `Create event Notification`
 
-3. Enter Name `cda-fhir-event`
+3. Enter Name `eg: cda-fhir-event`
 
 4. Enter Suffix as `RR_CDA.xml`
 
@@ -235,9 +235,9 @@ Lambda function needs to be triggered, for this we need to add and configure the
 6. Destination as `SQS queue`
 
 7. Specify SQS queue 
-    Enter SQS queque ARN
+    Enter SQS queque 
     
-    `arn:aws:<<SQS ARN >>`
+    `arn:aws:<<SQS Name (from the SQS Queue Step 1) >>`
 
 8. Click `Save Changes` 
 
