@@ -8,7 +8,7 @@ stages:
 # Lambda Build Stages
 build:
   stage: build
-  image: maven:3.8-jdk-8-slim
+  image: maven:3.8-openjdk-17-slim
   script:
     - mvn clean
     - mvn clean install
