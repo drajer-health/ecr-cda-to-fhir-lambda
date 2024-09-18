@@ -41,7 +41,7 @@ deploy-lambda-fhir-sandbox:
     AWS_ACCESS_KEY_ID: $FHIR_SANDBOX_AWS_ACCESS_KEY
     AWS_SECRET_ACCESS_KEY: $FHIR_SANDBOX_AWS_SECRET_KEY
     S3_BUCKET: 	fhir-aims-sandbox-lambda-funcs
-    S3_KEY: ecr-cda-to-fhir-lambda-1.0.0.jar
+    S3_KEY: ecr-cda-to-fhir-lambda-1.0.1.jar
     FUNCTION_NAME: fhir-aims-sandbox-cda2fhirlambda
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
@@ -58,7 +58,7 @@ deploy-lambda-fhir-onboard:
     AWS_ACCESS_KEY_ID: $FHIR_ONBOARD_AWS_ACCESS_KEY
     AWS_SECRET_ACCESS_KEY: $FHIR_ONBOARD_AWS_SECRET_KEY
     S3_BUCKET: 	fhir-aims-onboard-lambda-funcs
-    S3_KEY: ecr-cda-to-fhir-lambda-1.0.0.jar
+    S3_KEY: ecr-cda-to-fhir-lambda-1.0.1.jar
     FUNCTION_NAME: fhir-aims-onboard-cda2fhirlambda
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
