@@ -8,45 +8,144 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
+
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
 import org.springframework.util.ResourceUtils;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.S3Event;
+import com.amazonaws.services.lambda.runtime.events.SQSEvent;
+import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.event.S3EventNotification;
 import com.amazonaws.services.s3.event.S3EventNotification.S3EventNotificationRecord;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.StringUtils;
+import com.saxonica.config.ProfessionalConfiguration;
 
 import net.sf.saxon.Transform;
+import net.sf.saxon.lib.FeatureKeys;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.Serializer;
+import net.sf.saxon.s9api.XsltCompiler;
+import net.sf.saxon.s9api.XsltExecutable;
+import net.sf.saxon.s9api.XsltTransformer;
 
-public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3Event, String> {
+public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<SQSEvent, String> {
 	private AmazonS3 s3Client = AmazonS3ClientBuilder.standard().build();
 	private String destPath = System.getProperty("java.io.tmpdir");
 	public static final int DEFAULT_BUFFER_SIZE = 8192;
+	private static CDA2FHIRConverterLambdaFunctionHandler instance;
+	private XsltTransformer transformer;
+	private Processor processor;	
 
+	public static CDA2FHIRConverterLambdaFunctionHandler getInstance() throws IOException {
+		if (instance == null) {
+			synchronized (CDA2FHIRConverterLambdaFunctionHandler.class) {
+				if (instance == null) {
+					instance = new CDA2FHIRConverterLambdaFunctionHandler();
+				}
+			}
+		}
+		return instance;
+	}	
+	
+	public CDA2FHIRConverterLambdaFunctionHandler() throws IOException {
+		String bucketName = System.getenv("BUCKET_NAME");
+		if (bucketName == null || bucketName.isEmpty()) {
+			throw new IllegalArgumentException("S3 bucket name is not set in the environment variables.");
+		}		
+		// Load the Saxon processor and transformer
+		this.processor = createSaxonProcessor();
+		this.transformer = initializeTransformer();
+	}	
+	
+	private Processor createSaxonProcessor() throws IOException {
+		String bucketName = System.getenv("LICENSE_BUCKET_NAME");
+		String licenseFilePath = "/tmp/saxon-license.lic"; // Ensure temp path is used
+		ProfessionalConfiguration configuration = new ProfessionalConfiguration();
+		String key = "license/saxon-license.lic";
+
+		// Attempt to retrieve the license file from S3
+		S3Object licenseObj;
+		try {
+			licenseObj = s3Client.getObject(bucketName, key);
+		} catch (AmazonS3Exception e) {
+			throw new IOException("Failed to retrieve the license file from S3 bucket: " + bucketName, e);
+		}
+
+		// Read the license file
+		try (S3ObjectInputStream s3InputStream = licenseObj.getObjectContent();
+				FileOutputStream fos = new FileOutputStream(new File(licenseFilePath))) {
+
+			byte[] readBuf = new byte[DEFAULT_BUFFER_SIZE];
+			int readLen;
+			while ((readLen = s3InputStream.read(readBuf)) > 0) {
+				fos.write(readBuf, 0, readLen);
+			}
+		}
+
+		// Check if the license file was saved correctly
+		File licenseFile = ResourceUtils.getFile(licenseFilePath);
+		if (!licenseFile.exists() || licenseFile.length() == 0) {
+			throw new IOException("License file not found or is empty at: " + licenseFilePath);
+		}
+
+		String saxonLicenseAbsolutePath = licenseFile.getAbsolutePath();
+		System.setProperty("http://saxon.sf.net/feature/licenseFileLocation", saxonLicenseAbsolutePath);
+		configuration.setConfigurationProperty(FeatureKeys.LICENSE_FILE_LOCATION, saxonLicenseAbsolutePath);
+
+		return new Processor(configuration);
+	}
+	
+	private XsltTransformer initializeTransformer() {
+		try {
+			File xsltFile = ResourceUtils
+					.getFile("classpath:hl7-xml-transforms/transforms/cda2fhir-r4/NativeUUIDGen-cda2fhir.xslt");
+			processor.setConfigurationProperty(FeatureKeys.ALLOW_MULTITHREADING, true);
+			XsltCompiler compiler = processor.newXsltCompiler();
+
+//			compiler.setJustInTimeCompilation(true);
+			XsltExecutable executable = compiler.compile(new StreamSource(xsltFile));
+			return executable.load();
+		} catch (SaxonApiException | IOException e) {
+			throw new RuntimeException("Failed to initialize XSLT Transformer", e);
+		}
+	}
+	
 	@Override
-	public String handleRequest(S3Event event, Context context) {
-
+	public String handleRequest(SQSEvent event, Context context) {
 		InputStream input = null;
 		File outputFile = null;
 		String keyFileName = "";
 		String keyPrefix = "";
 		try {
+			instance = CDA2FHIRConverterLambdaFunctionHandler.getInstance();
+			SQSMessage message = event.getRecords().get(0);
+			String messageBody = message.getBody();
+			context.getLogger().log("messageBody : " + messageBody);
+			S3EventNotification s3EventNotification = S3EventNotification.parseJson(messageBody);
+			context.getLogger().log("s3EventNotification getRecords size : " + s3EventNotification.getRecords().size());
+			S3EventNotification.S3EventNotificationRecord record = s3EventNotification.getRecords().get(0);
 
-			S3EventNotificationRecord record = event.getRecords().get(0);
-			String key = record.getS3().getObject().getKey();
 			String bucket = record.getS3().getBucket().getName();
+			String key = record.getS3().getObject().getKey();
 
-			context.getLogger().log("EventName:" + record.getEventName());
-			context.getLogger().log("BucketName:" + bucket);
+			context.getLogger().log("EventName : " + record.getEventName());
+			context.getLogger().log("BucketName : " + bucket);
 			context.getLogger().log("Key:" + key);
+
 
 			if (key != null && key.indexOf(File.separator) != -1) {
 				keyFileName = key.substring(key.lastIndexOf(File.separator));
@@ -86,13 +185,15 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 			context.getLogger().log("---- s3Object-Content....:" + s3Object.getObjectMetadata().getContentType());
 
 			UUID randomUUID = UUID.randomUUID();
-			File xsltFile = ResourceUtils.getFile("classpath:hl7-xml-transforms/transforms/cda2fhir-r4/cda2fhir.xslt");
+//			File xsltFile = ResourceUtils.getFile("classpath:hl7-xml-transforms/transforms/cda2fhir-r4/NativeUUIDGen-cda2fhir.xslt");
 
-			context.getLogger().log("--- Before Transformation XSLT---::" + xsltFile.getAbsolutePath());
+//			context.getLogger().log("--- Before Transformation XSLT---::" + xsltFile.getAbsolutePath());
 			context.getLogger().log("--- Before Transformation OUTPUT---::" + outputFile.getAbsolutePath());
 			context.getLogger().log("--- Before Transformation UUID---::" + randomUUID);
 
-			xsltTransformation(xsltFile.getAbsolutePath(), outputFile.getAbsolutePath(), randomUUID, context);
+//			xsltTransformation(xsltFile.getAbsolutePath(), outputFile.getAbsolutePath(), randomUUID, context);
+			
+			instance.transform(outputFile, randomUUID, context);
 			
 			
 			String responseXML = getFileContentAsString(randomUUID, context);
@@ -121,6 +222,28 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 				outputFile.deleteOnExit();
 		}
 	}
+	public void transform(File sourceXml, UUID outputFileName, Context context) {
+		try {
+			Source source = new StreamSource(sourceXml);
+			Path outputPath = Paths.get("/tmp", outputFileName.toString() + ".xml");
+			Files.createDirectories(outputPath.getParent());
+
+			Serializer out = processor.newSerializer(outputPath.toFile());
+			out.setOutputProperty(Serializer.Property.METHOD, "xml");
+
+			transformer.setSource(source);
+			transformer.setDestination(out);
+			transformer.transform();
+
+			context.getLogger().log("Transformation complete. Output saved to: " + outputPath);
+		} catch (SaxonApiException e) {
+			context.getLogger().log("ERROR: Transformation failed with exception: " + e.getMessage());
+		} catch (IOException e) {
+			context.getLogger().log("ERROR: Failed to create output directory or file: " + e.getMessage());
+		} catch (Exception e) {
+			context.getLogger().log("ERROR: Unexpected error occurred: " + e.getMessage());
+		}
+	}	
 
 	private String getFileContentAsString(UUID fileName, Context context) {
 
@@ -158,6 +281,7 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 		return false;
 	}
 
+
 	/**
 	 * Below method is used to call the Saxon transform method (i.e main method)
 	 * 
@@ -185,6 +309,7 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<S3
 			context.getLogger().log("ERROR: Transformation Failed with exception " + e.getMessage());
 		}
 	}
+
 
 	private void writeFhirFile(String theFileContent, String theBucketName, String theKeyPrefix, Context context) {
 		try {
