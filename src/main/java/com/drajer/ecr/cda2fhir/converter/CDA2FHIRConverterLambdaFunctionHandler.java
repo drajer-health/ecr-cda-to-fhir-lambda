@@ -146,10 +146,26 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<SQ
 			context.getLogger().log("BucketName : " + bucket);
 			context.getLogger().log("Key:" + key);
 
-
+			String soureFolder = "FHIRConvertSubmissionV2";
+			String envVar = System.getenv("SOURCE_FOLDER");
+			
+			if (envVar == null || envVar.isEmpty()) {
+				context.getLogger().log("Source Folder is not set in the environment variables.");
+			}else {
+				soureFolder = envVar;
+			}
+			
+			String targerFolder = "RRMessageFHIRV2";
+			envVar = System.getenv("TARGET_FOLDER");
+			if (envVar == null || envVar.isEmpty()) {
+				throw new IllegalArgumentException("Target Folder is not set in the environment variables.");
+			}else {
+				targerFolder = envVar;
+			}
+						
 			if (key != null && key.indexOf(File.separator) != -1) {
 				keyFileName = key.substring(key.lastIndexOf(File.separator));
-				keyPrefix = key.substring(0, key.lastIndexOf(File.separator) + 1);
+				keyPrefix = key.replace(soureFolder,targerFolder);
 			} else {
 				keyFileName = key;
 			}

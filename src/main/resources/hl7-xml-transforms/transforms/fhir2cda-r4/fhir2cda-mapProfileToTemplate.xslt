@@ -33,11 +33,6 @@ limitations under the License.
     <xsl:template match="fhir:*" mode="map-resource-to-template">
         <xsl:param name="pElementType" />
 
-        <!-- Variable for identification of IG - moved out of Global vars for all files because XSpec can't deal with global vars -->
-        <xsl:variable name="vCurrentIg">
-            <xsl:call-template name="get-current-ig" />
-        </xsl:variable>
-
         <xsl:choose>
 
             <!-- Documents -->
@@ -86,7 +81,7 @@ limitations under the License.
                 <xsl:comment select="' [RR R1S1] Initial Public Health Case Report Reportability Response Document (RR) '" />
                 <templateId root="2.16.840.1.113883.10.20.15.2.1.2" extension="2017-04-01" />
             </xsl:when>
-            <xsl:when test="fhir:meta/fhir:profile/@value = 'http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-composition'">
+            <xsl:when test="fhir:meta/fhir:profile/@value = 'http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-composition' or fhir:type/fhir:coding/fhir:code/@value = '55751-2'">
                 <xsl:comment select="' [C-CDA R1.1] US Realm Header '" />
                 <templateId root="2.16.840.1.113883.10.20.22.1.1" />
                 <xsl:comment select="' [C-CDA R2.1] US Realm Header (V3) '" />
@@ -260,7 +255,7 @@ limitations under the License.
                 <templateId root="2.16.840.1.113883.10.20.22.2.7" extension="2014-06-09" />
             </xsl:when>
             <!-- Social History Section -->
-            <xsl:when test="fhir:code/fhir:coding[fhir:system/@value = 'http://loinc.org']/fhir:code/@value = '29762-2'">
+            <xsl:when test="fhir:code[parent::fhir:section]/fhir:coding[fhir:system/@value = 'http://loinc.org']/fhir:code/@value = '29762-2'">
                 <xsl:comment select="' [C-CDA 1.1] Social History Section '" />
                 <templateId root="2.16.840.1.113883.10.20.22.2.17" />
                 <xsl:comment select="' [C-CDA 2.1] Social History Section (V3) '" />
@@ -515,7 +510,7 @@ limitations under the License.
                 <xsl:comment select="' [RR R1S1] Relevant Reportable Condition Observation '" />
                 <templateId root="2.16.840.1.113883.10.20.15.2.3.12" extension="2017-04-01" />
             </xsl:when>
-            <xsl:when test="$vCurrentIg = 'RR' and fhir:code/fhir:coding/fhir:code[@value = '304561000']">
+            <xsl:when test="$gvCurrentIg = 'RR' and fhir:code/fhir:coding/fhir:code[@value = '304561000']">
                 <xsl:comment select="' [C-CDA R2.1] Instruction (V2) '" />
                 <templateId root="2.16.840.1.113883.10.20.22.4.20" extension="2014-06-09" />
                 <xsl:comment select="' [RR R1S1] Reportability Response Summary '" />
@@ -605,6 +600,13 @@ limitations under the License.
                 <xsl:comment select="' [C-CDA R2.1] Result Organizer (V3) '" />
                 <templateId root="2.16.840.1.113883.10.20.22.4.1" extension="2015-08-01" />
             </xsl:when>
+            <xsl:when test="fhir:category[parent::fhir:DiagnosticReport]/fhir:coding[fhir:code/@value = 'LAB']">
+                <xsl:comment select="' [C-CDA R1.1] Result Organizer '" />
+                <templateId root="2.16.840.1.113883.10.20.22.4.1" />
+                <xsl:comment select="' [C-CDA R2.1] Result Organizer (V3) '" />
+                <templateId root="2.16.840.1.113883.10.20.22.4.1" extension="2015-08-01" />
+            </xsl:when>
+            
             <xsl:when test="fhir:meta/fhir:profile/@value = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab'">
                 <xsl:comment select="' [C-CDA R1.1] Result Observation '" />
                 <templateId root="2.16.840.1.113883.10.20.22.4.2" />
@@ -651,7 +653,7 @@ limitations under the License.
             </xsl:when>
 
             <!-- SG 2023-04 eICR (updated for 3.1) -->
-            <xsl:when test="fhir:meta/fhir:profile/@value = 'http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-travel-history'">
+            <xsl:when test="fhir:meta/fhir:profile/@value = 'http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-travel-history' or fhir:code/fhir:coding/fhir:code/@value = '420008001'">
                 <xsl:choose>
                     <xsl:when test="$gParamCDAeICRVersion = 'R1.1'">
                         <xsl:comment select="' [eICR R2 STU1.1] Travel History '" />
@@ -776,6 +778,12 @@ limitations under the License.
             </xsl:when>
             <!-- MedicationInformation -->
             <xsl:when test="local-name() = 'medicationCodeableConcept'">
+                <xsl:comment select="' [C-CDA R2.0] Medication Information (V2) '" />
+                <templateId root="2.16.840.1.113883.10.20.22.4.23" extension="2014-06-09" />
+            </xsl:when>
+            
+            <!-- MedicationInformation -->
+            <xsl:when test="local-name() = 'medicationReference'">
                 <xsl:comment select="' [C-CDA R2.0] Medication Information (V2) '" />
                 <templateId root="2.16.840.1.113883.10.20.22.4.23" extension="2014-06-09" />
             </xsl:when>
@@ -936,6 +944,14 @@ limitations under the License.
 
             <!-- If the us-core-observation-lab contains hasMember it maps to an Organizer (not Observation) -->
             <xsl:when test="fhir:meta/fhir:profile/@value = 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab' and count(fhir:hasMember) > 0">
+                <xsl:comment select="' [C-CDA R1.1] Result Organizer '" />
+                <templateId root="2.16.840.1.113883.10.20.22.4.1" />
+                <xsl:comment select="' [C-CDA R2.1] Result Organizer (V3) '" />
+                <templateId root="2.16.840.1.113883.10.20.22.4.1" extension="2015-08-01" />
+                <xsl:comment select="' [eICR R2 STU2] Initial Case Report Trigger Code Result Organizer '" />
+                <templateId root="2.16.840.1.113883.10.20.15.2.3.35" extension="2019-04-01" />
+            </xsl:when>
+            <xsl:when test="fhir:category[parent::fhir:DiagnosticReport]/fhir:coding[fhir:code/@value = 'LAB']">
                 <xsl:comment select="' [C-CDA R1.1] Result Organizer '" />
                 <templateId root="2.16.840.1.113883.10.20.22.4.1" />
                 <xsl:comment select="' [C-CDA R2.1] Result Organizer (V3) '" />
