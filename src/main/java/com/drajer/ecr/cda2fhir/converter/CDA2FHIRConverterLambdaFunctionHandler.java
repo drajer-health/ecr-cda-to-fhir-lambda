@@ -162,7 +162,10 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<SQ
 			}else {
 				targerFolder = envVar;
 			}
-						
+			
+			context.getLogger().log("Source Folder value : "+soureFolder);
+			context.getLogger().log("Target Folder value : "+targerFolder);
+			
 			if (key != null && key.indexOf(File.separator) != -1) {
 				keyFileName = key.substring(key.lastIndexOf(File.separator));
 				keyPrefix = key.replace(soureFolder,targerFolder);
