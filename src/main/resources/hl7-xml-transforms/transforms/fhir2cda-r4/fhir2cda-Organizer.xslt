@@ -54,6 +54,18 @@ limitations under the License.
         </entry>
     </xsl:template>
 
+    <!-- An DiagnosticReport from FHIR translates to an Lab Result Organizer if category = LAB and it has a result -->
+    <xsl:template match="fhir:DiagnosticReport[fhir:category/fhir:coding[fhir:code/@value = 'LAB']][fhir:result]" mode="entry">
+        <xsl:param name="generated-narrative">additional</xsl:param>
+        <xsl:if test="$generated-narrative = 'generated'">
+            <xsl:attribute name="typeCode">DRIV</xsl:attribute>
+        </xsl:if>
+        <entry>
+            <xsl:call-template name="make-result-organizer" />
+        </entry>
+    </xsl:template>
+    
+
     <!-- Vital Signs Organizer (Organizer) -->
     <xsl:template name="make-vitalsign-organizer">
         <organizer classCode="CLUSTER" moodCode="EVN">
@@ -69,7 +81,7 @@ limitations under the License.
                     <id nullFlavor="NI" />
                 </xsl:otherwise>
             </xsl:choose>
-            <!-- **TODO** change this from hard coded to use what is in fhir? (I think anyway - wonder if it could ever be wrong for a vital signs organizer... -->
+            <!-- **TODO** change this from hard coded to use what is in fhir? -->
             <code code="46680005" displayName="Vital Signs" codeSystem="2.16.840.1.113883.6.96" codeSystemName="SNOMED CT">
                 <translation code="74728-7" displayName="Vital signs, weight, height, head circumference, oximetry, BMI, and BSA panel - HL7.CCDAr1.1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" />
             </code>
@@ -104,11 +116,6 @@ limitations under the License.
             <xsl:call-template name="check-for-trigger" />
         </xsl:variable>
         <xsl:variable name="vTriggerExtension" select="$vTriggerEntry/fhir:extension" />
-        <!--<!-\- Get all codes in the profile -\->
-    <xsl:variable name="vCodesToMatch">
-      <xsl:value-of select="descendant::*/fhir:coding/fhir:code/@value"/>
-    </xsl:variable>
-    <xsl:variable name="vTriggerExtension2" select="$vTriggerExtension[fhir:extension//fhir:code/@value = $vCodesToMatch]" />-->
 
         <organizer classCode="BATTERY" moodCode="EVN">
             <!-- templateId -->
@@ -131,18 +138,45 @@ limitations under the License.
             <xsl:apply-templates select="fhir:code">
                 <xsl:with-param name="pTriggerExtension" select="$vTriggerExtension" />
             </xsl:apply-templates>
-            <statusCode code="completed" />
+            <xsl:apply-templates select="fhir:status" mode="map-result-status"/>
             <xsl:choose>
+                <!-- effectiveTime in an Organizer is IVL TS and requires both high and low if it is present-->
                 <xsl:when test="fhir:effectiveDateTime">
-                    <xsl:apply-templates select="fhir:effectiveDateTime" />
+                    <xsl:apply-templates select="fhir:effectiveDateTime" mode="period" />
                 </xsl:when>
                 <xsl:when test="fhir:effectivePeriod">
                     <xsl:apply-templates select="fhir:effectivePeriod" />
                 </xsl:when>
-                <xsl:otherwise>
+                <!-- effectiveTime is optional in CDA -->
+                <!--<xsl:otherwise>
                     <effectiveTime nullFlavor="NI" />
-                </xsl:otherwise>
+                </xsl:otherwise>-->
             </xsl:choose>
+            <xsl:for-each select="fhir:performer">
+                <xsl:for-each select="fhir:reference">
+                    <xsl:variable name="referenceURI">
+                        <xsl:call-template name="resolve-to-full-url">
+                            <xsl:with-param name="referenceURI" select="@value" />
+                        </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:comment>Performer <xsl:value-of select="$referenceURI" /></xsl:comment>
+                    <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]/fhir:resource/*">
+                        <xsl:call-template name="make-performer" />
+                    </xsl:for-each>
+                </xsl:for-each>
+            </xsl:for-each>
+            <xsl:for-each select="fhir:result/fhir:reference">
+                <xsl:variable name="referenceURI">
+                    <xsl:call-template name="resolve-to-full-url">
+                        <xsl:with-param name="referenceURI" select="@value" />
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">
+                    <xsl:apply-templates select="fhir:resource/fhir:*" mode="component">
+                        <xsl:with-param name="generated-narrative" />
+                    </xsl:apply-templates>
+                </xsl:for-each>
+            </xsl:for-each>
             <xsl:for-each select="fhir:hasMember/fhir:reference">
                 <xsl:variable name="referenceURI">
                     <xsl:call-template name="resolve-to-full-url">
@@ -156,7 +190,7 @@ limitations under the License.
                 </xsl:for-each>
             </xsl:for-each>
             <!-- If this is eICR and this is a Result Organizer Trigger Code template -->
-            <xsl:if test="$vTriggerExtension">
+<!--            <xsl:if test="$vTriggerExtension">-->
                 <component>
                     <observation classCode="OBS" moodCode="EVN">
                         <xsl:comment select="' [C-CDA ID] Laboratory Result Status (ID) '" />
@@ -177,8 +211,7 @@ limitations under the License.
                         </xsl:apply-templates>
                     </xsl:for-each>
                 </xsl:for-each>
-            </xsl:if>
-
+            <!--</xsl:if>-->
         </organizer>
     </xsl:template>
 
@@ -226,10 +259,15 @@ limitations under the License.
                     <xsl:with-param name="includeTime" select="true()" />
                 </xsl:call-template>
             </xsl:variable>
-            <effectiveTime>
+            
+          
+            <xsl:choose>
+                <xsl:when test="not($vTime = '')">
+                    <effectiveTime>
                 <low value="{$vTime}" />
                 <high value="{$vTime}" />
-            </effectiveTime>
+            </effectiveTime></xsl:when>
+            </xsl:choose>
 
             <!--<xsl:choose>
         <xsl:when test="fhir:effectiveDateTime">
@@ -388,13 +426,13 @@ limitations under the License.
     </xsl:template>
 
     <!-- fhir:item[findings-group] -> (HAI) Findings Organizer -->
-    <xsl:template match="//fhir:item[fhir:linkId[@value = 'findings-group']]" mode="findings-organizer">
+    <!--<xsl:template match="//fhir:item[fhir:linkId[@value = 'findings-group']]" mode="findings-organizer">
         <xsl:choose>
-            <!-- Check to see if there's a pathogen identified and a ranking for it.  If not, empty observation
-           The way ranking is set up is probably incorrect.  Most likely needs to be nested within the pathogen identified fhir:item -->
+            <!-\- Check to see if there's a pathogen identified and a ranking for it.  If not, empty observation
+           The way ranking is set up is probably incorrect.  Most likely needs to be nested within the pathogen identified fhir:item -\->
             <xsl:when test="fhir:item[fhir:linkId[@value = 'pathogen-identified']] and fhir:item[fhir:linkId[@value = 'pathogen-ranking']]">
                 <organizer classCode="CLUSTER" moodCode="EVN">
-                    <!-- Findings Organizer -->
+                    <!-\- Findings Organizer -\->
                     <templateId root="2.16.840.1.113883.10.20.5.6.182" />
                     <id nullFlavor="NA" />
                     <statusCode code="completed" />
@@ -410,5 +448,5 @@ limitations under the License.
                 <xsl:call-template name="no-pathogens-found" />
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>
+    </xsl:template>-->
 </xsl:stylesheet>

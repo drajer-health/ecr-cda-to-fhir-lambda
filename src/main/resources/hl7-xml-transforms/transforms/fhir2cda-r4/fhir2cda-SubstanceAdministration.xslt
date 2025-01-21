@@ -16,7 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 -->
-<xsl:stylesheet exclude-result-prefixes="lcg xsl cda fhir" version="2.0" xmlns="urn:hl7-org:v3" xmlns:cda="urn:hl7-org:v3" xmlns:fhir="http://hl7.org/fhir" xmlns:lcg="http://www.lantanagroup.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet exclude-result-prefixes="lcg xsl cda fhir" version="2.0" xmlns="urn:hl7-org:v3" xmlns:cda="urn:hl7-org:v3" xmlns:fhir="http://hl7.org/fhir" xmlns:lcg="http://www.lantanagroup.com"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xsl:import href="fhir2cda-CD.xslt" />
     <xsl:import href="fhir2cda-TS.xslt" />
@@ -51,7 +52,7 @@ limitations under the License.
     <!-- fhir:MedicationAdministration -> Admission Medication (cda:substanceAdministration)-->
     <xsl:template match="fhir:MedicationAdministration" mode="entryAdmissionMedication">
         <xsl:param name="generated-narrative">additional</xsl:param>
-        
+
         <xsl:if test="$generated-narrative = 'generated'">
             <xsl:attribute name="typeCode">DRIV</xsl:attribute>
         </xsl:if>
@@ -59,16 +60,6 @@ limitations under the License.
         <entry>
             <xsl:call-template name="make-admission-medication" />
         </entry>
-        <!--<entry>
-            <xsl:if test="$generated-narrative = 'generated'">
-                <xsl:attribute name="typeCode">DRIV</xsl:attribute>
-            </xsl:if>
-            <xsl:call-template name="make-medication-activity">
-                <!-\- SG 2024-01: Updating this to EVN because Admission Medications are 
-                    "medications taken by the patient prior to and at the time of admission to the facility." -\->
-                <xsl:with-param name="moodCode">EVN</xsl:with-param>
-            </xsl:call-template>
-        </entry>-->
     </xsl:template>
 
     <!-- fhir:MedicationAdministration -> Medication Administration (cda:substanceAdministration)-->
@@ -218,8 +209,52 @@ limitations under the License.
                 <xsl:apply-templates select="fhir:vaccineCode">
                     <xsl:with-param name="pTriggerExtension" select="$vTriggerExtension" />
                 </xsl:apply-templates>
+                <xsl:if test="fhir:lotNumber/@value">
+                    <lotNumberText>
+                        <xsl:value-of select="fhir:lotNumber/@value" />
+                    </lotNumberText>
+                </xsl:if>
             </manufacturedMaterial>
+            <xsl:for-each select="fhir:manufacturer/fhir:reference">
+                <xsl:variable name="referenceURI">
+                    <xsl:call-template name="resolve-to-full-url">
+                        <xsl:with-param name="referenceURI" select="@value" />
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">
+                    <xsl:apply-templates select="fhir:resource/fhir:*" mode="manufacturer" />
+                </xsl:for-each>
+            </xsl:for-each>
         </manufacturedProduct>
+    </xsl:template>
+
+    <xsl:template match="fhir:Organization" mode="manufacturer">
+        <manufacturerOrganization>
+            <xsl:choose>
+                <xsl:when test="fhir:identifier">
+                    <xsl:apply-templates select="fhir:identifier" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <id nullFlavor="NI" />
+                </xsl:otherwise>
+            </xsl:choose>
+
+            <xsl:if test="fhir:name">
+                <xsl:call-template name="get-org-name" />
+            </xsl:if>
+            <!--<xsl:apply-templates select="fhir:name" />-->
+            <xsl:apply-templates select="fhir:telecom" />
+
+            <xsl:choose>
+                <xsl:when test="fhir:address">
+                    <xsl:apply-templates select="fhir:address" />
+                </xsl:when>
+                <xsl:otherwise>
+                    <addr nullFlavor="NI" />
+                </xsl:otherwise>
+            </xsl:choose>
+
+        </manufacturerOrganization>
     </xsl:template>
 
     <xsl:template name="make-admission-medication">
@@ -362,19 +397,15 @@ limitations under the License.
 
     <xsl:template name="make-medication-administration">
         <xsl:param name="moodCode">EVN</xsl:param>
-        <!-- Variable for identification of IG - moved out of Global var because XSpec can't deal with global vars -->
-        <xsl:variable name="vCurrentIg">
-            <xsl:call-template name="get-current-ig" />
-        </xsl:variable>
         <substanceAdministration classCode="SBADM" moodCode="{$moodCode}">
             <!-- templateId -->
             <xsl:choose>
-                <xsl:when test="$vCurrentIg = 'PCP'">
+                <xsl:when test="$gvCurrentIg = 'PCP'">
                     <templateId extension="2017-08-01" root="2.16.840.1.113883.10.20.37.3.10" />
                     <xsl:comment select="' MEDICATION ACTIVITY V2  '" />
                     <templateId extension="2014-06-09" root="2.16.840.1.113883.10.20.22.4.16" />
                 </xsl:when>
-                <xsl:when test="$vCurrentIg = 'eICR'">
+                <xsl:when test="$gvCurrentIg = 'eICR'">
                     <xsl:comment select="' [C-CDA R1.1] Medication Activity '" />
                     <templateId root="2.16.840.1.113883.10.20.22.4.16" />
                     <xsl:comment select="' [C-CDA R2.0] Medication Activity (V2)  '" />
@@ -411,16 +442,13 @@ limitations under the License.
 
             <!-- effective timing -->
             <!-- TODO: xsi:type="IVL_TS and null-->
-            <xsl:apply-templates select="fhir:effectiveDateTime">
-                <xsl:with-param name="pXSIType" select="'IVL_TS'" />
-                <xsl:with-param name="pOperator" select="'A'" />
-            </xsl:apply-templates>
+            <xsl:apply-templates select="fhir:effectiveDateTime"/>
 
             <xsl:apply-templates select="fhir:effectivePeriod">
                 <xsl:with-param name="pXSIType" select="'IVL_TS'" />
             </xsl:apply-templates>
 
-            <xsl:apply-templates select="fhir:dateAsserted"/>
+            <xsl:apply-templates select="fhir:dateAsserted" />
 
             <!-- SG 20230216: An issue here is that C-CDA specifies that routeCode has to come from SPL Drug Route of Administration Terminology
                  and that the translation if it's present needs to come from SNOMED  
@@ -479,41 +507,38 @@ limitations under the License.
                     <doseQuantity nullFlavor="NI" />
                 </xsl:otherwise>
             </xsl:choose>
+
+            <!-- Ming handle both medicationReference and medicationCodeableConcept -->
             <consumable>
                 <xsl:call-template name="make-medication-information" />
             </consumable>
+
             <xsl:apply-templates mode="entryRelationship" select="fhir:extension[@url = 'http://hl7.org/fhir/us/ecr/StructureDefinition/therapeutic-medication-response-extension']" />
             <xsl:apply-templates mode="entryRelationship" select="fhir:extension[@url = 'http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-therapeutic-medication-response-extension']" />
-            <!-- SG 2023-04 Moved this code into fhir2cda-Observation and called above (keeping the old ecr name for now - can remove later) -->
-            <!--      <xsl:for-each select="fhir:extension[@url = 'http://hl7.org/fhir/us/ecr/StructureDefinition/therapeutic-medication-response-extension']|fhir:extension[@url = 'http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-therapeutic-medication-response-extension']">-->
-            <!--<entryRelationship typeCode="CAUS">
-          <observation classCode="OBS" moodCode="EVN">
-            <xsl:comment select="' [eICR R2] Therapeutic Medication Response Observation '" />
-            <templateId root="2.16.840.1.113883.10.20.15.2.3.37" extension="2019-04-01" />
-            <id nullFlavor="NI" />
-            <code code="67540-5" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Response to medication" />
-            <!-\- MD: not hard code <statusCode code="completed" />-\->
-            <xsl:apply-templates select="../fhir:status" />
-            <!-\- MD: if effectivePeriod used -\->
-            <xsl:apply-templates select="../fhir:effectivePeriod" />
-            <xsl:apply-templates select="../fhir:effectiveDateTime" />
-            <xsl:apply-templates select="fhir:valueCodeableConcept">
-              <xsl:with-param name="pElementName" select="'value'" />
-              <xsl:with-param name="pXSIType" select="'CD'" />
-            </xsl:apply-templates>
-          </observation>
-        </entryRelationship>-->
-            <!--</xsl:for-each>-->
         </substanceAdministration>
     </xsl:template>
 
     <xsl:template name="make-medication-information">
         <!-- Check to see if this is a trigger code template -->
         <xsl:variable name="vTriggerEntry">
-            <xsl:call-template name="check-for-trigger" />
+            <xsl:choose>
+                <xsl:when test="fhir:medicationReference">
+                    <xsl:variable name="vReferenceURI">
+                        <xsl:call-template name="resolve-to-full-url">
+                            <xsl:with-param name="referenceURI" select="fhir:medicationReference/fhir:reference/@value" />
+                        </xsl:call-template>
+                    </xsl:variable>
+                    <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $vReferenceURI]/fhir:resource/fhir:Medication">
+                        <xsl:call-template name="check-for-trigger" />
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:when test="fhir:medicationCodeableConcept">
+                    <xsl:call-template name="check-for-trigger" />
+                </xsl:when>
+            </xsl:choose>
         </xsl:variable>
         <xsl:variable name="vTriggerExtension" select="$vTriggerEntry/fhir:extension" />
-
+        <!-- deal with both medicationReference and medicationCodeableConcept -->
         <manufacturedProduct classCode="MANU">
             <!-- templateId -->
             <xsl:choose>
@@ -521,14 +546,47 @@ limitations under the License.
                     <xsl:apply-templates mode="map-trigger-resource-to-template" select="." />
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:apply-templates mode="map-resource-to-template" select="fhir:medicationCodeableConcept" />
+                    <xsl:choose>
+                        <xsl:when test="fhir:medicationReference">
+                            <xsl:apply-templates mode="map-resource-to-template" select="fhir:medicationReference" />
+                        </xsl:when>
+                        <xsl:when test="fhir:medicationCodeableConcept">
+                            <xsl:apply-templates mode="map-resource-to-template" select="fhir:medicationCodeableConcept" />
+                        </xsl:when>
+                    </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
-            <manufacturedMaterial>
-                <xsl:apply-templates select="fhir:medicationCodeableConcept">
-                    <xsl:with-param name="pTriggerExtension" select="$vTriggerExtension" />
-                </xsl:apply-templates>
-            </manufacturedMaterial>
+
+            <!-- id -->
+            <xsl:apply-templates select="fhir:identifier" />
+
+            <xsl:choose>
+                <xsl:when test="fhir:medicationReference">
+
+                    <manufacturedMaterial>
+                        <!-- MD: Add handle medication reference -->
+                        <xsl:variable name="referenceURI">
+                            <xsl:call-template name="resolve-to-full-url">
+                                <xsl:with-param name="referenceURI" select="fhir:medicationReference/fhir:reference/@value" />
+                            </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:comment>Medication <xsl:value-of select="$referenceURI" /></xsl:comment>
+                        <xsl:for-each select="//fhir:entry[fhir:fullUrl/@value = $referenceURI]">
+                            <xsl:apply-templates mode="medication-activity" select="fhir:resource/fhir:*">
+                                <xsl:with-param name="pTriggerExtension" select="$vTriggerExtension" />
+                            </xsl:apply-templates>
+                        </xsl:for-each>
+                    </manufacturedMaterial>
+                </xsl:when>
+                <xsl:when test="fhir:medicationCodeableConcept">
+                    <!-- manufacturedMaterial -->
+                    <manufacturedMaterial>
+                        <xsl:apply-templates select="fhir:medicationCodeableConcept">
+                            <xsl:with-param name="pTriggerExtension" select="$vTriggerExtension" />
+                        </xsl:apply-templates>
+                    </manufacturedMaterial>
+                </xsl:when>
+            </xsl:choose>
         </manufacturedProduct>
     </xsl:template>
 
@@ -557,12 +615,12 @@ limitations under the License.
         <substanceAdministration classCode="SBADM" moodCode="{$moodCode}">
 
             <xsl:choose>
-                <xsl:when test="$vCurrentIg = 'DentalConsultNote' or $vCurrentIg = 'DentalReferalNote'">
+                <xsl:when test="$gvCurrentIg = 'DentalConsultNote' or $gvCurrentIg = 'DentalReferalNote'">
                     <xsl:comment select="' Medication Activity (V2) '" />
                     <templateId root="2.16.840.1.113883.10.20.22.4.16" />
                     <templateId extension="2014-06-09" root="2.16.840.1.113883.10.20.22.4.16" />
                 </xsl:when>
-                <xsl:when test="$vCurrentIg = 'PCP'">
+                <xsl:when test="$gvCurrentIg = 'PCP'">
                     <xsl:comment select="' Medication Activity (V2) '" />
                     <templateId extension="2017-08-01" root="2.16.840.1.113883.10.20.37.3.10" />
                 </xsl:when>
@@ -591,7 +649,7 @@ limitations under the License.
                 </xsl:when>
             </xsl:choose>
 
-            <xsl:if test="$vCurrentIg = 'PCP'">
+            <xsl:if test="$gvCurrentIg = 'PCP'">
                 <code code="16076005" codeSystem="2.16.840.1.113883.6.96" displayName="Prescription" />
             </xsl:if>
             <xsl:choose>
@@ -648,7 +706,8 @@ limitations under the License.
                         <templateId extension="2014-06-09" root="2.16.840.1.113883.10.20.22.4.23" />
                         <id root="4b355395-790c-405d-826f-f5a8e242db89" />
                         <manufacturedMaterial>
-                            <xsl:call-template name="CodeableConcept2CD" />
+                            <xsl:apply-templates select="." />
+                            <!--<xsl:call-template name="CodeableConcept2CD" />-->
                         </manufacturedMaterial>
                     </manufacturedProduct>
                 </consumable>
@@ -683,9 +742,12 @@ limitations under the License.
     </xsl:template>
 
     <xsl:template match="fhir:Medication" mode="medication-activity">
-        <xsl:for-each select="fhir:code">
-            <xsl:call-template name="CodeableConcept2CD" />
-        </xsl:for-each>
+        <xsl:param name="pTriggerExtension" />
+        <!-- code -->
+        <xsl:apply-templates select="fhir:code">
+            <xsl:with-param name="pTriggerExtension" select="$pTriggerExtension" />
+        </xsl:apply-templates>
+        <!-- manufacturerOrganization (Medication.manufacturer.reference(Organization)-->
     </xsl:template>
 
     <xsl:template match="fhir:status" mode="medication-activity">

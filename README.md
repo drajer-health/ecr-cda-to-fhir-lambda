@@ -228,7 +228,7 @@ Lambda function needs to be triggered, for this we need to add and configure the
 
 3. Enter Name `eg: cda-fhir-event`
 
-4. Enter Suffix as `RR_CDA.xml`
+4. Enter Prefix as `FHIRConvertSubmissionV2/`
 
 5. Event Types as `All object create events`
 

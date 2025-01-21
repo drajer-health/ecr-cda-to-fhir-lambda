@@ -49,7 +49,7 @@ limitations under the License.
 
     <!--    <xsl:import href="fhir2cda-utility.xslt" />-->
 
-    <xsl:template name="CodeableConcept2CD">
+    <!--<xsl:template name="CodeableConcept2CD">
         <xsl:param name="pElementName">code</xsl:param>
         <xsl:param name="pXSIType" />
         <xsl:choose>
@@ -88,7 +88,7 @@ limitations under the License.
                 </xsl:element>
             </xsl:otherwise>
         </xsl:choose>
-    </xsl:template>
+    </xsl:template>-->
 
     <!-- Creating a match template similar to the above for more flexibility -->
     <xsl:template match="fhir:*[fhir:coding] | fhir:*[fhir:valueCoding] | fhir:code[fhir:text] | fhir:valueCodeableConcept | fhir:medicationCodeableConcept | fhir:route | fhir:vaccineCode">
@@ -97,6 +97,7 @@ limitations under the License.
         <xsl:param name="pXSIType" />
         <xsl:param name="pTriggerExtension" />
         <xsl:choose>
+
             <xsl:when test="fhir:coding | fhir:valueCoding">
                 <xsl:element name="{$pElementName}">
                     <xsl:if test="$pXSIType">
@@ -160,6 +161,7 @@ limitations under the License.
     <xsl:template match="fhir:coding | fhir:valueCoding | fhir:class | fhir:item/fhir:code | fhir:dischargeDisposition">
         <xsl:param name="pElementName" />
         <xsl:param name="pTriggerExtension" />
+        
         <xsl:call-template name="debug-element-stack" />
         <xsl:choose>
             <!-- If this is a nullFlavor we need to process differently -->
@@ -168,6 +170,9 @@ limitations under the License.
                     <xsl:attribute name="xsi:type" select="'CD'" />
                 </xsl:if>
                 <xsl:attribute name="nullFlavor" select="fhir:code/@value" />
+            </xsl:when>
+            <xsl:when test="fhir:extension[@url = 'http://hl7.org/fhir/StructureDefinition/data-absent-reason']">
+                <xsl:apply-templates select="fhir:extension[@url = 'http://hl7.org/fhir/StructureDefinition/data-absent-reason']" mode="attribute-only" />
             </xsl:when>
             <xsl:otherwise>
                 <xsl:variable name="codeSystem">
@@ -198,7 +203,17 @@ limitations under the License.
                     <xsl:variable name="vCodeValue" select="fhir:code/@value" />
                     <xsl:for-each select="$pTriggerExtension[fhir:extension[@url = 'triggerCode']/fhir:valueCoding/fhir:code/@value = $vCodeValue]">
                         <xsl:attribute name="sdtc:valueSet">
-                            <xsl:value-of select="substring-after(fhir:extension[@url = 'triggerCodeValueSet']/fhir:valueOid/@value, 'urn:oid:')" />
+                            <!-- SG 20241118: Added to deal with non-oid values (having non-oid values is wrong and not in the spec, but it's what is coming from eCR Now -->
+                            <xsl:choose>
+                                <xsl:when test="fhir:extension[@url = 'triggerCodeValueSet']/fhir:valueString">
+                                    <xsl:call-template name="convertURI">
+                                        <xsl:with-param name="uri" select="fhir:extension[@url = 'triggerCodeValueSet']/fhir:valueString/@value" />
+                                    </xsl:call-template>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="substring-after(fhir:extension[@url = 'triggerCodeValueSet']/fhir:valueOid/@value, 'urn:oid:')" />
+                                </xsl:otherwise>
+                            </xsl:choose>
                         </xsl:attribute>
                         <xsl:attribute name="sdtc:valueSetVersion">
                             <xsl:value-of select="fhir:extension[@url = 'triggerCodeValueSetVersion']/fhir:valueString/@value" />
