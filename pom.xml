@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.drajer.ecr.cda2fhir</groupId>
 	<artifactId>ecr-cda-to-fhir-lambda</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<packaging>jar</packaging>
 	
 	<properties>
