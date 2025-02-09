@@ -378,7 +378,9 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 				context.getLogger().log("Post Message failed reason: " + response.getStatusLine().getReasonPhrase());
 				context.getLogger().log("Post Message response body: " + response.toString());
 
-				throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+				
+				//comment out for testing purpose NEED TO BE REMOVE BEFORE MERGE
+				//throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
 			}
 			StringBuilder outputStr = new StringBuilder();
 			
