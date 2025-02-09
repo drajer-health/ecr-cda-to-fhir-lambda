@@ -1,30 +1,38 @@
 package com.drajer.ecr.cda2fhir.converter;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.util.ResourceUtils;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.SQSEvent.SQSMessage;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.event.S3EventNotification;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -35,7 +43,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saxonica.config.ProfessionalConfiguration;
 
-import net.sf.saxon.Transform;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
@@ -230,7 +237,10 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 				context.getLogger().log("Writing output file ");
 				this.writeFhirFile(responseXML, bucket, keyPrefix, context);
 				context.getLogger().log("Output Generated  "+bucket+"/"+keyPrefix);
-
+				// Call Validation on RR FHIR
+				keyPrefix.replace(targerFolder,"RRValidationMessageFHIRV2");
+				validateRRFhir(responseXML, bucket,keyPrefix , context);
+				
 			}
 			return "SUCCESS";
 		} catch (Exception e) {
@@ -307,36 +317,6 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 		return false;
 	}
 
-
-	/**
-	 * Below method is used to call the Saxon transform method (i.e main method)
-	 * 
-	 * @param xslFilePath
-	 * @param sourceXml
-	 * @param outputFileName
-	 */
-	private void xsltTransformation(String xslFilePath, String sourceXml, UUID outputFileName, Context context) {
-
-		try {
-
-			String[] commandLineArguments = new String[3];
-
-			commandLineArguments[0] = "-xsl:" + xslFilePath;
-			commandLineArguments[1] = "-s:" + sourceXml;
-			//commandLineArguments[2] = "-license:on";
-			commandLineArguments[2] = "-o:" + "/tmp/" + outputFileName + ".xml";
-
-			Transform.main(commandLineArguments);
-			
-			context.getLogger().log("Transformation Complete");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			context.getLogger().log("ERROR: Transformation Failed with exception " + e.getMessage());
-		}
-	}
-
-
 	private void writeFhirFile(String theFileContent, String theBucketName, String theKeyPrefix, Context context) {
 		try {
 			byte[] contentAsBytes = theFileContent.getBytes("UTF-8");
@@ -352,5 +332,89 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 			context.getLogger().log("ERROR:" + e.getMessage());
 			e.printStackTrace();
 		}
+	}
+	
+	private void validateRRFhir(String requestBody, String theBucketName, String theKeyPrefix, Context context) {
+		// URL where the request will be forwarded
+		String httpPostUrl = System.getenv("VALIDATION_URL");
+
+		if (httpPostUrl == null) {
+			throw new RuntimeException("HTTP_POST_URL Environment variable not configured");
+		}
+		context.getLogger().log("HTTP Post URL " + httpPostUrl);
+		// Create a instance of httpClient and forward the request
+//		DefaultHttpClient httpClient = new DefaultHttpClient();
+
+		int timeout = 15;
+		RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+				.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+		CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+		try {
+			// Add content type as application / json
+			HttpPost postRequest = new HttpPost(httpPostUrl);
+			postRequest.addHeader("accept", "application/json");
+			StringEntity input = new StringEntity(requestBody);
+			input.setContentType("application/json");
+			postRequest.setEntity(input);
+
+			context.getLogger().log("Forwarding the request to FHIR Validator ");
+			context.getLogger().log("Request Body Content Size " + input.getContentLength());
+
+			// logger.log(inputStrBuilder.toString());
+
+			HttpResponse response = null;
+			try {
+				context.getLogger().log("Making the HTTP Post to " + httpPostUrl);
+				response = httpClient.execute(postRequest);
+				context.getLogger().log("HTTP Post completed ");
+			} catch (Exception e) {
+				context.getLogger().log(" In HTTP Post Exception " + e.getLocalizedMessage());
+				e.printStackTrace();
+			}
+
+			// Check return status and throw Runtime exception for return code != 200
+			if (response != null && response.getStatusLine().getStatusCode() != 200) {
+				context.getLogger().log("Post Message failed with Code: " + response.getStatusLine().getStatusCode());
+				context.getLogger().log("Post Message failed reason: " + response.getStatusLine().getReasonPhrase());
+				context.getLogger().log("Post Message response body: " + response.toString());
+
+				throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+			}
+			StringBuilder outputStr = new StringBuilder();
+			
+			context.getLogger().log("Response status code: "+response.getStatusLine().getStatusCode());
+
+			if (response != null) {
+				BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
+				String output;
+				context.getLogger().log("Response from FHIR Validator .... ");
+				// Write the response back to invoking program
+				while ((output = br.readLine()) != null) {
+					outputStr.append(output);
+				}
+				br.close();
+			}
+			context.getLogger().log("Validation Output : " + outputStr.toString());
+			
+			context.getLogger().log("Write output to bucker : " + theBucketName);
+			context.getLogger().log("Write output to filename : " + theKeyPrefix);
+			this.writeFhirFile(outputStr.toString(), theBucketName, theKeyPrefix, context);
+			
+		} catch (ClientProtocolException e) {
+			context.getLogger().log("Failed with ClientProtocolException " + e.getMessage());
+			throw new RuntimeException("Failed with ClientProtocolException: " + e.getMessage());
+		} catch (IOException e) {
+			context.getLogger().log("Failed with IOException " + e.getMessage());
+			throw new RuntimeException("Failed with IOException: " + e.getMessage());
+		} finally {
+			context.getLogger().log("Closing HTTP Connection to " + httpPostUrl);
+			try {
+				httpClient.close();
+			} catch (IOException e) {
+				context.getLogger().log("Failed with close connection " + e.getMessage());
+			}
+
+		}
+
 	}
 }
