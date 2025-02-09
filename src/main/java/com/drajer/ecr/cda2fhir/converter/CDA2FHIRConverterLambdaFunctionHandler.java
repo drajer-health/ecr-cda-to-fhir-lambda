@@ -238,7 +238,7 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 				this.writeFhirFile(responseXML, bucket, keyPrefix, context);
 				context.getLogger().log("Output Generated  "+bucket+"/"+keyPrefix);
 				// Call Validation on RR FHIR
-				keyPrefix.replace(targerFolder,"RRValidationMessageFHIRV2");
+				keyPrefix= keyPrefix.replace(targerFolder,"RRValidationMessageFHIRV2");
 				validateRRFhir(responseXML, bucket,keyPrefix , context);
 				
 			}
@@ -398,7 +398,7 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 			}
 			context.getLogger().log("Validation Output : " + outputStr.toString());
 			
-			context.getLogger().log("Write output to bucker : " + theBucketName);
+			context.getLogger().log("Write output to bucket : " + theBucketName);
 			context.getLogger().log("Write output to filename : " + theKeyPrefix);
 			this.writeFhirFile(outputStr.toString(), theBucketName, theKeyPrefix, context);
 			
