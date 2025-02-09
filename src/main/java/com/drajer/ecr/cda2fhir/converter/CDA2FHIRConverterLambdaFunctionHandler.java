@@ -339,9 +339,9 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 		String httpPostUrl = System.getenv("VALIDATION_URL");
 
 		if (httpPostUrl == null) {
-			throw new RuntimeException("HTTP_POST_URL Environment variable not configured");
+			throw new RuntimeException("VALIDATION_URL Environment variable not configured");
 		}
-		context.getLogger().log("HTTP Post URL " + httpPostUrl);
+		context.getLogger().log("HTTP Post URL : " + httpPostUrl);
 		// Create a instance of httpClient and forward the request
 //		DefaultHttpClient httpClient = new DefaultHttpClient();
 
