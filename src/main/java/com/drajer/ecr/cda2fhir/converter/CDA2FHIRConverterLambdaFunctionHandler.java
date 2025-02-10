@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -261,7 +260,7 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 	public void transform(File sourceXml, UUID outputFileName, Context context) {
 		try {
 			Source source = new StreamSource(sourceXml);
-			Path outputPath = Paths.get("/tmp", outputFileName.toString() + ".xml");
+			Path outputPath = Paths.get("/tmp", outputFileName.toString() );
 			Files.createDirectories(outputPath.getParent());
 
 			Serializer out = processor.newSerializer(outputPath.toFile());
@@ -285,7 +284,7 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 
 		File outputFile = null;
 		try {
-			outputFile = ResourceUtils.getFile("/tmp/" + fileName + ".xml");
+			outputFile = ResourceUtils.getFile("/tmp/" + fileName );
 			String absolutePath = outputFile.getAbsolutePath();
 			byte[] readAllBytes = Files.readAllBytes(Paths.get(absolutePath));
 			Charset encoding = Charset.defaultCharset();
@@ -338,6 +337,7 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 		// URL where the request will be forwarded
 		String httpPostUrl = System.getenv("VALIDATION_URL");
 
+//		System.out.println("requestBody :::::"+requestBody);
 		if (httpPostUrl == null) {
 			throw new RuntimeException("VALIDATION_URL Environment variable not configured");
 		}
@@ -352,9 +352,14 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 		try {
 			// Add content type as application / json
 			HttpPost postRequest = new HttpPost(httpPostUrl);
-			postRequest.addHeader("accept", "application/json");
+			postRequest.addHeader("accept", "application/xml");
+			
+//			JSONObject json = XML.toJSONObject(requestBody);
+//			String jsonString = json.toString();
 			StringEntity input = new StringEntity(requestBody);
-			input.setContentType("application/json");
+//			context.getLogger().log("Forwarding the jsonString : "+jsonString);
+			
+			input.setContentType("application/xml");
 			postRequest.setEntity(input);
 
 			context.getLogger().log("Forwarding the request to FHIR Validator ");
@@ -377,10 +382,7 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 				context.getLogger().log("Post Message failed with Code: " + response.getStatusLine().getStatusCode());
 				context.getLogger().log("Post Message failed reason: " + response.getStatusLine().getReasonPhrase());
 				context.getLogger().log("Post Message response body: " + response.toString());
-
-				
-				//comment out for testing purpose NEED TO BE REMOVE BEFORE MERGE
-				//throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+				throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
 			}
 			StringBuilder outputStr = new StringBuilder();
 			
