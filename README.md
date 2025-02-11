@@ -267,7 +267,7 @@ Lambda function needs to be triggered, for this we need to add and configure the
 
 4. From the `SQS queque` drop down select your SQS that this lambda function will listen.
 
-6. Click Add.
+5. Click Add.
 
 
 ### At this point the Lambda function is created and configured to listen to the S3 Bucket.
