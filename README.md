@@ -162,6 +162,8 @@ To process the file from the S3 bucket, lambda function needs to be configured t
 |LICENSE_BUCKET_NAME  | <- S3-FolderName ->  |
 |VALIDATION_URL  | <- URL for validation ->  |
 
+    eg VALIDATION_URL : https://<<ServerName>>/fhirvalidator/fhir/Bundle/$validate
+
 
 ### SQS Queue
 Choose the SQS queue and click `Create Queue` 
@@ -203,6 +205,55 @@ Choose the SQS queue and click `Create Queue`
 ```
 
 6. Click Save
+
+
+### Amazon EventBridge
+Choose the Amazon EventBridge and click `Rules` 
+
+1. Select `Create Rule` and Enter the Name for the Queue as `eg: cda-2-fhir`
+   
+3. Click "Next"
+   
+4. Under `Sample event - optional` section select Sample event type `Enter my own`
+   
+5. Access Policy `Advanced`
+   
+6. Past the below Json and change Bucket name 
+
+```
+{
+  "detail": {
+    "bucket": {
+      "name": ["<<BUCKET_NAME>>"]
+    },
+    "object": {
+      "key": [{
+        "prefix": "FHIRConvertSubmissionV2/"
+      }]
+    }
+  },
+  "detail-type": ["Object Created"],
+  "source": ["aws.s3"]
+}
+```
+
+7. Under `Creation method` section select `Custom pattern (JSON editor)`
+
+8. Under `Event pattern ` section `Event source`  drop down select `AWS services` 
+
+9. Under `AWS service` section select `Simple Queue Service (SQS)` 
+
+10. Under `Event type` section select `All Event` 
+
+11. Click `Next`
+
+12. Under `Target 1` section `Queue`  select `<<SQS queue name >>` 
+
+13. Click `Next`
+
+14. Click `Next`
+
+15. Click `Create rule`
 
 
 ### Lambda Trigger
