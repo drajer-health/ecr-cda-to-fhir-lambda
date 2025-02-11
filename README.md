@@ -160,6 +160,7 @@ To process the file from the S3 bucket, lambda function needs to be configured t
 |--|--|
 |BUCKET_NAME  | <- S3-FolderName ->  |
 |LICENSE_BUCKET_NAME  | <- S3-FolderName ->  |
+|VALIDATION_URL  | <- URL for validation ->  |
 
 
 ### SQS Queue
