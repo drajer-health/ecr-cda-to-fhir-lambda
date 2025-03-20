@@ -4,13 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.drajer.ecr.cda2fhir</groupId>
 	<artifactId>ecr-cda-to-fhir-lambda</artifactId>
-	<version>1.0.6</version>
+	<version>1.0.7</version>
 	<packaging>jar</packaging>
 	
 	<properties>
 	    <maven.compiler.target>17</maven.compiler.target>
 	    <maven.compiler.source>17</maven.compiler.source>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	    <junit.version>4.13.2</junit.version>
+	    <commons.logging.version>1.3.5</commons.logging.version>	
+	    <spring.core.version>5.3.10</spring.core.version>    
 	</properties>	
 	<build>
 		<plugins>
@@ -168,7 +171,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${junit.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -210,7 +213,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
-			<version>5.3.10</version>
+			<version>${spring.core.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws</groupId>
@@ -228,13 +231,17 @@
 		    <version>2.3.1</version>
 		</dependency>	
 
-<!-- https://mvnrepository.com/artifact/org.json/json -->
-<dependency>
-    <groupId>org.json</groupId>
-    <artifactId>json</artifactId>
-    <version>20250107</version>
-</dependency>
-
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20250107</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>commons-logging</groupId>
+		    <artifactId>commons-logging</artifactId>
+		    <version>${commons.logging.version}</version>
+		</dependency>
 					
 	</dependencies>
 </project>
