@@ -33,9 +33,11 @@ limitations under the License.
     <xsl:template match="fhir:Composition">
         <xsl:variable name="docId" select="lower-case(uuid:get-uuid())" />
         <ClinicalDocument>
+            <!-- realmCode -->
             <realmCode code="US" />
+            <!-- typeId -->
             <typeId extension="POCD_HD000040" root="2.16.840.1.113883.1.3" />
-
+            <!-- templateId -->
             <xsl:if test="$gvCurrentIg = 'eICR'">
                 <xsl:call-template name="get-template-id" />
             </xsl:if>
@@ -43,13 +45,13 @@ limitations under the License.
                 <xsl:call-template name="get-template-id" />
             </xsl:if>
             <!-- generate a new ID for this document. Save the FHIR document id in parentDocument with a type of XFRM -->
+            <!-- id -->
             <id root="{$docId}" />
-
+            <!-- code -->
             <xsl:for-each select="fhir:type">
                 <xsl:apply-templates select="." />
-                <!--<xsl:call-template name="CodeableConcept2CD" />-->
             </xsl:for-each>
-            <!-- SG 20210701: Where are the other IG titles? Added a choice around this -->
+            <!-- title -->
             <xsl:choose>
                 <xsl:when test="$gvCurrentIg = 'eICR'">
                     <title>Initial Public Health Case Report</title>
@@ -58,10 +60,11 @@ limitations under the License.
                     <title>Reportability Response</title>
                 </xsl:when>
             </xsl:choose>
-
+            <!-- effectiveTime -->
             <xsl:call-template name="get-effective-time">
                 <xsl:with-param name="pElement" select="fhir:date" />
             </xsl:call-template>
+            <!-- confidentialityCode -->
             <xsl:choose>
                 <xsl:when test="fhir:confidentiality">
                     <confidentialityCode code="{fhir:confidentiality/@value}" codeSystem="2.16.840.1.113883.5.25" />
@@ -70,6 +73,7 @@ limitations under the License.
                     <confidentialityCode nullFlavor="NI" />
                 </xsl:otherwise>
             </xsl:choose>
+            <!-- languageCode -->
             <xsl:choose>
                 <xsl:when test="fhir:language">
                     <languageCode code="{fhir:language/@value}" />
@@ -78,7 +82,7 @@ limitations under the License.
                     <languageCode code="en-US" />
                 </xsl:otherwise>
             </xsl:choose>
-
+            <!-- setId -->
             <xsl:choose>
                 <xsl:when test="fhir:identifier">
                     <xsl:apply-templates select="fhir:identifier">
@@ -89,6 +93,7 @@ limitations under the License.
                     <id nullFlavor="NI" />
                 </xsl:otherwise>
             </xsl:choose>
+            <!-- versionNumber -->
             <xsl:choose>
                 <xsl:when test="fhir:extension[@url = 'http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-versionNumber']/fhir:valueString/@value">
                     <versionNumber value="{fhir:extension[@url='http://hl7.org/fhir/StructureDefinition/composition-clinicaldocument-versionNumber']/fhir:valueString/@value}" />
@@ -97,10 +102,13 @@ limitations under the License.
                     <versionNumber value="{fhir:extension[@url='http://hl7.org/fhir/us/ccda/StructureDefinition/VersionNumber']/fhir:valueInteger/@value}" />
                 </xsl:when>
             </xsl:choose>
-
+            <!-- recordTarget -->
             <xsl:apply-templates select="fhir:subject" />
+            <!-- author -->
             <xsl:apply-templates select="fhir:author" />
-
+            <!-- dataEnterer -->
+            <!-- informant -->
+            <!-- custodian -->
             <xsl:choose>
                 <xsl:when test="fhir:custodian">
                     <xsl:apply-templates select="fhir:custodian" />
@@ -111,6 +119,7 @@ limitations under the License.
                 </xsl:otherwise>
             </xsl:choose>
 
+            <!-- informationRecipient -->
             <xsl:choose>
                 <!-- fhir:recipient -> cda:informationRecipient -->
                 <xsl:when
@@ -141,23 +150,64 @@ limitations under the License.
                     </xsl:choose>
                 </xsl:otherwise>
             </xsl:choose>
-
+            <!-- legalAuthenticator and authenticator -->
             <!-- fhir:attester -> cda:legalAuthenticator or cda:Authenticator-->
             <xsl:apply-templates select="fhir:attester" />
-
+            <!-- participant -->
             <!-- SG 20231126: Check for Emergency Contact -->
-            <xsl:for-each select="//fhir:Patient/fhir:contact[fhir:relationship/fhir:coding/fhir:code[@value = 'C']]">
-                <participant typeCode="IND">
-                    <associatedEntity classCode="ECON">
-                        <xsl:call-template name="get-addr" />
-                        <xsl:call-template name="get-telecom" />
-                        <associatedPerson>
-                            <xsl:call-template name="get-person-name" />
-                        </associatedPerson>
-                    </associatedEntity>
-                </participant>
+            <xsl:for-each select="//fhir:Patient/fhir:contact">
+                <xsl:choose>
+                    <xsl:when test="fhir:relationship/fhir:coding/fhir:code[@value = 'N' or @value = 'GUARD']"/>
+                    <xsl:when test="fhir:relationship/fhir:coding/fhir:code[@value = 'C' or @value = 'ECON']">
+<!--                        <xsl:for-each select="//fhir:Patient/fhir:contact[fhir:relationship/fhir:coding/fhir:code[@value = 'C' or @value = 'ECON']]">-->
+                            <participant typeCode="IND">
+                                <associatedEntity classCode="ECON">
+                                    <xsl:call-template name="get-addr" />
+                                    <xsl:call-template name="get-telecom" />
+                                    <associatedPerson>
+                                        <xsl:call-template name="get-person-name" />
+                                    </associatedPerson>
+                                </associatedEntity>
+                            </participant>
+                        <!--</xsl:for-each>-->
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <participant typeCode="IND">
+                            <associatedEntity classCode="CON">
+                                
+                                <xsl:call-template name="get-addr" />
+                                <xsl:call-template name="get-telecom" />
+                                <associatedPerson>
+                                    <xsl:call-template name="get-person-name" />
+                                </associatedPerson>
+                            </associatedEntity>
+                        </participant>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:for-each>
-
+            <!-- inFulfillmentOf -->
+            <!-- fhir:extension  -->
+            <!-- be aware a Composition can have multiple extensions to ensure in correct context -->
+            <!-- MD: OrderExtension -> cda:inFulfillmentOf -->
+            <xsl:variable name="vCompositionOrderExtension" select="'http://hl7.org/fhir/us/ccda/StructureDefinition/OrderExtension'" />
+            <xsl:apply-templates mode="inFulfillmentOf" select="fhir:extension[@url = $vCompositionOrderExtension]"> </xsl:apply-templates>
+            
+            <!-- documentationOf -->
+            <xsl:if test="$gvCurrentIg = 'eICR' and fhir:extension[@url = 'http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-initiation-type-extension']">
+                <documentationOf>
+                    <serviceEvent>
+                        <!-- code -->
+                        <xsl:apply-templates select="fhir:extension[@url = 'http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-initiation-type-extension']/fhir:valueCodeableConcept">
+                            <xsl:with-param name="pElementName">code</xsl:with-param>
+                        </xsl:apply-templates>
+                        <!--<xsl:apply-templates select="fhir:extension[@url = 'http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-initiation-type-extension']/fhir:effectiveTime">
+                            <xsl:with-param name="pElementName">effectiveTime</xsl:with-param>
+                        </xsl:apply-templates>-->
+                        <xsl:apply-templates select="//fhir:Composition/fhir:date" mode="period" />
+                    </serviceEvent>
+                </documentationOf>
+            </xsl:if>
+            <xsl:apply-templates select="fhir:event" />
             <!-- relatedDocument/parentDocument -->
             <relatedDocument typeCode="XFRM">
                 <parentDocument>
@@ -189,13 +239,17 @@ limitations under the License.
                     </xsl:choose>
                 </parentDocument>
             </relatedDocument>
-            
-            <xsl:for-each select="fhir:relatesTo[fhir:code/@value='replaces']">
+            <xsl:for-each select="fhir:relatesTo[fhir:code/@value = 'replaces']">
                 <relatedDocument typeCode="RPLC">
                     <parentDocument>
                         <xsl:choose>
                             <xsl:when test="fhir:targetIdentifier">
                                 <xsl:apply-templates select="fhir:targetIdentifier" />
+                            </xsl:when>
+                            <!-- going to have to put the target reference into the identifier because there is no other place to put it -->
+                            <xsl:when test="fhir:targetReference">
+                                <xsl:comment>This is a workaround to preserve the targetReference</xsl:comment>
+                                <id root="2.16.840.1.113883.4.873" extension="{fhir:targetReference/fhir:reference/@value}" />
                             </xsl:when>
                             <xsl:otherwise>
                                 <id nullFlavor="NI" />
@@ -204,14 +258,9 @@ limitations under the License.
                     </parentDocument>
                 </relatedDocument>
             </xsl:for-each>
-            
-            <!-- fhir:extension  -->
-            <!-- be aware a Composition can have multiple extensions to ensure in correct context -->
-            <!-- MD: OrderExtension -> cda:inFulfillmentOf -->
-            <xsl:variable name="vCompositionOrderExtension" select="'http://hl7.org/fhir/us/ccda/StructureDefinition/OrderExtension'" />
-            <xsl:apply-templates mode="inFulfillmentOf" select="fhir:extension[@url = $vCompositionOrderExtension]"> </xsl:apply-templates>
 
-            <xsl:apply-templates select="fhir:event" />
+            
+            <!-- componentOf -->
             <xsl:apply-templates select="fhir:encounter" />
 
             <component>
