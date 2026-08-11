@@ -1,29 +1,198 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec" xmlns:cda="urn:hl7-org:v3" xmlns:fhir="http://hl7.org/fhir" xmlns:lcg="http://www.lantanagroup.com" stylesheet="../SaxonPE-cda2fhir.xslt" run-as="external">
-    <!-- encompassingEncounter - create bundle entry-->
-    <x:scenario label="A. Scenario for testing template with match 'cda:encompassingEncounter'and mode 'bundle-entry'">
-        <x:context href="../../../samples/cda/xspec-test-files/XSPEC_eICR-CDA-001_R3_1.xml" />
-        
-        <x:expect label="A1. There should be one Encounter resource" test="count(//fhir:Encounter)=1" />
-        <x:expect label="A2. There Encounter should have a period with a start date of 2020-11-07"
-            test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:period/fhir:start[substring(@value, 1, 23)='2020-11-07T08:44:21.000'])=1" />
-        <x:expect label="A3. There should be one Encounter.identifier[value=9937012][system=2.16.840.1.113883.19]"
-            test="count(//fhir:Encounter/fhir:identifier[fhir:value/@value='9937012'][fhir:system/@value='urn:oid:2.16.840.1.113883.19'])=1" />
-        <x:expect label="A4. There should be one Encounter.class.code='AMB'" test="count(fhir:entry/fhir:resource/fhir:Encounter/fhir:class/fhir:code/@value='AMB')=1" />
-        <x:expect label="A5. The Encounter should have one participant with type ATND that has an individual"
-            test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:participant[fhir:type/fhir:coding/fhir:code/@value='ATND']/fhir:individual)=1" />
-        <x:expect label="A6. The Encounter resource should contain a diagnosis that is a trigger code diagnosis for pertussis (27836007)"
-            test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:diagnosis/fhir:extension[@url='http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-trigger-code-flag-extension']/fhir:extension/fhir:valueCoding/fhir:code[@value='27836007'])=1" />
-        <x:expect label="A7. The Encounter resource should contain a trigger code diagnosis for pertussis that has a reference to a condition"
-            test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:diagnosis[fhir:extension/fhir:extension/fhir:valueCoding/fhir:code/@value='27836007']/fhir:condition)=1" />
-        <x:expect label="A8. The Encounter resource should contain a non-trigger code diagnosis that has a reference to a condition"
-            test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:diagnosis[not(fhir:extension)]/fhir:condition)=1" />
-        <x:expect label="A9. The Encounter resource should a location reference" test="count(//fhir:Encounter/fhir:location/fhir:location)=1" />
-        <x:expect label="A10. There should be a Location resource with identifier = 77777777777" test="count(//fhir:Location/fhir:identifier/fhir:value/@value='77777777777')=1" />
-        <x:expect label="A11. The Location resource with identifier 77777777777 should have name = Good Health Hospital"
-            test="count(//fhir:Location[fhir:identifier/fhir:value/@value='77777777777']/fhir:name/@value='Good Health Hospital')=1" />
-        <x:expect label="A12. The Location resource with identifier 77777777777 should have 2 telecoms" test="count(//fhir:Location[fhir:identifier/fhir:value/@value='77777777777']/fhir:telecom)=2" />
-        <x:expect label="A13. The Location resource with identifier 77777777777 should have 1 address with 1000 Hospital Lane"
-            test="count(//fhir:Location[fhir:identifier/fhir:value/@value='77777777777']/fhir:address/fhir:line[@value='1000 Hospital Lane'])=1" />
-    </x:scenario>
+<x:description xmlns:x="http://www.jenitennison.com/xslt/xspec" xmlns:cda="urn:hl7-org:v3" xmlns:fhir="http://hl7.org/fhir" xmlns:lcg="http://www.lantanagroup.com" stylesheet="../NativeUUIDGen-cda2fhir.xslt"
+  run-as="external">
+  <!-- encompassingEncounter - create bundle entry-->
+  <x:scenario label="A. Scenario for testing template with match 'cda:encompassingEncounter'and mode 'bundle-entry'">
+    <x:context href="../../../samples/cda/xspec-test-files/XSPEC_eICR-CDA-001_R3_1.xml" />
+
+    <x:expect label="A1. There should be one Encounter resource" test="count(//fhir:Encounter)=1" />
+    <x:expect label="A2. There Encounter should have a period with a start date of 2020-11-07"
+      test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:period/fhir:start[substring(@value, 1, 23)='2020-11-07T08:44:21.000'])=1" />
+    <x:expect label="A3. There should be one Encounter.identifier[value=9937012][system=2.16.840.1.113883.19]"
+      test="count(//fhir:Encounter/fhir:identifier[fhir:value/@value='9937012'][fhir:system/@value='urn:oid:2.16.840.1.113883.19'])=1" />
+    <!-- 20260729 Claude: Fix - assertion was always-true: count() of a comparison counts a boolean (=1 regardless); comparison moved into a predicate -->
+    <x:expect label="A4. There should be one Encounter.class.code='AMB'" test="count(//fhir:entry/fhir:resource/fhir:Encounter/fhir:class/fhir:code[@value = 'AMB'])=1" />
+    <x:expect label="A5. The Encounter should have one participant with type ATND that has an individual"
+      test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:participant[fhir:type/fhir:coding/fhir:code/@value='ATND']/fhir:individual)=1" />
+    <x:expect label="A6. The Encounter resource should contain a diagnosis that is a trigger code diagnosis for pertussis (27836007)"
+      test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:diagnosis/fhir:extension[@url='http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-trigger-code-flag-extension']/fhir:extension/fhir:valueCoding/fhir:code[@value='27836007'])=1" />
+    <x:expect label="A7. The Encounter resource should contain a trigger code diagnosis for pertussis that has a reference to a condition"
+      test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:diagnosis[fhir:extension/fhir:extension/fhir:valueCoding/fhir:code/@value='27836007']/fhir:condition)=1" />
+    <x:expect label="A8. The Encounter resource should contain a non-trigger code diagnosis that has a reference to a condition"
+      test="count(//fhir:Encounter[fhir:identifier/fhir:value/@value='9937012']/fhir:diagnosis[not(fhir:extension)]/fhir:condition)=1" />
+    <x:expect label="A9. The Encounter resource should a location reference" test="count(//fhir:Encounter/fhir:location/fhir:location)=1" />
+    <!-- 20260729 Claude: Fix - assertion was always-true: count() of a comparison counts a boolean (=1 regardless); comparison moved into a predicate -->
+    <x:expect label="A10. There should be a Location resource with identifier = 77777777777" test="count(//fhir:Location/fhir:identifier/fhir:value[@value = '77777777777'])=1" />
+    <!-- 20260729 Claude: Fix - assertion was always-true: count() of a comparison counts a boolean (=1 regardless); comparison moved into a predicate -->
+    <x:expect label="A11. The Location resource with identifier 77777777777 should have name = 3 Good Health Hospital Third"
+      test="count(//fhir:Location[fhir:identifier/fhir:value/@value='77777777777']/fhir:name[@value = '3 Good Health Hospital Third'])=1" />
+    <x:expect label="A12. The Location resource with identifier 77777777777 should have 2 telecoms" test="count(//fhir:Location[fhir:identifier/fhir:value/@value='77777777777']/fhir:telecom)=2" />
+    <x:expect label="A13. The Location resource with identifier 77777777777 should have 1 address with 1000 Hospital Lane"
+      test="count(//fhir:Location[fhir:identifier/fhir:value/@value='77777777777']/fhir:address/fhir:line[@value='1000 Hospital Lane'])=1" />
+  </x:scenario>
+
+  <!-- 20260730 Claude: regression tests for the two Encounter fixes of 2026-07-30 (defect items 38/39). -->
+
+  <x:scenario label="B. eICR: reference mode for a 4.49 Encounter Activity emits NOTHING - no resource is created for it in eICR, so a reference would dangle (4.40 Planned Encounter is NOT suppressed - it maps to a planned Encounter, scenario D)">
+    <x:context href="../../../samples/cda/xspec-test-files/XSPEC_eICR-CDA-001_R3_1.xml" mode="reference"
+      select="(//cda:encounter[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.49'])[1]" />
+    <x:expect label="B1. No output at all" select="()" />
+  </x:scenario>
+
+  <x:scenario label="C. Non-eICR: body-encounter bundle-entry creates Conditions for NESTED Encounter Diagnosis acts (4.80 inside 4.80) - the reference side walks them document-deep, so the creation side must too">
+    <x:context mode="bundle-entry">
+      <encounter xmlns="urn:hl7-org:v3" xmlns:lcg="http://www.lantanagroup.com" classCode="ENC" moodCode="EVN" lcg:uuid="70000000-0000-0000-0000-000000000000">
+        <templateId root="2.16.840.1.113883.10.20.22.4.49" />
+        <id root="70000000-0000-0000-0000-000000000001" />
+        <code code="AMB" codeSystem="2.16.840.1.113883.5.4" />
+        <effectiveTime value="20250101" />
+        <entryRelationship typeCode="SUBJ">
+          <act classCode="ACT" moodCode="EVN" lcg:uuid="70000000-0000-0000-0000-000000000002">
+            <templateId root="2.16.840.1.113883.10.20.22.4.80" />
+            <code code="29308-4" codeSystem="2.16.840.1.113883.6.1" />
+            <entryRelationship typeCode="SUBJ">
+              <observation classCode="OBS" moodCode="EVN" lcg:uuid="70000000-0000-0000-0000-000000000003">
+                <templateId root="2.16.840.1.113883.10.20.22.4.4" />
+                <id root="70000000-0000-0000-0000-000000000004" />
+                <code code="29308-4" codeSystem="2.16.840.1.113883.6.1" />
+                <statusCode code="completed" />
+                <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="CD" code="27836007" codeSystem="2.16.840.1.113883.6.96" />
+              </observation>
+            </entryRelationship>
+            <entryRelationship typeCode="SUBJ">
+              <act classCode="ACT" moodCode="EVN" lcg:uuid="70000000-0000-0000-0000-000000000005">
+                <templateId root="2.16.840.1.113883.10.20.22.4.80" />
+                <code code="29308-4" codeSystem="2.16.840.1.113883.6.1" />
+                <entryRelationship typeCode="SUBJ">
+                  <observation classCode="OBS" moodCode="EVN" lcg:uuid="70000000-0000-0000-0000-000000000006">
+                    <templateId root="2.16.840.1.113883.10.20.22.4.4" />
+                    <id root="70000000-0000-0000-0000-000000000007" />
+                    <code code="29308-4" codeSystem="2.16.840.1.113883.6.1" />
+                    <statusCode code="completed" />
+                    <value xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="CD" code="6142004" codeSystem="2.16.840.1.113883.6.96" />
+                  </observation>
+                </entryRelationship>
+              </act>
+            </entryRelationship>
+          </act>
+        </entryRelationship>
+      </encounter>
+    </x:context>
+    <x:expect label="C1. Both Problem Observations become Conditions, including the one inside the nested 4.80 (was: only the first level, leaving a dangling Encounter.diagnosis.condition)"
+      test="count(//fhir:Condition) = 2" />
+  </x:scenario>
+
+  <!-- 20260730 Claude: Planned Encounter (4.40) -> Encounter status=planned (SG mapping decision; see the
+       dated comment in cda2fhir-Encounter.xslt). Inline fragment, so $gvCurrentIg is NA - the mapping is
+       IG-independent; the eICR case is covered end-to-end by the 2026-04 COVID snapshot and the conformance
+       delta run (zero new errors). -->
+  <x:scenario label="D. Planned Encounter (4.40) produces a planned Encounter resource">
+    <x:context>
+      <encounter xmlns="urn:hl7-org:v3" xmlns:lcg="http://www.lantanagroup.com" classCode="ENC" moodCode="INT" lcg:uuid="71000000-0000-0000-0000-000000000000">
+        <templateId root="2.16.840.1.113883.10.20.22.4.40" />
+        <templateId root="2.16.840.1.113883.10.20.22.4.40" extension="2014-06-09" />
+        <id root="71000000-0000-0000-0000-000000000001" />
+        <code code="270427003" codeSystem="2.16.840.1.113883.6.96" displayName="Patient-initiated encounter" />
+        <statusCode code="active" />
+        <effectiveTime value="20250224" />
+      </encounter>
+    </x:context>
+    <x:expect label="D1. status is planned, never the source statusCode" test="count(fhir:Encounter/fhir:status[@value = 'planned']) = 1" />
+    <!-- 20260804 Claude (CDAFHIR-051): expectation updated, not relaxed. The behaviour under test is
+         unchanged - a SNOMED 4.40 code is not an ActEncounterCode, so class has no source and the
+         fallback fires - but the fallback no longer invents a v3-NullFlavor NI coding. Encounter.class
+         is 1..1 with a REQUIRED binding to ActEncounterCode, so NI was outside the value set and a hard
+         conformance error; the pipeline's convention for required-but-absent data is a data-absent-reason
+         extension (same as Location.name, item 42). Asserting the DAR shape AND the absence of any code
+         so the old behaviour cannot come back unnoticed. -->
+    <x:expect label="D2. class falls back to data-absent-reason when the code is not an ActCode"
+      test="count(fhir:Encounter/fhir:class/fhir:extension[@url = 'http://hl7.org/fhir/StructureDefinition/data-absent-reason']/fhir:valueCode[@value = 'unknown']) = 1" />
+    <x:expect label="D2b. the fallback class carries no invented code" test="count(fhir:Encounter/fhir:class/fhir:code) = 0" />
+    <x:expect label="D3. the SNOMED code lands in type" test="count(fhir:Encounter/fhir:type/fhir:coding/fhir:code[@value = '270427003']) = 1" />
+    <x:expect label="D4. point effectiveTime becomes period.start" test="count(fhir:Encounter/fhir:period/fhir:start[@value = '2025-02-24']) = 1" />
+    <x:expect label="D5. identifier from id" test="count(fhir:Encounter/fhir:identifier) = 1" />
+  </x:scenario>
+
+  <!-- 20260803 Claude (CDAFHIR-016): the class fallback used to select EVERY Encounter Activity code
+       document-wide and space-join them into one invalid class code; it also ran for non-eICR
+       documents, where 4.49 activities are separate Encounter resources (only in eICR are they
+       deduplicated into the encompassing encounter). Inline whole-document contexts because both
+       $gvCurrentIg and the //-fallback need a real document root. -->
+  <x:scenario label="E1. eICR encompassingEncounter without a class code borrows exactly ONE class from the first Encounter Activity">
+    <x:context select="//cda:encompassingEncounter">
+      <ClinicalDocument xmlns="urn:hl7-org:v3" lcg:uuid="00000000-0000-0000-0000-0000000000f0">
+        <templateId root="2.16.840.1.113883.10.20.15.2" />
+        <component>
+          <structuredBody>
+            <component>
+              <section>
+                <templateId root="2.16.840.1.113883.10.20.22.2.22.1" />
+                <entry>
+                  <encounter classCode="ENC" moodCode="EVN" lcg:uuid="00000000-0000-0000-0000-0000000000f1">
+                    <templateId root="2.16.840.1.113883.10.20.22.4.49" />
+                    <code code="AMB" codeSystem="2.16.840.1.113883.1.11.13955" />
+                  </encounter>
+                </entry>
+                <entry>
+                  <encounter classCode="ENC" moodCode="EVN" lcg:uuid="00000000-0000-0000-0000-0000000000f2">
+                    <templateId root="2.16.840.1.113883.10.20.22.4.49" />
+                    <code code="IMP" codeSystem="2.16.840.1.113883.1.11.13955" />
+                  </encounter>
+                </entry>
+              </section>
+            </component>
+          </structuredBody>
+        </component>
+        <componentOf>
+          <encompassingEncounter lcg:uuid="00000000-0000-0000-0000-0000000000f3">
+            <id root="00000000-0000-0000-0000-0000000000f4" />
+            <effectiveTime>
+              <low value="20240101" />
+            </effectiveTime>
+          </encompassingEncounter>
+        </componentOf>
+      </ClinicalDocument>
+    </x:context>
+    <x:expect label="exactly one class element (class is 1..1)"
+      test="count(fhir:Encounter/fhir:class) = 1" />
+    <x:expect label="the class is the FIRST activity's code, not the space-joined pair 'AMB IMP'"
+      test="fhir:Encounter/fhir:class/fhir:code/@value = 'AMB'" />
+  </x:scenario>
+
+  <x:scenario label="E2. non-eICR encompassingEncounter does NOT borrow class from body Encounter Activities">
+    <x:context select="//cda:encompassingEncounter">
+      <ClinicalDocument xmlns="urn:hl7-org:v3" lcg:uuid="00000000-0000-0000-0000-0000000000f5">
+        <templateId root="9.9.9.9.9" />
+        <component>
+          <structuredBody>
+            <component>
+              <section>
+                <entry>
+                  <encounter classCode="ENC" moodCode="EVN" lcg:uuid="00000000-0000-0000-0000-0000000000f6">
+                    <templateId root="2.16.840.1.113883.10.20.22.4.49" />
+                    <code code="AMB" codeSystem="2.16.840.1.113883.1.11.13955" />
+                  </encounter>
+                </entry>
+              </section>
+            </component>
+          </structuredBody>
+        </component>
+        <componentOf>
+          <encompassingEncounter lcg:uuid="00000000-0000-0000-0000-0000000000f7">
+            <id root="00000000-0000-0000-0000-0000000000f8" />
+            <effectiveTime>
+              <low value="20240101" />
+            </effectiveTime>
+          </encompassingEncounter>
+        </componentOf>
+      </ClinicalDocument>
+    </x:context>
+    <!-- 20260804 Claude (CDAFHIR-051): same expectation update as D2 above - the point of this scenario
+         is that OUTSIDE eICR the encompassingEncounter does not borrow a body encounter's class, so the
+         fallback must fire. That is unchanged; only the fallback's representation moved from an invalid
+         v3-NullFlavor NI coding to the data-absent-reason convention. -->
+    <x:expect label="class falls back to data-absent-reason - a body encounter's class is a different encounter's data outside eICR"
+      test="count(fhir:Encounter/fhir:class/fhir:extension[@url = 'http://hl7.org/fhir/StructureDefinition/data-absent-reason']/fhir:valueCode[@value = 'unknown']) = 1" />
+    <x:expect label="and no ActCode is borrowed from the body encounter" test="count(fhir:Encounter/fhir:class/fhir:code) = 0" />
+  </x:scenario>
 </x:description>

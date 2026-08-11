@@ -203,12 +203,13 @@
         <xsl:variable name="profiles">
             <xsl:apply-templates select="cda:templateId" mode="template2profile" />
         </xsl:variable>
-        <xsl:if test="$profiles/fhir:profile or cda:confidentialityCode[not(@nullFlavor)]">
-
-            <meta>
+        <!--<xsl:if test="$profiles/fhir:profile or cda:confidentialityCode[not(@nullFlavor)]">-->
+            
                 <xsl:choose>
                     <xsl:when test="$profiles/fhir:profile">
+                      <meta>
                         <xsl:apply-templates select="cda:templateId" mode="template2profile" />
+                      </meta>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:comment>WARNING: No profiles found for any of the following templates:
@@ -226,8 +227,7 @@
                         <code value="{cda:confidentialityCode/@code}" />
                     </security>
                 </xsl:if>-->
-            </meta>
-        </xsl:if>
+        <!--</xsl:if>-->
     </xsl:template>
 
     <!-- TEMPLATE: Uses the template to profile file imported at the top of this file to match template oids with their structureDefinition profile -->
@@ -413,10 +413,14 @@
     <xsl:template name="encompassingEncounter-reference">
         <xsl:param name="pElementName">encounter</xsl:param>
         <!-- TODO: handle multiple subjects (record as a group where allowed - needed for HAI) -->
-        <xsl:element name="{$pElementName}">
-            <reference value="urn:uuid:{/cda:ClinicalDocument/
-                cda:componentOf/cda:encompassingEncounter[1]/@lcg:uuid}" />
-        </xsl:element>
+        <!-- 20260729 Claude: Fix - the reference was emitted unconditionally, so a document with no
+             componentOf/encompassingEncounter produced an empty reference (urn:uuid:); now omitted when absent -->
+        <xsl:if test="/cda:ClinicalDocument/cda:componentOf/cda:encompassingEncounter">
+            <xsl:element name="{$pElementName}">
+                <reference value="urn:uuid:{/cda:ClinicalDocument/
+                    cda:componentOf/cda:encompassingEncounter[1]/@lcg:uuid}" />
+            </xsl:element>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template name="subject-reference">
@@ -558,7 +562,9 @@
     <xsl:template match="cda:act[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.80']]" mode="reference">
         <xsl:param name="wrapping-elements" />
         <!-- Remove Encounter Diagnosis wrappers, since maps to Condition.category -->
-        <xsl:for-each select="cda:entryRelationship/cda:*[not(@nullFlavor)]">
+        <!-- 20260803 Claude (item 41): skip suppressed templates when unwrapping - they produce no
+             resource, so a reference to them dangles (same rule as section entries and item 40). -->
+        <xsl:for-each select="cda:entryRelationship/cda:*[not(@nullFlavor)][not(cda:templateId[key('templates-to-suppress-key', @root)])]">
             <xsl:apply-templates select="." mode="reference">
                 <xsl:with-param name="wrapping-elements" select="$wrapping-elements" />
             </xsl:apply-templates>
@@ -571,6 +577,26 @@
             <xsl:apply-templates select="." mode="bundle-entry" />
         </xsl:for-each>
     </xsl:template>
+  
+  
+  <xsl:template match="cda:act[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.36']]" mode="reference">
+    <xsl:param name="wrapping-elements" />
+    <!-- Remove Admission Medication wrappers, since maps to MedicationAdministration -->
+    <!-- 20260803 Claude (item 41): skip suppressed templates when unwrapping - they produce no
+         resource, so a reference to them dangles (same rule as section entries and item 40). -->
+    <xsl:for-each select="cda:entryRelationship/cda:*[not(@nullFlavor)][not(cda:templateId[key('templates-to-suppress-key', @root)])]">
+      <xsl:apply-templates select="." mode="reference">
+        <xsl:with-param name="wrapping-elements" select="$wrapping-elements" />
+      </xsl:apply-templates>
+    </xsl:for-each>
+  </xsl:template>
+  
+  <xsl:template match="cda:act[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.36']]" mode="bundle-entry">
+    <!-- Remove Admission Medication wrappers, since maps to MedicationAdministration -->
+    <xsl:for-each select="cda:entryRelationship/cda:*[not(@nullFlavor)]">
+      <xsl:apply-templates select="." mode="bundle-entry" />
+    </xsl:for-each>
+  </xsl:template>
 
     <xsl:template match="cda:*[@nullFlavor]" mode="bundle-entry">
         <!-- Suppress -->
@@ -1013,6 +1039,14 @@
                     <xsl:when test="$pResource = 'Encounter'">
                         <xsl:value-of select="'http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-encounter'" />
                     </xsl:when>
+                    <!-- 20260729 Claude: added Location. eicr-encounter constrains Encounter.location.location to
+                         us-ph-location, so a Service Delivery Location participant (2.16.840.1.113883.10.20.22.4.32)
+                         referenced from an Encounter has to carry that profile. It cannot come from
+                         template-profile-mapping.xml: 4.32 is a plain C-CDA template used in non-eCR documents too,
+                         where us-core-location is the right target, so the choice is IG-dependent and belongs here. -->
+                    <xsl:when test="$pResource = 'Location'">
+                        <xsl:value-of select="'http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-location'" />
+                    </xsl:when>
                     <xsl:when test="$pResource = 'Patient'">
                         <xsl:value-of select="'http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-patient'" />
                     </xsl:when>
@@ -1031,6 +1065,10 @@
                 <xsl:choose>
                     <xsl:when test="$pResource = 'Encounter'">
                         <xsl:value-of select="'http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-encounter'" />
+                    </xsl:when>
+                    <!-- 20260729 Claude: added Location - see the eICR branch above -->
+                    <xsl:when test="$pResource = 'Location'">
+                        <xsl:value-of select="'http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-location'" />
                     </xsl:when>
                     <xsl:when test="$pResource = 'Patient'">
                         <xsl:value-of select="'http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-patient'" />
@@ -1089,6 +1127,13 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+  
+  <!-- TEMPLATE: get values out of cda:td and concat together -->
+  <xsl:template match="cda:td" mode="textRefValue">
+    <xsl:for-each select=".">
+      <xsl:value-of select="concat(., '; ')" />
+    </xsl:for-each>
+  </xsl:template>
 
     <xsl:template match="." mode="base64">
         <xsl:call-template name="b64:encode">

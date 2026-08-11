@@ -24,9 +24,14 @@
             cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.3'] or
             cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.30'] or
             cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.136'] or
-            cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.34']]" mode="reference">
+            cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.34'] or
+            cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.33']]" mode="reference">
         <xsl:param name="wrapping-elements" />
-        <xsl:for-each select="cda:entryRelationship/cda:*[not(@nullFlavor)]">
+        <!-- 20260803 Claude (item 41): consult the suppression list here, same rule as section entries
+             and hasMember (item 40). A suppressed template (e.g. Comment Activity 4.64 nested in a
+             Problem Concern Act) produces no resource - the bundle-entry side already skips it via the
+             suppression no-op in c-to-fhir-utility.xslt - so unwrapping a reference to it dangles. -->
+        <xsl:for-each select="cda:entryRelationship/cda:*[not(@nullFlavor)][not(cda:templateId[key('templates-to-suppress-key', @root)])]">
             <xsl:apply-templates select="." mode="reference">
                 <xsl:with-param name="wrapping-elements" select="$wrapping-elements" />
             </xsl:apply-templates>
@@ -38,8 +43,9 @@
             cda:act[cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.132'] or
             cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.3'] or 
             cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.30'] or 
-            cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.136']or 
-            cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.34']]"
+            cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.136'] or 
+            cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.34'] or 
+            cda:templateId[@root = '2.16.840.1.113883.10.20.22.4.33']]"
         mode="bundle-entry">
         <!-- Create bundle entries for any authors or performers -->
         <xsl:apply-templates select="cda:author" mode="bundle-entry" />
@@ -84,12 +90,19 @@
 
             <xsl:apply-templates select="cda:id" />
             <!-- clinicalStatus: check both effectiveTime and potentially a contained Problem Status Observation -->
+            <!-- 20260729 Claude: Fix - clinicalStatus was emitted unconditionally, but the negated eICR trigger case below
+                 sets verificationStatus=entered-in-error, and FHIR invariant con-5 forbids clinicalStatus when
+                 verificationStatus is entered-in-error - suppress it in that case -->
+            <xsl:if test="not(@negationInd = 'true' and cda:templateId[@root = '2.16.840.1.113883.10.20.15.2.3.3'])">
             <clinicalStatus>
                 <coding>
                     <system value="http://terminology.hl7.org/CodeSystem/condition-clinical" />
                     <code>
                         <xsl:choose>
-                            <xsl:when test="cda:effectiveTime/cda:high or cda:entryRelationship/cda:observation[cda:templateId/@root='2.16.840.1.113883.10.20.22.4.6']/cda:value/@code='413322009'">
+                            <!-- 20260803 Claude (item 44/CDAFHIR-011): was cda:effectiveTime/cda:high (existence) -
+                                 a <high nullFlavor="UNK"/> means the end is UNKNOWN, not that the problem is
+                                 resolved. Now requires an actual @value. -->
+                            <xsl:when test="cda:effectiveTime/cda:high/@value or cda:entryRelationship/cda:observation[cda:templateId/@root='2.16.840.1.113883.10.20.22.4.6']/cda:value/@code='413322009'">
                                 <xsl:attribute name="value">resolved</xsl:attribute>
                             </xsl:when>
                             <xsl:when test="cda:entryRelationship/cda:observation[cda:templateId/@root='2.16.840.1.113883.10.20.22.4.6']/cda:value/@code='246455001'">
@@ -114,6 +127,7 @@
                     </code>
                 </coding>
             </clinicalStatus>
+            </xsl:if>
             <!-- SG 2024-02-05: Updated negationInd processing for eCR -->
             <xsl:choose>
                 <xsl:when test="@negationInd = 'true' and cda:templateId[@root = '2.16.840.1.113883.10.20.15.2.3.3']">
@@ -174,7 +188,10 @@
             </xsl:choose>
 
             <!-- recorder (max 1) (can only be Practitioner, PractitionerRole, Patient, RelatedPerson -->
-            <xsl:apply-templates select="cda:author[cda:assignedAuthor/cda:assignedPerson[1]]" mode="rename-reference-participant">
+            <!-- 20260729 Claude: Fix - the [1] predicate was on assignedPerson, so ALL authors with a person were
+                 selected and multiple recorder elements could be emitted (Condition.recorder is 0..1); now selects the
+                 first such author -->
+            <xsl:apply-templates select="cda:author[cda:assignedAuthor/cda:assignedPerson][1]" mode="rename-reference-participant">
                 <xsl:with-param name="pElementName">recorder</xsl:with-param>
             </xsl:apply-templates>
 
@@ -190,7 +207,8 @@
             </xsl:for-each>
             
             <!-- note -->
-            <xsl:if test="cda:text | cda:text">
+            <!-- 20260729 Claude: Fix - test was the self-union "cda:text | cda:text" -->
+            <xsl:if test="cda:text">
                 <xsl:for-each select="cda:text">
                     
                     <xsl:variable name="vText">
@@ -216,28 +234,8 @@
         </Condition>
     </xsl:template>
 
-    <!-- C-CDA Problem Status -->
-    <xsl:template match="cda:observation[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.6']" mode="condition">
-        <xsl:for-each select="cda:value">
-            <clinicalStatus>
-                <coding>
-                    <system value="http://terminology.hl7.org/CodeSystem/condition-clinical" />
-
-                    <xsl:choose>
-                        <xsl:when test="@code = '55561003'">
-                            <code value="active" />
-                        </xsl:when>
-                        <xsl:when test="@code = '73425007'">
-                            <code value="inactive" />
-                        </xsl:when>
-                        <xsl:when test="@code = '413322009'">
-                            <code value="resolved" />
-                        </xsl:when>
-                    </xsl:choose>
-                </coding>
-            </clinicalStatus>
-        </xsl:for-each>
-    </xsl:template>
+    <!-- 20260729 Claude: removed dead template match="cda:observation[4.6 Problem Status]" mode="condition" - it was
+         never invoked (the Problem Status -> clinicalStatus logic is inlined in the main Condition template above) -->
 
     <xsl:template match="cda:effectiveTime" mode="condition">
         <xsl:if test="cda:low/@value">
@@ -248,11 +246,8 @@
         </xsl:if>
     </xsl:template>
 
-    <xsl:template match="cda:code" mode="condition">
-        <xsl:call-template name="newCreateCodableConcept">
-            <xsl:with-param name="pElementName">category</xsl:with-param>
-        </xsl:call-template>
-    </xsl:template>
+    <!-- 20260729 Claude: removed dead template match="cda:code" mode="condition" - it was never invoked (category is
+         built inline in the main Condition template above) -->
 
     <xsl:template match="cda:value" mode="condition">
         <xsl:choose>
