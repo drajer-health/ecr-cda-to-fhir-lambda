@@ -1,0 +1,6 @@
+# corpus-known-issues.txt - baseline for run-integration-tests.py --corpus.
+# One line per known problem: <repo-relative path> TAB <count> TAB <problem>.
+# Regenerate with --corpus --update-known AFTER REVIEWING what changed -
+# this file is the list of accepted open defects, and it should only shrink.
+# Each entry should correspond to an open defect item in the project's
+# codebase notes.
