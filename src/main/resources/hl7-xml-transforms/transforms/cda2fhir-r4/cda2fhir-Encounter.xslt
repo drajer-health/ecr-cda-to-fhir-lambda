@@ -12,6 +12,11 @@
     <!-- 20260729 Claude: Fix - the Encounter body emits a participant/individual reference for each author (see the
          author for-each below), but no bundle entry was ever created for them, leaving dangling references -->
     <xsl:apply-templates select="cda:author" mode="bundle-entry" />
+    <!-- 20260825 Claude (B15b): companion org-only PractitionerRole for every participation the
+         Encounter body classifies as org-direct/org-routed (see the participant loops in the convert
+         template and org-practitionerrole-entry in cda2fhir-PractitionerRole.xslt) - the reference
+         side and the creation side must stay paired. The mode emits nothing for other kinds. -->
+    <xsl:apply-templates select="cda:responsibleParty[not(@nullFlavor)] | cda:encounterParticipant[not(@nullFlavor)] | cda:performer[not(@nullFlavor)] | cda:author" mode="org-practitionerrole-entry" />
     <xsl:apply-templates select="cda:location[not(@nullFlavor)]" mode="bundle-entry" />
     <xsl:apply-templates select="cda:location/cda:healthCareFacility/cda:serviceProviderOrganization[not(@nullFlavor)]" mode="bundle-entry" />
 
@@ -27,6 +32,13 @@
     <xsl:if test="$gvCurrentIg != 'eICR'">
       <xsl:call-template name="create-bundle-entry" />
       <xsl:apply-templates select="cda:performer" mode="bundle-entry" />
+      <!-- 20260825 Claude (B15b): the shared Encounter body also emits participants for this
+           activity's performers and (now classified) authors - create their resources and, for
+           org-direct/org-routed participations, the companion org-only PractitionerRole the
+           participant references (authors previously got NO bundle entry here at all, so a 4.49
+           author's participant reference dangled outside eICR). -->
+      <xsl:apply-templates select="cda:author" mode="bundle-entry" />
+      <xsl:apply-templates select="cda:performer[not(@nullFlavor)] | cda:author" mode="org-practitionerrole-entry" />
     </xsl:if>
     <!-- Encounter Diagnosis/Problem Observation -->
     <!-- 20260730 Claude: was a single-level path (entryRelationship/act[4.80]/entryRelationship/observation[4.4]),
@@ -214,21 +226,30 @@
         </xsl:otherwise>
       </xsl:choose>
 
-      <xsl:comment select="'INFO: Id from encompassingEncounter'" />
       <!-- SG 20260629: Removing code that limits this to one encounter id
            2026 version of eICR Encounter has been updated to allow multiple identifiers
            eICR Validation will fail if using an earlier version -->
-      <xsl:apply-templates select="cda:id" />
-      <!-- SG 20260629: This was commented out because the Encounter in eCR only allows one identifier.
-           Now including code - 2026 version of eICR Encounter has been updated to allow multiple identifiers -->
-      <!-- Note, there are also ids on the other Encounters. 
+      <!-- Note, there are also ids on the other Encounters.
         If this is eCR get the id from other encounters in the CDA-->
-      <xsl:if test="$gvCurrentIg = 'eICR'">
-        <xsl:comment select="'Id from Encounter Activity'" />
-        <xsl:apply-templates select="//cda:encounter[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.49']/cda:id" />
-        <xsl:comment select="'Id from Encounter Diagnosis Act'" />
-        <xsl:apply-templates select="//cda:act[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.80']/cda:id" />
-      </xsl:if>
+      <!-- 20260824 Claude (per SG): the encompassingEncounter and the Encounter Activity (4.49) /
+           Encounter Diagnosis act (4.80) routinely carry the SAME id (seen live in the TN eICR:
+           root 2.16.840.1.113883.19.1614.88 / extension 9044494381677, once bare and once with
+           assigningAuthorityName EPIC), which emitted two DUPLICATE identifiers. Identifiers are
+           duplicates when their mapped (system, value) match - i.e. same @root (case-blind; uuid
+           roots are lowercased by the id template) and same @extension (case-SENSITIVE, item 002).
+           One identifier is emitted per unique pair. The assigner does not distinguish duplicates,
+           but survives the merge: within a group, the first id that carries an
+           assigningAuthorityName is the one transformed (so its assigner is kept; when several
+           disagree, the first wins - SG's rule); with no assigner anywhere, the first id wins.
+           TRULY distinct identifiers still all emit: the profile's max-1 error on those is
+           tolerated until the balloting IG version (which allows multiples) lands. -->
+      <xsl:comment select="'INFO: Ids from encompassingEncounter + Encounter Activity / Encounter Diagnosis acts, deduplicated by (system, value)'" />
+      <xsl:variable name="vBodyEncounterIds"
+        select="(//cda:encounter[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.49'] | //cda:act[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.80'])/cda:id" />
+      <xsl:variable name="vEncounterIds" select="cda:id | $vBodyEncounterIds[$gvCurrentIg = 'eICR']" />
+      <xsl:for-each-group select="$vEncounterIds" group-by="concat(lower-case(@root), '||', @extension)">
+        <xsl:apply-templates select="(current-group()[@assigningAuthorityName][1], .)[1]" />
+      </xsl:for-each-group>
 
       <xsl:if test="local-name(.) eq 'encounter'">
         <xsl:choose>
@@ -364,38 +385,74 @@
 
       <xsl:call-template name="subject-reference" />
 
+      <!-- 20260825 Claude (B15b): Encounter.participant.individual only allows
+           Practitioner|PractitionerRole|RelatedPerson (eicr-encounter 2.1.2 = us-ph-encounter 2.1.2;
+           us-core-encounter 3.1.1 is even tighter: us-core-practitioner only) - never Patient,
+           Organization, or Device. Each participation is therefore CLASSIFIED first
+           (lcg:participation-target-kind):
+           - person / other: unchanged emission (the role-uuid reference, as before)
+           - org-direct / org-routed: individual references the companion org-only PractitionerRole
+             (created by the owning bundle-entry template, mode org-practitionerrole-entry)
+           - device or patient-routed: the WHOLE participant element is suppressed - individual would
+             be omitted and an empty participant violates ele-1 -->
       <xsl:for-each select="cda:responsibleParty[not(@nullFlavor)]">
-        <participant>
-          <type>
-            <coding>
-              <system value="http://terminology.hl7.org/CodeSystem/v3-ParticipationType" />
-              <code value="ATND" />
-            </coding>
-          </type>
-          <!--<xsl:apply-templates select="cda:assignedEntity/cda:code">
+        <xsl:variable name="vKind" select="lcg:participation-target-kind(.)" />
+        <xsl:if test="not($vKind = ('device', 'patient'))">
+          <participant>
+            <type>
+              <coding>
+                <system value="http://terminology.hl7.org/CodeSystem/v3-ParticipationType" />
+                <code value="ATND" />
+              </coding>
+            </type>
+            <!--<xsl:apply-templates select="cda:assignedEntity/cda:code">
                         <xsl:with-param name="pElementName">type</xsl:with-param>
                     </xsl:apply-templates>-->
-          <individual>
-            <xsl:apply-templates select="cda:assignedEntity" mode="reference" />
-          </individual>
-        </participant>
+            <xsl:choose>
+              <xsl:when test="$vKind = ('org-direct', 'org-routed')">
+                <xsl:apply-templates select="." mode="rename-reference-participant">
+                  <xsl:with-param name="pElementName">individual</xsl:with-param>
+                  <xsl:with-param name="pPersonOnlyTargets" select="true()" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <xsl:otherwise>
+                <individual>
+                  <xsl:apply-templates select="cda:assignedEntity" mode="reference" />
+                </individual>
+              </xsl:otherwise>
+            </xsl:choose>
+          </participant>
+        </xsl:if>
       </xsl:for-each>
       <xsl:for-each select="cda:encounterParticipant[not(@nullFlavor)] | cda:performer[not(@nullFlavor)]">
-        <participant>
-          <!--<type>
+        <xsl:variable name="vKind" select="lcg:participation-target-kind(.)" />
+        <xsl:if test="not($vKind = ('device', 'patient'))">
+          <participant>
+            <!--<type>
                         <coding>
                             <system value="http://terminology.hl7.org/CodeSystem/v3-ParticipationType" />
                             <code value="PPRF" />
                         </coding>
                     </type>-->
 
-          <!--<xsl:apply-templates select="cda:assignedEntity/cda:code">
+            <!--<xsl:apply-templates select="cda:assignedEntity/cda:code">
                         <xsl:with-param name="pElementName">type</xsl:with-param>
                     </xsl:apply-templates>-->
-          <individual>
-            <xsl:apply-templates select="cda:assignedEntity" mode="reference" />
-          </individual>
-        </participant>
+            <xsl:choose>
+              <xsl:when test="$vKind = ('org-direct', 'org-routed')">
+                <xsl:apply-templates select="." mode="rename-reference-participant">
+                  <xsl:with-param name="pElementName">individual</xsl:with-param>
+                  <xsl:with-param name="pPersonOnlyTargets" select="true()" />
+                </xsl:apply-templates>
+              </xsl:when>
+              <xsl:otherwise>
+                <individual>
+                  <xsl:apply-templates select="cda:assignedEntity" mode="reference" />
+                </individual>
+              </xsl:otherwise>
+            </xsl:choose>
+          </participant>
+        </xsl:if>
       </xsl:for-each>
 
       <!--<xsl:choose>
@@ -409,10 +466,18 @@
            matching template (it matches cda:author | cda:performer), so XSLT built-in rules copied the person's name
            text into the output instead of emitting a reference. Now the author itself is applied in that mode, which
            resolves to the assignedAuthor's uuid (the PractitionerRole resource) -->
-      <xsl:for-each select="cda:author[cda:assignedAuthor/cda:assignedPerson]">
+      <!-- 20260825 Claude (B15b): select widened from cda:author[cda:assignedAuthor/cda:assignedPerson]
+           to a classification: 'person' emits exactly as before; org-direct/org-routed authors (live
+           latent: the person-less org author on the 4.49 Encounter Activity in the TN eICR) now emit a
+           participant whose individual references the companion org-only PractitionerRole; device,
+           patient-routed and 'other' (hollow-unmatched - previously not emitted either) produce NO
+           participant at all (empty participant violates ele-1; Patient/Device are not legal
+           individual targets). -->
+      <xsl:for-each select="cda:author[lcg:participation-target-kind(.) = ('person', 'org-direct', 'org-routed')]">
         <participant>
           <xsl:apply-templates select="." mode="rename-reference-participant">
             <xsl:with-param name="pElementName">individual</xsl:with-param>
+            <xsl:with-param name="pPersonOnlyTargets" select="true()" />
           </xsl:apply-templates>
         </participant>
       </xsl:for-each>

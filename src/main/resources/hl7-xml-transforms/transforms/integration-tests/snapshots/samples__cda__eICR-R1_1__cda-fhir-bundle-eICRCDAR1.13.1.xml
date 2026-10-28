@@ -1436,17 +1436,15 @@
                   <p>...</p>
                </div>
             </text>
-            <!--INFO: Id from encompassingEncounter-->
+            <!--INFO: Ids from encompassingEncounter + Encounter Activity / Encounter Diagnosis acts, deduplicated by (system, value)-->
             <identifier>
                <system value="urn:oid:2.16.840.1.113883.19"/>
                <value value="9937012"/>
             </identifier>
-            <!--Id from Encounter Activity-->
             <identifier>
                <system value="urn:ietf:rfc:3986"/>
                <value value="urn:uuid:UUID030"/>
             </identifier>
-            <!--Id from Encounter Diagnosis Act-->
             <status value="in-progress"/>
             <class>
                <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
@@ -2060,7 +2058,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2018-11-07T11:15:00.000+10:00"/>
+            <effectiveDateTime value="2018-11-07T11:15:00+10:00"/>
             <dosage>
                <route>
                   <coding>
@@ -3161,7 +3159,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2018-01-05T10:15:00.000+10:00"/>
+            <effectiveDateTime value="2018-01-05T10:15:00+10:00"/>
             <!--Start of last menstrual period-->
             <valueDateTime value="2017-08-01"/>
          </Observation>
@@ -3190,7 +3188,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2018-01-05T10:15:00.000+10:00"/>
+            <effectiveDateTime value="2018-01-05T10:15:00+10:00"/>
             <!--Postpartum status-->
             <valueCodeableConcept>
                <coding>

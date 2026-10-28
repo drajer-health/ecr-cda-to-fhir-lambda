@@ -13,7 +13,7 @@
       </assigner>
    </identifier>
    <type value="document"/>
-   <timestamp value="2025-02-22T15:00:45.000-04:00"/>
+   <timestamp value="2025-02-22T15:00:45-04:00"/>
    <entry>
       <fullUrl value="urn:uuid:UUID001"/>
       <resource>
@@ -178,7 +178,7 @@
             <encounter>
                <reference value="urn:uuid:UUID005"/>
             </encounter>
-            <date value="2025-02-22T15:00:45.000-04:00"/>
+            <date value="2025-02-22T15:00:45-04:00"/>
             <author>
                <reference value="urn:uuid:UUID006"/>
             </author>
@@ -1021,12 +1021,11 @@
                   <p>...</p>
                </div>
             </text>
-            <!--INFO: Id from encompassingEncounter-->
+            <!--INFO: Ids from encompassingEncounter + Encounter Activity / Encounter Diagnosis acts, deduplicated by (system, value)-->
             <identifier>
                <system value="urn:oid:2.16.840.1.113883.19"/>
                <value value="9937015"/>
             </identifier>
-            <!--Id from Encounter Activity-->
             <identifier>
                <system value="urn:ietf:rfc:3986"/>
                <value value="urn:uuid:UUID024"/>
@@ -1039,7 +1038,6 @@
                <system value="urn:ietf:rfc:3986"/>
                <value value="urn:uuid:UUID026"/>
             </identifier>
-            <!--Id from Encounter Diagnosis Act-->
             <status value="finished"/>
             <class>
                <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
@@ -1469,7 +1467,7 @@
             <target>
                <reference value="urn:uuid:UUID001"/>
             </target>
-            <recorded value="2025-02-27T15:00:45.000-04:00"/>
+            <recorded value="2025-02-27T15:00:45-04:00"/>
             <agent>
                <type>
                   <coding>
@@ -1491,7 +1489,7 @@
             <target>
                <reference value="urn:uuid:UUID001"/>
             </target>
-            <recorded value="2025-02-22T15:00:45.000-04:00"/>
+            <recorded value="2025-02-22T15:00:45-04:00"/>
             <agent>
                <who>
                   <display value="cda-to-fhir-transform"/>
@@ -1961,7 +1959,7 @@
             <subject>
                <reference value="urn:uuid:UUID004"/>
             </subject>
-            <authoredOn value="2025-02-27T15:00:45.000-04:00"/>
+            <authoredOn value="2025-02-27T15:00:45-04:00"/>
             <requester>
                <reference value="urn:uuid:UUID006"/>
             </requester>
@@ -2035,7 +2033,7 @@
                <reference value="urn:uuid:UUID004"/>
             </subject>
             <!--INFO: Using document effective time as issued date-->
-            <issued value="2025-02-22T15:00:45.000-04:00"/>
+            <issued value="2025-02-22T15:00:45-04:00"/>
             <valueCodeableConcept>
                <coding>
                   <system value="http://snomed.info/sct"/>
@@ -2065,7 +2063,7 @@
             <subject>
                <reference value="urn:uuid:UUID004"/>
             </subject>
-            <authoredOn value="2025-02-27T15:00:45.000-04:00"/>
+            <authoredOn value="2025-02-27T15:00:45-04:00"/>
             <requester>
                <reference value="urn:uuid:UUID006"/>
             </requester>
@@ -2139,7 +2137,7 @@
                <reference value="urn:uuid:UUID004"/>
             </subject>
             <!--INFO: Using document effective time as issued date-->
-            <issued value="2025-02-22T15:00:45.000-04:00"/>
+            <issued value="2025-02-22T15:00:45-04:00"/>
             <valueCodeableConcept>
                <coding>
                   <system value="http://snomed.info/sct"/>
@@ -2211,7 +2209,7 @@
                <start value="2025-02-16"/>
             </effectivePeriod>
             <!--INFO: Using document effective time as issued date-->
-            <issued value="2025-02-22T15:00:45.000-04:00"/>
+            <issued value="2025-02-22T15:00:45-04:00"/>
             <valueCodeableConcept>
                <coding>
                   <system value="urn:oid:2.16.840.1.113883.6.243"/>
@@ -2253,7 +2251,7 @@
                <start value="2025-02-16"/>
             </effectivePeriod>
             <!--INFO: Using document effective time as issued date-->
-            <issued value="2025-02-22T15:00:45.000-04:00"/>
+            <issued value="2025-02-22T15:00:45-04:00"/>
             <valueCodeableConcept>
                <coding>
                   <system value="http://snomed.info/sct"/>
