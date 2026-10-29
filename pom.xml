@@ -13,7 +13,8 @@
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	    <junit.version>4.13.2</junit.version>
 	    <commons.logging.version>1.3.5</commons.logging.version>	
-	    <spring.core.version>6.2.11</spring.core.version>    
+	    <spring.core.version>7.0.10</spring.core.version>    
+	    <jackson.version>2.22.4</jackson.version>
 	</properties>	
 	<build>
 		<plugins>
@@ -243,5 +244,16 @@
 		    <version>${commons.logging.version}</version>
 		</dependency>
 					
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>					
 	</dependencies>
 </project>
