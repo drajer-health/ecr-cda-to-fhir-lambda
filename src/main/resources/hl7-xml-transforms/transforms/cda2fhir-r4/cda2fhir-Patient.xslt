@@ -116,14 +116,36 @@
                             <code value="GUARD" />
                         </coding>
                     </relationship>
+                    <!-- 20260821 Claude (item 055, live part; policy refined by SG same day): a null-flavored
+                         contact addr used to flow through the generic nullFlavor mapping into
+                         <address> with DAR 'unknown', which us-ph-patient rejects (its contact DAR
+                         slices are fixed to 'masked') - live in the two Flu refiner corpus documents.
+                         SG's POLICY: a DAR 'masked' may only ever be a faithful translation of an
+                         explicit MSK in the source CDA - the transform must never ADD one for data
+                         that is merely absent. So addr nullFlavor='MSK' passes through the generic
+                         mapping (MSK -> masked, which also matches the profile's fixed slice), and
+                         every OTHER nullFlavor (NI etc.) is OMITTED. contact.address is 1..1 in the
+                         profile, so the omission makes the validator flag the document -
+                         DELIBERATELY: that error is the signal to take to the implementer whose
+                         data is missing, not something to paper over.
+                         Telecom and name are untouched: their existing filling puts the DAR on the
+                         VALUE primitive inside them, where no fixed slice applies, and that passes. -->
                     <xsl:apply-templates select="cda:guardianPerson/cda:name" />
                     <xsl:apply-templates select="cda:telecom" />
-                    <xsl:apply-templates select="cda:addr" />
+                    <xsl:apply-templates select="cda:addr[not(@nullFlavor) or @nullFlavor = 'MSK']" />
                 </contact>
             </xsl:for-each>
 
             <!-- SG 20240321: Add emergency contact -->
-            <xsl:for-each select="/cda:ClinicalDocument/cda:participant[@typeCode = 'IND']/cda:associatedEntity[@classCode = 'ECON']">
+            <!-- 20260902 Claude (SG decision 2026-09-02, seen live in eICRTN2Scrubbed, which carries
+                 FIVE byte-identical ECON participants): identical emergency contacts collapse to ONE,
+                 the first in document order surviving - the contact analogue of the identifier
+                 dedupe policy. Identity = everything the mapping emits (ids, person-name text,
+                 telecom value/use, addr text/use), so two ECONs that would produce the same contact
+                 collapse and any that differ in any mapped datum all survive. -->
+            <xsl:for-each-group
+                select="/cda:ClinicalDocument/cda:participant[@typeCode = 'IND']/cda:associatedEntity[@classCode = 'ECON']"
+                group-by="string-join((for $vNode in (cda:id/@root, cda:id/@extension, cda:associatedPerson/cda:name//text()[normalize-space()], cda:telecom/@value, cda:telecom/@use, cda:addr//text()[normalize-space()], cda:addr/@use) return normalize-space($vNode)), '|')">
                 <contact>
                     <relationship>
                         <coding>
@@ -131,37 +153,154 @@
                             <code value="C" />
                         </coding>
                     </relationship>
+                    <!-- 20260821 Claude (item 055): same rule as the guardian contact above -
+                         MSK passes through (faithful masked), any other nullFlavor is omitted -->
                     <xsl:apply-templates select="cda:associatedPerson/cda:name" />
                     <xsl:apply-templates select="cda:telecom" />
-                    <xsl:apply-templates select="cda:addr" />
+                    <!-- 20260902 Claude (SG decision 2026-09-02, seen live in eICRTN2Scrubbed): an
+                         emergency-contact participant with NO telecom/addr in the CDA is NOT wrong -
+                         the CDA does not require them on an ECON participant (unlike the guardian,
+                         where absence IS an implementer signal and no fallback is added). But
+                         us-ph-patient makes contact.telecom 1..* and contact.address 1..1, so a
+                         truly-absent one gets DARs on the LOWER-LEVEL primitives - the contact-level
+                         DAR slices are fixed to 'masked', which the policy reserves for explicit MSK.
+                         Probed on TN2 2026-09-02: the string parts (address line/city/state/
+                         postalCode/country, telecom value) validate clean; the code parts with
+                         REQUIRED bindings (telecom.system/use, address.use) cannot carry a bare DAR
+                         without a "code is required from the value set" error, so per SG: 'use' is
+                         dropped entirely, and telecom.system DEFAULTS to 'phone' (SG's revision,
+                         same day, replacing a first-draft DAR that cost one binding error per
+                         contact; a value-only telecom fails cpt-2 instead). The one asserted code
+                         is SG's mapping decision, like the Composition.title constant.
+                         A PRESENT-but-null-flavored telecom/addr keeps its item-055 handling. -->
+                    <xsl:if test="not(cda:telecom)">
+                        <telecom>
+                            <system value="phone" />
+                            <value>
+                                <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                                    <valueCode value="unknown" />
+                                </extension>
+                            </value>
+                        </telecom>
+                    </xsl:if>
+                    <xsl:apply-templates select="cda:addr[not(@nullFlavor) or @nullFlavor = 'MSK']" />
+                    <xsl:if test="not(cda:addr)">
+                        <address>
+                            <line>
+                                <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                                    <valueCode value="unknown" />
+                                </extension>
+                            </line>
+                            <city>
+                                <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                                    <valueCode value="unknown" />
+                                </extension>
+                            </city>
+                            <state>
+                                <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                                    <valueCode value="unknown" />
+                                </extension>
+                            </state>
+                            <postalCode>
+                                <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                                    <valueCode value="unknown" />
+                                </extension>
+                            </postalCode>
+                            <country>
+                                <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                                    <valueCode value="unknown" />
+                                </extension>
+                            </country>
+                        </address>
+                    </xsl:if>
                 </contact>
-            </xsl:for-each>
+            </xsl:for-each-group>
 
             <!-- Communication:  TODO - add extension patient-proficiency modeCode -> proficieny.type, proficiency.level -->
-            <xsl:for-each select="cda:patientRole/cda:patient/cda:languageCommunication">
+            <!-- 20260821 Claude (item 054): the coding was emitted unconditionally, so a languageCommunication
+                 with a missing, empty or null-flavored languageCode (seen in production data) produced
+                 <code value=""/> - three validator errors per instance (empty code, ele-1, codeless Coding).
+                 us-ph-patient constrains this element hard (measured against 2.1.2): communication is 1..*,
+                 language is 1..1, and the dataAbsentReason slice on language FIXES its code to 'masked' -
+                 any other DAR code fails _DT_Fixed_Wrong and un-matches the whole Patient profile. So:
+                 a real code is emitted normalize-space'd (the item-047 shape); a languageCommunication
+                 with no usable code is skipped; a languageCode explicitly marked MSK becomes DAR 'masked'
+                 (the one DAR value the profile permits, and a FAITHFUL TRANSLATION of the source's own MSK -
+                 kept on SG's refinement 2026-08-21: masked may carry through from the CDA, it may just
+                 never be ADDED where the source had no MSK); and when NOTHING remains - every
+                 languageCommunication unusable, or the CDA carries none at all (the profile-required-element
+                 case SG raised) - one communication is emitted so communication 1..* always holds,
+                 carrying a coding whose CODE primitive holds a data-absent-reason extension (SG's
+                 decision 2026-08-24, replacing the earlier 'en' default - seen live in a TN eICR whose
+                 languageCode is nullFlavor UNK). The nullFlavor, when present, is translated by the
+                 generic data-absent-reason-extension mapping (UNK -> unknown, ASKU -> asked-unknown, ...);
+                 no languageCommunication at all -> 'unknown'. The DAR sits on coding.code - NOT on
+                 language itself, where the profile's fixed slice would force 'masked' - so the only
+                 validator consequence is a warning that no code was provided for the extensible binding.
+                 (MSK never reaches this fallback: an MSK entry is 'usable' above and keeps its
+                 language-level DAR 'masked', the shape the profile's own slice describes.)
+                 preferred is only emitted when preferenceInd carries an actual value - it used to emit
+                 <preferred value=""/> (an invalid boolean) for a null-flavored preferenceInd. -->
+            <xsl:variable name="vUsableLanguageComms" select="cda:patientRole/cda:patient/cda:languageCommunication[normalize-space(cda:languageCode/@code) or cda:languageCode/@nullFlavor = 'MSK']" />
+            <xsl:for-each select="$vUsableLanguageComms">
                 <communication>
                     <language>
-                        <coding>
-                            <!-- Hard coding system because it's not in CDA -->
-                            <system value="urn:ietf:bcp:47" />
-                            <!-- eng is not allowed in FHIR - map to en -->
-                            <xsl:choose>
-                                <xsl:when test="cda:languageCode/@code = 'eng'">
-                                    <code value="en" />
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <code value="{cda:languageCode/@code}" />
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </coding>
+                        <xsl:choose>
+                            <xsl:when test="normalize-space(cda:languageCode/@code)">
+                                <coding>
+                                    <!-- Hard coding system because it's not in CDA -->
+                                    <system value="urn:ietf:bcp:47" />
+                                    <!-- eng is not allowed in FHIR - map to en -->
+                                    <xsl:choose>
+                                        <xsl:when test="normalize-space(cda:languageCode/@code) = 'eng'">
+                                            <code value="en" />
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <code value="{normalize-space(cda:languageCode/@code)}" />
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </coding>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <!-- MSK - the one DAR code the profile permits here, and the honest one -->
+                                <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                                    <valueCode value="masked" />
+                                </extension>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </language>
-                    <xsl:if test="cda:preferenceInd">
+                    <xsl:if test="cda:preferenceInd/@value">
                         <preferred>
                             <xsl:attribute name="value" select="cda:preferenceInd/@value" />
                         </preferred>
                     </xsl:if>
                 </communication>
             </xsl:for-each>
+            <xsl:if test="not($vUsableLanguageComms)">
+                <!-- communication is 1..* in us-ph-patient, so absence must still produce one entry.
+                     SG decision 2026-08-24: a DAR on the coding's CODE primitive (not on language,
+                     whose fixed slice only permits 'masked'), translating the source nullFlavor when
+                     one is present and defaulting to 'unknown' when the CDA has no
+                     languageCommunication at all. Replaces the earlier 'en' default. -->
+                <communication>
+                    <language>
+                        <coding>
+                            <code>
+                                <xsl:choose>
+                                    <xsl:when test="cda:patientRole/cda:patient/cda:languageCommunication/cda:languageCode/@nullFlavor">
+                                        <xsl:apply-templates select="(cda:patientRole/cda:patient/cda:languageCommunication/cda:languageCode/@nullFlavor)[1]" mode="data-absent-reason-extension" />
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                                            <valueCode value="unknown" />
+                                        </extension>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </code>
+                        </coding>
+                    </language>
+                </communication>
+            </xsl:if>
 
             <!-- managingOrganization -->
             <xsl:if test="cda:patientRole/cda:providerOrganization">

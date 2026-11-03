@@ -13,7 +13,7 @@
       </assigner>
    </identifier>
    <type value="document"/>
-   <timestamp value="2020-05-15T12:00:00.000-06:00"/>
+   <timestamp value="2020-05-15T12:00:00-06:00"/>
    <entry>
       <fullUrl value="urn:uuid:UUID001"/>
       <resource>
@@ -218,7 +218,7 @@
             <encounter>
                <reference value="urn:uuid:UUID005"/>
             </encounter>
-            <date value="2020-05-15T12:00:00.000-06:00"/>
+            <date value="2020-05-15T12:00:00-06:00"/>
             <author>
                <reference value="urn:uuid:UUID006"/>
             </author>
@@ -415,6 +415,17 @@
                <postalCode value="84116"/>
                <country value="US"/>
             </address>
+            <communication>
+               <language>
+                  <coding>
+                     <code>
+                        <extension url="http://hl7.org/fhir/StructureDefinition/data-absent-reason">
+                           <valueCode value="unknown"/>
+                        </extension>
+                     </code>
+                  </coding>
+               </language>
+            </communication>
          </Patient>
       </resource>
    </entry>
@@ -425,7 +436,7 @@
             <meta>
                <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-encounter"/>
             </meta>
-            <!--INFO: Id from encompassingEncounter-->
+            <!--INFO: Ids from encompassingEncounter + Encounter Activity / Encounter Diagnosis acts, deduplicated by (system, value)-->
             <identifier>
                <system value="urn:oid:2.16.840.1.113883.19"/>
                <value value="9937015"/>
@@ -824,7 +835,7 @@
             <target>
                <reference value="urn:uuid:UUID001"/>
             </target>
-            <recorded value="2020-05-15T12:00:00.000-06:00"/>
+            <recorded value="2020-05-15T12:00:00-06:00"/>
             <agent>
                <type>
                   <coding>
@@ -846,7 +857,7 @@
             <target>
                <reference value="urn:uuid:UUID001"/>
             </target>
-            <recorded value="2020-05-15T12:00:00.000-06:00"/>
+            <recorded value="2020-05-15T12:00:00-06:00"/>
             <agent>
                <who>
                   <display value="cda-to-fhir-transform"/>

@@ -1264,7 +1264,7 @@
             </telecom>
             <gender value="female"/>
             <birthDate value="1974-11-24"/>
-            <deceasedDateTime value="2019-11-07T09:44:21.000-05:00"/>
+            <deceasedDateTime value="2019-11-07T09:44:21-05:00"/>
             <address>
                <use value="home"/>
                <line value="2222 Home Street"/>
@@ -1429,17 +1429,15 @@
                   <p>...</p>
                </div>
             </text>
-            <!--INFO: Id from encompassingEncounter-->
+            <!--INFO: Ids from encompassingEncounter + Encounter Activity / Encounter Diagnosis acts, deduplicated by (system, value)-->
             <identifier>
                <system value="urn:oid:2.16.840.1.113883.19"/>
                <value value="9937012"/>
             </identifier>
-            <!--Id from Encounter Activity-->
             <identifier>
                <system value="urn:ietf:rfc:3986"/>
                <value value="urn:uuid:UUID031"/>
             </identifier>
-            <!--Id from Encounter Diagnosis Act-->
             <status value="in-progress"/>
             <class>
                <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
@@ -2025,7 +2023,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2018-11-07T11:15:00+00:00"/>
+            <effectiveDateTime value="2018-11-07T11:15:00-05:00"/>
             <dosage>
                <route>
                   <coding>
@@ -3095,7 +3093,7 @@
             <!--Pregnancy Status Recorded Date-->
             <!--Date Recorded Extension-->
             <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-date-recorded-extension">
-               <valueDateTime value="2017-10-01T10:35:00+00:00"/>
+               <valueDateTime value="2017-10-01T10:35:00-05:00"/>
             </extension>
             <!--Pregnancy Status Determination Date-->
             <!--Date Determined Extension-->
@@ -3136,7 +3134,7 @@
             </method>
             <component><!--Observation.component: sliceEstimatedDateOfDelivery--><!--Date Determined Extension-->
                <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-date-determined-extension">
-                  <valueDateTime value="2017-10-01T10:15:00+00:00"/>
+                  <valueDateTime value="2017-10-01T10:15:00-05:00"/>
                </extension>
                <code>
                   <coding>
@@ -3149,7 +3147,7 @@
             </component>
             <component><!--Observation.component: sliceEstimatedGestationalAgeOfPregnancysliceEstimatedDateOfDelivery--><!--Date Determined Extension-->
                <extension url="http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-date-determined-extension">
-                  <valueDateTime value="2017-10-01T10:15:00+00:00"/>
+                  <valueDateTime value="2017-10-01T10:15:00-05:00"/>
                </extension>
                <code>
                   <coding>
@@ -3193,7 +3191,7 @@
             <focus>
                <reference value="urn:uuid:UUID026"/>
             </focus>
-            <effectiveDateTime value="2018-01-05T08:50:00+00:00"/>
+            <effectiveDateTime value="2018-01-05T08:50:00-05:00"/>
             <valueCodeableConcept>
                <coding>
                   <system value="http://snomed.info/sct"/>
@@ -3238,7 +3236,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2018-01-05T10:15:00+00:00"/>
+            <effectiveDateTime value="2018-01-05T10:15:00-05:00"/>
             <!--Start of last menstrual period-->
             <valueDateTime value="2017-08-01"/>
          </Observation>
@@ -3267,7 +3265,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2018-01-05T10:15:00+00:00"/>
+            <effectiveDateTime value="2018-01-05T10:15:00-05:00"/>
             <!--Postpartum status-->
             <valueCodeableConcept>
                <coding>
@@ -3313,7 +3311,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2014-05-20T19:36:05.000-05:00"/>
+            <effectiveDateTime value="2014-05-20T19:36:05-05:00"/>
             <hasMember><!--2.16.840.1.113883.10.20.22.4.27--><!--2.16.840.1.113883.10.20.22.4.27:2014-06-09-->
                <reference value="urn:uuid:UUID080"/>
             </hasMember>
@@ -3367,7 +3365,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2014-05-20T19:36:05.000-05:00"/>
+            <effectiveDateTime value="2014-05-20T19:36:05-05:00"/>
             <note>
                <text value="120"/>
             </note>
@@ -3433,7 +3431,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2014-05-20T19:36:05.000-05:00"/>
+            <effectiveDateTime value="2014-05-20T19:36:05-05:00"/>
             <valueQuantity>
                <value value="80"/>
                <unit value="/min"/>
@@ -3475,7 +3473,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2014-05-20T19:36:05.000-05:00"/>
+            <effectiveDateTime value="2014-05-20T19:36:05-05:00"/>
             <valueQuantity>
                <value value="99.0"/>
                <unit value="[degF]"/>
@@ -3517,7 +3515,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2014-05-20T19:36:05.000-05:00"/>
+            <effectiveDateTime value="2014-05-20T19:36:05-05:00"/>
             <valueQuantity>
                <value value="18"/>
                <unit value="/min"/>
@@ -3559,7 +3557,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2014-05-20T19:36:05.000-05:00"/>
+            <effectiveDateTime value="2014-05-20T19:36:05-05:00"/>
             <valueQuantity>
                <value value="67"/>
                <unit value="[in_i]"/>
@@ -3605,7 +3603,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2014-05-20T19:36:05.000-05:00"/>
+            <effectiveDateTime value="2014-05-20T19:36:05-05:00"/>
             <valueQuantity>
                <value value="239.9"/>
                <unit value="[lb_av]"/>
@@ -3647,7 +3645,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2014-05-20T19:36:05.000-05:00"/>
+            <effectiveDateTime value="2014-05-20T19:36:05-05:00"/>
             <valueQuantity>
                <value value="37.58"/>
                <unit value="kg/m2"/>

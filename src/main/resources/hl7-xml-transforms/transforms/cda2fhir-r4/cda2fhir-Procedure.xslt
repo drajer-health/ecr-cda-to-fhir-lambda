@@ -12,6 +12,13 @@
         <xsl:apply-templates select="cda:author" mode="bundle-entry" />
         <xsl:apply-templates select="cda:informant" mode="bundle-entry" />
         <xsl:apply-templates select="cda:performer" mode="bundle-entry" />
+        <!-- 20260824 Claude (per SG): companion org-only PractitionerRole for the recorder when
+             author[1] is, or resolves to, an Organization - pairs with the pPersonOnlyTargets
+             reference in the convert template (see cda2fhir-PractitionerRole.xslt) -->
+        <xsl:apply-templates select="cda:author[1]" mode="org-practitionerrole-entry" />
+        <!-- 20260825 Claude (B15a): same pairing for the asserter - informant[1] is classified with
+             pPersonOnlyTargets in the convert templates, so its org companion must be created here -->
+        <xsl:apply-templates select="cda:informant[1]" mode="org-practitionerrole-entry" />
 
         <xsl:for-each select="cda:author[position() > 1] | cda:informant[position() > 1]">
             <xsl:apply-templates select="." mode="provenance" />
@@ -86,11 +93,27 @@
             <!-- recorder (max 1)-->
             <xsl:apply-templates select="cda:author[1]" mode="rename-reference-participant">
                 <xsl:with-param name="pElementName">recorder</xsl:with-param>
+                <!-- 20260824 Claude (per SG): Procedure.recorder only allows Practitioner|PractitionerRole|
+                     Patient|RelatedPerson. An author that is (or resolves to) an Organization is preserved
+                     by referencing a companion org-only PractitionerRole (created by the bundle-entry
+                     template above, mode org-practitionerrole-entry); a Device author is omitted
+                     (recorder is 0..1). Live in the TN eICR: hollow authors resolving to a person-less
+                     org author. See rename-reference-participant in c-to-fhir-utility.xslt. -->
+                <xsl:with-param name="pPersonOnlyTargets" select="true()" />
             </xsl:apply-templates>
 
             <!-- asserter (max 1)-->
+            <!-- 20260825 Claude (B15a): Procedure.asserter only allows Patient|RelatedPerson|
+                 Practitioner|PractitionerRole (eicr-procedure 2.1.2 = us-core-procedure 3.1.1 = R4
+                 base). The informant used to fall through to XSLT built-in rules (the
+                 rename-reference-participant template matched only author|performer), leaking the
+                 informant's TEXT into the Procedure. Now an informant behaves like a performer:
+                 person -> PractitionerRole reference; org -> companion org-only PractitionerRole
+                 (created by the bundle-entry template above, mode org-practitionerrole-entry);
+                 device -> omitted (asserter is 0..1); patient-routed -> Patient reference (legal). -->
             <xsl:apply-templates select="cda:informant[1]" mode="rename-reference-participant">
                 <xsl:with-param name="pElementName">asserter</xsl:with-param>
+                <xsl:with-param name="pPersonOnlyTargets" select="true()" />
             </xsl:apply-templates>
 
             <!-- performers (multiple) -->
@@ -178,11 +201,27 @@
             <!-- recorder (max 1)-->
             <xsl:apply-templates select="cda:author[1]" mode="rename-reference-participant">
                 <xsl:with-param name="pElementName">recorder</xsl:with-param>
+                <!-- 20260824 Claude (per SG): Procedure.recorder only allows Practitioner|PractitionerRole|
+                     Patient|RelatedPerson. An author that is (or resolves to) an Organization is preserved
+                     by referencing a companion org-only PractitionerRole (created by the bundle-entry
+                     template above, mode org-practitionerrole-entry); a Device author is omitted
+                     (recorder is 0..1). Live in the TN eICR: hollow authors resolving to a person-less
+                     org author. See rename-reference-participant in c-to-fhir-utility.xslt. -->
+                <xsl:with-param name="pPersonOnlyTargets" select="true()" />
             </xsl:apply-templates>
 
             <!-- asserter (max 1)-->
+            <!-- 20260825 Claude (B15a): Procedure.asserter only allows Patient|RelatedPerson|
+                 Practitioner|PractitionerRole (eicr-procedure 2.1.2 = us-core-procedure 3.1.1 = R4
+                 base). The informant used to fall through to XSLT built-in rules (the
+                 rename-reference-participant template matched only author|performer), leaking the
+                 informant's TEXT into the Procedure. Now an informant behaves like a performer:
+                 person -> PractitionerRole reference; org -> companion org-only PractitionerRole
+                 (created by the bundle-entry template above, mode org-practitionerrole-entry);
+                 device -> omitted (asserter is 0..1); patient-routed -> Patient reference (legal). -->
             <xsl:apply-templates select="cda:informant[1]" mode="rename-reference-participant">
                 <xsl:with-param name="pElementName">asserter</xsl:with-param>
+                <xsl:with-param name="pPersonOnlyTargets" select="true()" />
             </xsl:apply-templates>
 
             <!-- performers (multiple) -->
@@ -282,11 +321,27 @@
             <!-- recorder (max 1)-->
             <xsl:apply-templates select="cda:author[1]" mode="rename-reference-participant">
                 <xsl:with-param name="pElementName">recorder</xsl:with-param>
+                <!-- 20260824 Claude (per SG): Procedure.recorder only allows Practitioner|PractitionerRole|
+                     Patient|RelatedPerson. An author that is (or resolves to) an Organization is preserved
+                     by referencing a companion org-only PractitionerRole (created by the bundle-entry
+                     template above, mode org-practitionerrole-entry); a Device author is omitted
+                     (recorder is 0..1). Live in the TN eICR: hollow authors resolving to a person-less
+                     org author. See rename-reference-participant in c-to-fhir-utility.xslt. -->
+                <xsl:with-param name="pPersonOnlyTargets" select="true()" />
             </xsl:apply-templates>
 
             <!-- asserter (max 1)-->
+            <!-- 20260825 Claude (B15a): Procedure.asserter only allows Patient|RelatedPerson|
+                 Practitioner|PractitionerRole (eicr-procedure 2.1.2 = us-core-procedure 3.1.1 = R4
+                 base). The informant used to fall through to XSLT built-in rules (the
+                 rename-reference-participant template matched only author|performer), leaking the
+                 informant's TEXT into the Procedure. Now an informant behaves like a performer:
+                 person -> PractitionerRole reference; org -> companion org-only PractitionerRole
+                 (created by the bundle-entry template above, mode org-practitionerrole-entry);
+                 device -> omitted (asserter is 0..1); patient-routed -> Patient reference (legal). -->
             <xsl:apply-templates select="cda:informant[1]" mode="rename-reference-participant">
                 <xsl:with-param name="pElementName">asserter</xsl:with-param>
+                <xsl:with-param name="pPersonOnlyTargets" select="true()" />
             </xsl:apply-templates>
 
             <!-- performers (multiple) -->
@@ -384,4 +439,4 @@
             </xsl:choose>
         </status>
     </xsl:template>
-</xsl:stylesheet>
+</xsl:stylesheet>

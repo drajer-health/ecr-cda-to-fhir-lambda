@@ -250,12 +250,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
 
@@ -317,6 +323,9 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
 
@@ -441,12 +450,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- value -->
@@ -535,6 +550,9 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
 
@@ -621,12 +639,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -657,12 +681,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- <xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -744,12 +774,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -781,12 +817,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- <xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -818,12 +860,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -863,12 +911,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -958,12 +1012,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -1004,12 +1064,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -1050,12 +1116,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -1204,12 +1276,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -1262,12 +1340,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -1326,12 +1410,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- <xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -1363,7 +1453,29 @@
   <xsl:template match="cda:observation[cda:templateId/@root = '2.16.840.1.113883.10.20.22.4.212']">
     <xsl:comment>ODH History of Employment Status</xsl:comment>
     <Observation>
-      <xsl:call-template name="add-meta" />
+      <!-- 20261015 Claude (SG decision 2026-10-15, register B18b): a null-flavored value
+           (<value xsi:type="CD" nullFlavor="UNK"/>, seen live in the TN2/TN3 documents and in all
+           three Drajer production samples) is translated to Observation.dataAbsentReason by the
+           generic mapping below, which is the right thing for an ordinary Observation - but
+           odh-EmploymentStatus (hl7.fhir.us.odh 1.1.0) sets dataAbsentReason to max 0, so no
+           resource carrying a DAR can ever conform to that profile and the validator reported
+           "Observation.dataAbsentReason: max allowed = 0, but found 1" on every such document.
+           Per SG: keep the faithful DAR translation and DROP the meta.profile claim, so the
+           resource validates as a base Observation, and say so in a comment in the output.
+           The Composition's Social History entry slices are all 0..* (eicr-composition 2.1.2),
+           so nothing upstream requires an odh-EmploymentStatus entry. A real value is unchanged. -->
+      <xsl:choose>
+        <xsl:when test="cda:value[@nullFlavor]">
+          <xsl:comment>
+            <xsl:text>INFO: meta.profile (odh-EmploymentStatus) omitted - the CDA value is nullFlavor="</xsl:text>
+            <xsl:value-of select="cda:value/@nullFlavor" />
+            <xsl:text>", translated to dataAbsentReason, which that profile forbids (max 0)</xsl:text>
+          </xsl:comment>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="add-meta" />
+        </xsl:otherwise>
+      </xsl:choose>
       <xsl:apply-templates select="cda:id" />
       <status value="final" />
       <category>
@@ -1385,12 +1497,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -1466,12 +1584,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -1543,12 +1667,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">
@@ -1655,12 +1785,18 @@
       <xsl:for-each select="cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!-- if there are any specific performers in the component observations, get them -->
       <xsl:for-each select="cda:component/cda:observation/cda:performer[cda:assignedEntity[cda:*[not(@nullFlavor)]]]">
         <xsl:apply-templates select="." mode="rename-reference-participant">
           <xsl:with-param name="pElementName">performer</xsl:with-param>
+          <!-- 20260825 Claude (B15c): Observation.performer allows Organization but NOT Device
+               (R4 base = us-core-observation-lab 3.1.1 = us-ph observation profiles 2.1.2) -->
+          <xsl:with-param name="pOmitDeviceTargets" select="true()" />
         </xsl:apply-templates>
       </xsl:for-each>
       <!--<xsl:for-each select="cda:component/cda:observation[cda:performer/cda:assignedEntity]">

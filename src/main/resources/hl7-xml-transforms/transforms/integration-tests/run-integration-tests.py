@@ -72,6 +72,29 @@ positive. The whole XHTML subtree is skipped.
 On the corpus they immediately found 39 live violations in 9 documents that the pre-existing
 invariants called clean, including 4 instances of CDAFHIR-015 surviving at three sites the
 2026-08-03 fix did not touch. See the codebase notes, items 046-052.
+
+20260825 Claude: added three more element-level invariants (B2/B3 from the external-review
+triage), measured against the corpus before implementation:
+
+  9. string-whitespace - any @value with leading or trailing whitespace on element types not
+     already covered by the code/uri primitive checks (B2). FHIR string values SHOULD NOT
+     carry edge whitespace; in this pipeline it is always untrimmed source text (xsi:type ST
+     text nodes, name parts, referenceRange text). The corpus survey found 15 instances in
+     8 documents (valueString x12, name.suffix x2, referenceRange.text x1) - those are
+     baselined; anything new fails.
+  10. reference-display-duplication - a Reference-typed element (one with a <reference>
+     child) carrying MORE THAN ONE <display> child is schema-invalid (display is 0..1).
+     The corpus survey found ZERO instances of this, and zero of the softer "display text
+     redundantly duplicates the target resource's name" variant, so this is a PURE
+     REGRESSION GUARD for the B3 defect class, not a live-defect detector.
+  11. duplicate-identifier - two direct Resource.identifier children of one resource sharing
+     the same (system/@value, value/@value) pair (B3's sibling defect). The corpus survey
+     found zero pairs across 1765 resources (121 with >1 identifier), confirming the
+     c00f618 Encounter dedupe holds corpus-wide - also a pure regression guard.
+
+Problem strings for all three carry element paths only, never values: flagged values can
+contain newlines and tabs, which would corrupt the tab-separated known-issues format, and
+values would make the baseline unstable anyway.
 """
 import re
 import sys
@@ -202,6 +225,43 @@ SENTINEL_VALUES = {"unknown", "unk", "n/a", "na", "none", "no information",
                    "null", "nil", "tbd", "not available", "not applicable"}
 SENTINEL_PATHS = {"telecom.value", "address.text"}
 
+# xhtml content models the FHIR validator enforces inside narrative (item 053): these
+# elements accept ONLY the listed children, and no bare text. Production CDA narratives
+# (refiner footnotes, vendor quirks) can carry inline elements in these positions; the
+# transform must re-home them, so any hit here is a transform defect, not input noise.
+NARRATIVE_TABLE_CHILDREN = {
+    "table": {"caption", "col", "colgroup", "thead", "tfoot", "tbody", "tr"},
+    "thead": {"tr"}, "tfoot": {"tr"}, "tbody": {"tr"},
+    "colgroup": {"col"}, "tr": {"td", "th"},
+}
+
+
+def check_narrative(div, where, problems):
+    """Table-structure legality inside one narrative div (item 053).
+
+    check_elements deliberately skips the XHTML subtree for its ele-1 checks - narrative
+    is full of legitimately empty elements - but table STRUCTURE is still ours to get
+    right: "Elements of type table at div/table cannot have the following children: span"
+    is exactly what the production validator raised. Problem strings carry element names
+    only, so they stay stable in the known-issues baseline.
+    """
+    for el in div.iter():
+        if not el.tag.startswith(XHTML_NS):
+            continue
+        name = el.tag.split("}")[-1]
+        allowed = NARRATIVE_TABLE_CHILDREN.get(name)
+        if allowed is None:
+            continue
+        seen = set()
+        for child in el:
+            cname = child.tag.split("}")[-1]
+            if (not child.tag.startswith(XHTML_NS) or cname not in allowed) and cname not in seen:
+                seen.add(cname)
+                problems.append(
+                    f"invalid narrative xhtml: {where} has <{cname}> as a child of <{name}>")
+        if any(t and t.strip() for t in [el.text] + [c.tail for c in el]):
+            problems.append(f"invalid narrative xhtml: {where} has bare text inside <{name}>")
+
 
 def check_elements(xml: str, problems: list):
     """ele-1, primitive syntax and house-convention checks over the parsed Bundle.
@@ -226,13 +286,34 @@ def check_elements(xml: str, problems: list):
     def walk(elem, rtype, path):
         for child in elem:
             if child.tag.startswith(XHTML_NS):
-                continue                      # narrative - not FHIR elements
+                # narrative - not FHIR elements, so the ele-1 checks skip the subtree,
+                # but its table structure is still checked (item 053)
+                check_narrative(child, label(rtype, path + [child.tag.split("}")[-1]]),
+                                problems)
+                continue
             name = child.tag.split("}")[-1]
             # entering a resource: <entry><resource><Patient> -> rtype becomes Patient, and the
             # path restarts so problem strings read Patient.contact.address, not
             # Bundle.entry.resource.Patient.contact.address
             if rtype is None and elem.tag == FHIR_NS + "resource":
                 child_rtype, child_path = name, []
+                # child is a resource root - duplicate-identifier (B3 sibling, 20260825):
+                # two direct Resource.identifier children sharing (system, value) mean an
+                # upstream dedupe regressed (cf. the c00f618 Encounter identifier dedupe).
+                # One problem line per duplicate beyond the first, path/type only - no values.
+                seen_ident = set()
+                for ident in child:
+                    if ident.tag != FHIR_NS + "identifier":
+                        continue
+                    key = tuple(
+                        part_el.get("value") if (part_el := ident.find(FHIR_NS + part))
+                        is not None else None
+                        for part in ("system", "value"))
+                    if key in seen_ident:
+                        problems.append(
+                            f"duplicate-identifier: {name} has two identifiers sharing "
+                            f"the same (system, value) pair")
+                    seen_ident.add(key)
             else:
                 child_rtype, child_path = rtype, path + [name]
             where = label(child_rtype, child_path)
@@ -272,6 +353,16 @@ def check_elements(xml: str, problems: list):
                 # --- uri primitive syntax ---------------------------------------------
                 if name in URI_PRIMITIVES and re.search(r"\s", value):
                     problems.append(f"invalid uri primitive: {where} value contains whitespace")
+                # --- string-whitespace (B2, 20260825): edge whitespace on every other
+                # @value (string/display/text and all remaining primitives). code and uri
+                # primitives are excluded - their own checks above already report these.
+                if (name not in CODE_PRIMITIVES and name not in URI_PRIMITIVES
+                        and value != value.strip()):
+                    kind = ("leading and trailing"
+                            if value != value.lstrip() and value != value.rstrip()
+                            else "leading" if value != value.lstrip() else "trailing")
+                    problems.append(
+                        f"string-whitespace: {where} value has {kind} whitespace")
                 # --- placeholder strings where DAR is the convention ------------------
                 tail = ".".join(child_path[-2:]) if child_path else ""
                 if tail in SENTINEL_PATHS and value.strip().lower() in SENTINEL_VALUES:
@@ -285,6 +376,17 @@ def check_elements(xml: str, problems: list):
                 problems.append(
                     f"v3-NullFlavor coding: {parent} carries a NullFlavor code - the "
                     f"convention for absent data is a data-absent-reason extension")
+
+            # --- reference-display-duplication (B3 definition (a), 20260825) ----------
+            # Reference.display is 0..1: an element with a <reference> child and more than
+            # one <display> child is schema-invalid. Zero corpus instances at adoption -
+            # this is a pure regression guard for the B3 defect class.
+            if has_children:
+                cnames = [c.tag.split("}")[-1] for c in child]
+                if "reference" in cnames and cnames.count("display") > 1:
+                    problems.append(
+                        f"reference-display-duplication: {where} has more than one "
+                        f"display child")
 
             walk(child, child_rtype, child_path)
 

@@ -13,7 +13,7 @@
       </assigner>
    </identifier>
    <type value="document"/>
-   <timestamp value="2020-11-07T09:44:21.000-05:00"/>
+   <timestamp value="2020-11-07T09:44:21-05:00"/>
    <entry>
       <fullUrl value="urn:uuid:UUID001"/>
       <resource>
@@ -179,7 +179,7 @@
             <encounter>
                <reference value="urn:uuid:UUID004"/>
             </encounter>
-            <date value="2020-11-07T09:44:21.000-05:00"/>
+            <date value="2020-11-07T09:44:21-05:00"/>
             <author>
                <reference value="urn:uuid:UUID005"/>
             </author>
@@ -779,17 +779,15 @@
                   <p>...</p>
                </div>
             </text>
-            <!--INFO: Id from encompassingEncounter-->
+            <!--INFO: Ids from encompassingEncounter + Encounter Activity / Encounter Diagnosis acts, deduplicated by (system, value)-->
             <identifier>
                <system value="urn:oid:2.16.840.1.113883.19"/>
                <value value="9937012"/>
             </identifier>
-            <!--Id from Encounter Activity-->
             <identifier>
                <system value="urn:ietf:rfc:3986"/>
                <value value="urn:uuid:UUID019"/>
             </identifier>
-            <!--Id from Encounter Diagnosis Act-->
             <status value="in-progress"/>
             <class>
                <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
@@ -1156,7 +1154,7 @@
             <target>
                <reference value="urn:uuid:UUID001"/>
             </target>
-            <recorded value="2020-11-07T09:44:21.000-05:00"/>
+            <recorded value="2020-11-07T09:44:21-05:00"/>
             <agent>
                <type>
                   <coding>
@@ -1178,7 +1176,7 @@
             <target>
                <reference value="urn:uuid:UUID001"/>
             </target>
-            <recorded value="2020-11-07T09:44:21.000-05:00"/>
+            <recorded value="2020-11-07T09:44:21-05:00"/>
             <agent>
                <who>
                   <display value="cda-to-fhir-transform"/>
@@ -1212,7 +1210,7 @@
             <subject>
                <reference value="urn:uuid:UUID003"/>
             </subject>
-            <effectiveDateTime value="2020-11-07T11:59:00.000-07:00"/>
+            <effectiveDateTime value="2020-11-07T11:59:00-07:00"/>
             <dosage>
                <route>
                   <coding>

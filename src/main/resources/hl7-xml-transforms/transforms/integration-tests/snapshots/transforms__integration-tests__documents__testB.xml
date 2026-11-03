@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--Element count: 132-->
+<!--Element count: 141-->
 <Bundle xmlns="http://hl7.org/fhir">
    <id value="eICR-bundle-GENID"/>
    <meta>
@@ -13,7 +13,7 @@
       </assigner>
    </identifier>
    <type value="document"/>
-   <timestamp value="2026-07-27T10:30:00.000+10:00"/>
+   <timestamp value="2026-07-27T10:30:00+10:00"/>
    <entry>
       <fullUrl value="urn:uuid:UUID001"/>
       <resource>
@@ -124,7 +124,7 @@
             <encounter>
                <reference value="urn:uuid:UUID004"/>
             </encounter>
-            <date value="2026-07-27T10:30:00.000+10:00"/>
+            <date value="2026-07-27T10:30:00+10:00"/>
             <author>
                <reference value="urn:uuid:UUID005"/>
             </author>
@@ -168,11 +168,15 @@
                </code>
                <text>
                   <status value="additional"/>
-                  <div xmlns="http://www.w3.org/1999/xhtml">Occupation: Nurse</div>
+                  <div xmlns="http://www.w3.org/1999/xhtml">Occupation: Nurse. Employment status: unknown (as of 2024-01-01).</div>
                </text>
-               <!--2.16.840.1.113883.10.20.22.4.217:2020-09-01-->
+               <!--2.16.840.1.113883.10.20.22.4.212:2017-11-30-->
                <entry>
                   <reference value="urn:uuid:UUID008"/>
+               </entry>
+               <!--2.16.840.1.113883.10.20.22.4.217:2020-09-01-->
+               <entry>
+                  <reference value="urn:uuid:UUID009"/>
                </entry>
             </section>
             <section>
@@ -231,7 +235,7 @@
                   <div xmlns="http://www.w3.org/1999/xhtml">No information</div>
                </text>
                <entry>
-                  <reference value="urn:uuid:UUID009"/>
+                  <reference value="urn:uuid:UUID010"/>
                </entry>
             </section>
             <section>
@@ -248,7 +252,7 @@
                   <div xmlns="http://www.w3.org/1999/xhtml">No information</div>
                </text>
                <entry>
-                  <reference value="urn:uuid:UUID010"/>
+                  <reference value="urn:uuid:UUID011"/>
                </entry>
             </section>
             <section>
@@ -359,13 +363,13 @@
                </language>
             </communication>
             <managingOrganization>
-               <reference value="urn:uuid:UUID011"/>
+               <reference value="urn:uuid:UUID012"/>
             </managingOrganization>
          </Patient>
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID011"/>
+      <fullUrl value="urn:uuid:UUID012"/>
       <resource>
          <Organization>
             <meta>
@@ -395,7 +399,7 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID012"/>
+      <fullUrl value="urn:uuid:UUID013"/>
       <resource>
          <Patient>
             <text>
@@ -418,7 +422,7 @@
             <birthDate value="1955-03-15"/>
             <link>
                <other>
-                  <reference value="urn:uuid:UUID013"/>
+                  <reference value="urn:uuid:UUID014"/>
                </other>
                <type value="seealso"/>
             </link>
@@ -426,7 +430,7 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID013"/>
+      <fullUrl value="urn:uuid:UUID014"/>
       <resource>
          <RelatedPerson>
             <identifier>
@@ -466,13 +470,11 @@
                   <p>...</p>
                </div>
             </text>
-            <!--INFO: Id from encompassingEncounter-->
+            <!--INFO: Ids from encompassingEncounter + Encounter Activity / Encounter Diagnosis acts, deduplicated by (system, value)-->
             <identifier>
                <system value="urn:ietf:rfc:3986"/>
                <value value="urn:uuid:UUID002"/>
             </identifier>
-            <!--Id from Encounter Activity-->
-            <!--Id from Encounter Diagnosis Act-->
             <status value="finished"/>
             <class>
                <system value="http://terminology.hl7.org/CodeSystem/v3-ActCode"/>
@@ -494,17 +496,17 @@
             </period>
             <location>
                <location>
-                  <reference value="urn:uuid:UUID014"/>
+                  <reference value="urn:uuid:UUID015"/>
                </location>
             </location>
             <serviceProvider>
-               <reference value="urn:uuid:UUID015"/>
+               <reference value="urn:uuid:UUID016"/>
             </serviceProvider>
          </Encounter>
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID014"/>
+      <fullUrl value="urn:uuid:UUID015"/>
       <resource>
          <Location>
             <meta>
@@ -533,7 +535,7 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID015"/>
+      <fullUrl value="urn:uuid:UUID016"/>
       <resource>
          <Organization>
             <meta>
@@ -572,7 +574,7 @@
                <value value="1111111111"/>
             </identifier>
             <practitioner>
-               <reference value="urn:uuid:UUID016"/>
+               <reference value="urn:uuid:UUID017"/>
             </practitioner>
             <telecom>
                <system value="other"/>
@@ -586,7 +588,7 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID016"/>
+      <fullUrl value="urn:uuid:UUID017"/>
       <resource>
          <Practitioner>
             <meta>
@@ -630,7 +632,7 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID017"/>
+      <fullUrl value="urn:uuid:UUID018"/>
       <resource>
          <DocumentReference><!--DocumentReference.masterIdentifier = ClinicalDocument/id-->
             <masterIdentifier>
@@ -662,13 +664,13 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID018"/>
+      <fullUrl value="urn:uuid:UUID019"/>
       <resource>
          <Provenance>
             <target>
                <reference value="urn:uuid:UUID001"/>
             </target>
-            <recorded value="2026-07-27T10:30:00.000+10:00"/>
+            <recorded value="2026-07-27T10:30:00+10:00"/>
             <agent>
                <type>
                   <coding>
@@ -684,13 +686,13 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID019"/>
+      <fullUrl value="urn:uuid:UUID020"/>
       <resource>
          <Provenance>
             <target>
                <reference value="urn:uuid:UUID001"/>
             </target>
-            <recorded value="2026-07-27T10:30:00.000+10:00"/>
+            <recorded value="2026-07-27T10:30:00+10:00"/>
             <agent>
                <who>
                   <display value="cda-to-fhir-transform"/>
@@ -699,14 +701,14 @@
             <entity>
                <role value="derivation"/>
                <what>
-                  <reference value="urn:uuid:UUID017"/>
+                  <reference value="urn:uuid:UUID018"/>
                </what>
             </entity>
          </Provenance>
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID009"/>
+      <fullUrl value="urn:uuid:UUID010"/>
       <resource>
          <Condition>
             <meta>
@@ -730,7 +732,7 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID010"/>
+      <fullUrl value="urn:uuid:UUID011"/>
       <resource>
          <Observation>
             <meta>
@@ -806,14 +808,52 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID020"/>
+      <fullUrl value="urn:uuid:UUID008"/>
+      <resource><!--ODH History of Employment Status-->
+         <Observation><!--INFO: meta.profile (odh-EmploymentStatus) omitted - the CDA value is nullFlavor="UNK", translated to dataAbsentReason, which that profile forbids (max 0)-->
+            <identifier>
+               <system value="urn:ietf:rfc:3986"/>
+               <value value="urn:uuid:UUID021"/>
+            </identifier>
+            <status value="final"/>
+            <category>
+               <coding>
+                  <system value="http://terminology.hl7.org/CodeSystem/observation-category"/>
+                  <code value="social-history"/>
+                  <display value="Social History"/>
+               </coding>
+            </category>
+            <code>
+               <coding>
+                  <system value="http://loinc.org"/>
+                  <code value="74165-2"/>
+                  <display value="History of employment status NIOSH"/>
+               </coding>
+            </code>
+            <subject>
+               <reference value="urn:uuid:UUID003"/>
+            </subject>
+            <effectivePeriod>
+               <start value="2024-01-01"/>
+            </effectivePeriod>
+            <dataAbsentReason>
+               <coding>
+                  <system value="http://terminology.hl7.org/CodeSystem/data-absent-reason"/>
+                  <code value="unknown"/>
+               </coding>
+            </dataAbsentReason>
+         </Observation>
+      </resource>
+   </entry>
+   <entry>
+      <fullUrl value="urn:uuid:UUID022"/>
       <resource>
          <Organization>
             <meta>
                <profile value="http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-organization"/>
             </meta>
             <identifier>
-               <system value="urn:uuid:UUID021"/>
+               <system value="urn:uuid:UUID023"/>
                <value value="emp1"/>
             </identifier>
             <active value="true"/>
@@ -834,18 +874,18 @@
       </resource>
    </entry>
    <entry>
-      <fullUrl value="urn:uuid:UUID008"/>
+      <fullUrl value="urn:uuid:UUID009"/>
       <resource><!--ODH Past or Present Job-->
          <Observation><!--WARNING: No profiles found for any of the following templates:
                         urn:hl7ii:2.16.840.1.113883.10.20.22.4.217:2020-09-01--><!--ODH Employer Extension-->
             <extension url="http://hl7.org/fhir/us/odh/StructureDefinition/odh-Employer-extension">
                <valueReference>
-                  <reference value="urn:uuid:UUID020"/>
+                  <reference value="urn:uuid:UUID022"/>
                </valueReference>
             </extension>
             <identifier>
                <system value="urn:ietf:rfc:3986"/>
-               <value value="urn:uuid:UUID022"/>
+               <value value="urn:uuid:UUID024"/>
             </identifier>
             <status value="final"/>
             <code>

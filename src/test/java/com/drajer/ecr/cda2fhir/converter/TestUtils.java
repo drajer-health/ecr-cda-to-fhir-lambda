@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
@@ -129,7 +129,7 @@ public class TestUtils {
     }
 
     private static class UpperCaseRecordsPropertyNamingStrategy
-            extends PropertyNamingStrategy.PropertyNamingStrategyBase {
+            extends PropertyNamingStrategies.NamingBase {
 
         private static final long serialVersionUID = 1L;
 

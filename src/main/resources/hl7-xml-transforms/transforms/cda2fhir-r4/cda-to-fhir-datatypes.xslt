@@ -3,6 +3,53 @@
   xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:lcg="http://www.lantanagroup.com"
   xmlns:b64="https://github.com/ilyakharlamov/xslt_base64" version="2.0" exclude-result-prefixes="lcg cda fhir xs xsi sdtc xhtml b64">
   <!--***   Date and Time functions and templates  *** -->
+  <!-- FUNCTION: to return the timezone offset of a CDA TS as a FHIR offset ('-05:00'), or the
+       empty sequence when the TS carries no offset. -->
+  <xsl:function name="lcg:tzFromcdaTS" as="xs:string?">
+    <xsl:param name="cdaTS" as="xs:string?" />
+    <xsl:if test="matches($cdaTS, '[-+][0-9]{4}$')">
+      <xsl:sequence select="concat(substring($cdaTS, string-length($cdaTS) - 4, 3), ':', substring($cdaTS, string-length($cdaTS) - 1, 2))" />
+    </xsl:if>
+  </xsl:function>
+  <!-- 20260810 Claude (CDAFHIR-001): the document's timezone, used by lcg:cdaTS2date when a CDA TS
+       carries no offset of its own. Three rungs, in order:
+         1. ClinicalDocument/effectiveTime's offset - the sending system's own stamp. It is 1..1 in
+            CDA and carries an offset in all 34 corpus documents, so this is the rung that fires.
+         2. The most common offset elsewhere in the document, ties broken lexically so the result is
+            deterministic. NOTE the hazard measured on 20260810: in 'Test eICR (1).xml' the plurality
+            is '+0000' (118 of 178 values) while the real zone is '-0800' - plurality is safe here
+            ONLY because rung 1 already catches that document. If this rung ever starts firing on
+            real input, re-examine it rather than trusting it.
+         3. UTC.
+       Rejected alternatives, both measured against the 6 affected corpus documents: plurality as
+       rung 1 (wrong on Test eICR, above) and nearest-preceding-offset (wrong on all four eICR R3.1
+       samples, where one stray substanceAdministration at -0700 would capture nine values whose
+       document header says -0500).
+       KNOWN CEILING: an offset is not a timezone, so it cannot be extrapolated across a DST
+       boundary. The R3.1 samples carry a -0500 (November, EST) header and one value dated July 2000,
+       which was really -0400; that one comes out an hour off. Accepted - the alternative was a value
+       that is arbitrarily wrong AND differs between a local run and CI.
+       Depends on a whole ClinicalDocument being in context, exactly like $gvCurrentIg: an XSpec
+       scenario built from a bare fragment resolves this to rung 3, not to rung 1. -->
+  <xsl:variable name="gvDocumentTimezone" as="xs:string">
+    <xsl:variable name="vHeaderTz" as="xs:string?" select="lcg:tzFromcdaTS((/cda:ClinicalDocument/cda:effectiveTime[not(@nullFlavor)]/@value)[1])" />
+    <xsl:choose>
+      <xsl:when test="exists($vHeaderTz)">
+        <xsl:sequence select="$vHeaderTz" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="vAllTz" as="xs:string*" select="for $v in //@value[matches(., '^[0-9]{8,}(\.[0-9]+)?[-+][0-9]{4}$')] return lcg:tzFromcdaTS($v)" />
+        <xsl:variable name="vRankedTz" as="xs:string*">
+          <xsl:for-each-group select="$vAllTz" group-by=".">
+            <xsl:sort select="count(current-group())" order="descending" />
+            <xsl:sort select="current-grouping-key()" order="ascending" />
+            <xsl:sequence select="current-grouping-key()" />
+          </xsl:for-each-group>
+        </xsl:variable>
+        <xsl:sequence select="($vRankedTz, '+00:00')[1]" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
   <!-- FUNCTION:  to return date part of a CDA TS -->
   <xsl:function name="lcg:dateFromcdaTS" as="xs:string">
     <!-- Just get the date part, ignoring any time data -->
@@ -22,6 +69,38 @@
     </xsl:variable>
     <xsl:value-of select="$date" />
   </xsl:function>
+  <!-- 20260811 Claude (CDAFHIR-003): a CDA TS rendered as a comparable xs:dateTime, or the empty
+       sequence when it cannot be rendered as one. Date-only values are anchored at midnight in the
+       document's timezone rather than the machine's, so the result never depends on where it runs. -->
+  <xsl:function name="lcg:cdaTScomparable" as="xs:dateTime?">
+    <xsl:param name="cdaTS" as="xs:string?" />
+    <xsl:variable name="vFhir" as="xs:string?" select="if (normalize-space($cdaTS)) then lcg:cdaTS2date($cdaTS) else ()" />
+    <xsl:choose>
+      <xsl:when test="empty($vFhir)" />
+      <xsl:when test="$vFhir castable as xs:dateTime">
+        <xsl:sequence select="xs:dateTime($vFhir)" />
+      </xsl:when>
+      <xsl:when test="concat($vFhir, 'T00:00:00', $gvDocumentTimezone) castable as xs:dateTime">
+        <xsl:sequence select="xs:dateTime(concat($vFhir, 'T00:00:00', $gvDocumentTimezone))" />
+      </xsl:when>
+    </xsl:choose>
+  </xsl:function>
+  <!-- 20260811 Claude (CDAFHIR-003): does a period's high genuinely fall after its low? Six sites used
+       to ask this as `cda:high/@value > cda:low/@value`. Both operands are untypedAtomic, so XPath 2.0
+       casts them to xs:string and compares LEXICOGRAPHICALLY - which is right only by accident of CDA's
+       zero-padded fixed-width format, and wrong as soon as the two ends carry different offsets or
+       different precision ('20201110130000+0900' sorts after '20201110120000-0500' but is four hours
+       EARLIER). No corpus document trips it: all 136 low/high pairs share an offset and a precision.
+       Fixed for shape, and because the next document need not be so tidy.
+       An absent low means "no lower bound", so the high is emitted - preserving the old
+       `or not(cda:low/@value)` limb. An unusable high is not emitted. -->
+  <xsl:function name="lcg:highIsAfterLow" as="xs:boolean">
+    <xsl:param name="high" as="xs:string?" />
+    <xsl:param name="low" as="xs:string?" />
+    <xsl:variable name="vHigh" as="xs:dateTime?" select="lcg:cdaTScomparable($high)" />
+    <xsl:variable name="vLow" as="xs:dateTime?" select="lcg:cdaTScomparable($low)" />
+    <xsl:sequence select="if (empty($vLow)) then true() else if (empty($vHigh)) then false() else ($vHigh gt $vLow)" />
+  </xsl:function>
   <!-- FUNCTION:  to convert CDA TS to FHIR date -->
   <xsl:function name="lcg:cdaTS2date" as="xs:string">
     <!-- the FHIR specification allows ignoring seconds, but the FHIR XSD does not -->
@@ -40,11 +119,17 @@
         <xsl:when test="substring($cdaTS, 13, 4) and matches(substring($cdaTS, 13, 4), '\.')">
           <xsl:sequence select="concat(':', substring($cdaTS, 13, 4), '00')" />
         </xsl:when>
+        <!-- 20260811 Claude (CDAFHIR-001, seconds): these two branches used to append '.000'. A CDA TS
+             that states whole seconds does not state milliseconds, and one that states neither states
+             neither - emitting '.000' asserted a precision the source never gave. The ':00' below is
+             still a fabrication, but an unavoidable one: the FHIR XSD requires a seconds field once a
+             time is present at all. A source that really does carry a fraction keeps it, via the three
+             branches above. -->
         <xsl:when test="substring($cdaTS, 13, 2) and not(matches(substring($cdaTS, 13, 2), '[-+]'))">
-          <xsl:sequence select="concat(':', substring($cdaTS, 13, 2), '.000')" />
+          <xsl:sequence select="concat(':', substring($cdaTS, 13, 2))" />
         </xsl:when>
         <xsl:otherwise>
-          <xsl:sequence select="':00.000'" />
+          <xsl:sequence select="':00'" />
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -65,11 +150,22 @@
         <xsl:sequence select="concat($date, 'T', $time, $timezone)" />
       </xsl:when>
       <!-- check to make sure the xs:time will work, otherwise this will crash -->
-      <xsl:when test="string-length($cdaTS) > 8 and concat(substring($cdaTS, 9, 2), ':', substring($cdaTS, 11, 2), ':00.000') castable as xs:time">
-        <xsl:variable name="time" as="xs:time">
-          <xsl:sequence select="adjust-time-to-timezone(xs:time(concat(substring($cdaTS, 9, 2), ':', substring($cdaTS, 11, 2), ':00.000')))" />
-        </xsl:variable>
-        <xsl:sequence select="concat($date, 'T', format-time($time, '[H01]:[m01]:[s01][Z]'))" />
+      <!-- 20260810 Claude (CDAFHIR-001): the TS carries no offset of its own, so take the document's
+           (see $gvDocumentTimezone). This used to be adjust-time-to-timezone() with no second
+           argument, which stamps the offset of whatever MACHINE ran the transform - so the same
+           document produced '+10:00' on a developer's laptop and '+00:00' in CI, and neither had
+           anything to do with the sending facility. The wall-clock digits are unchanged either way:
+           adjust-time-to-timezone ATTACHES the implicit timezone to a timezone-less xs:time rather
+           than converting it, so this rewrite moves only the suffix. -->
+      <!-- 20260811 Claude (CDAFHIR-001, seconds): use $vSeconds, exactly as the offset-bearing branch
+           above does. This branch used to hard-code ':00', so a source stating whole seconds lost
+           them - 20170116154714 became 15:47:00. The two branches now produce the same shape for the
+           same input, which is what stops this diverging again. Note both fabricate '.000' when the
+           source states no fractional part; that padding is unavoidable for the HHMM-only sources
+           (the FHIR XSD requires a seconds field) and is kept identical across the two branches
+           rather than being made honest in one and not the other. -->
+      <xsl:when test="string-length($cdaTS) > 8 and concat(substring($cdaTS, 9, 2), ':', substring($cdaTS, 11, 2), $vSeconds) castable as xs:time">
+        <xsl:sequence select="concat($date, 'T', substring($cdaTS, 9, 2), ':', substring($cdaTS, 11, 2), $vSeconds, $gvDocumentTimezone)" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="$date" />
@@ -215,7 +311,7 @@
           <xsl:if test="cda:low/@value">
             <start value="{lcg:cdaTS2date(cda:low/@value)}" />
           </xsl:if>
-          <xsl:if test="cda:high/@value and ((cda:high/@value > cda:low/@value) or not(cda:low/@value))">
+          <xsl:if test="cda:high/@value and lcg:highIsAfterLow(cda:high/@value, cda:low/@value)">
             <end value="{lcg:cdaTS2date(cda:high/@value)}" />
           </xsl:if>
         </period>
@@ -239,7 +335,7 @@
           <xsl:if test="cda:low/@value">
             <start value="{lcg:cdaTS2date(cda:low/@value)}" />
           </xsl:if>
-          <xsl:if test="cda:high/@value and ((cda:high/@value > cda:low/@value) or not(cda:low/@value))">
+          <xsl:if test="cda:high/@value and lcg:highIsAfterLow(cda:high/@value, cda:low/@value)">
             <end value="{lcg:cdaTS2date(cda:high/@value)}" />
           </xsl:if>
         </period>
@@ -251,7 +347,11 @@
   </xsl:template>
   <xsl:template match="cda:birthTime | sdtc:birthTime">
     <xsl:param name="pElementName">birthDate</xsl:param>
-    <xsl:if test="not(@nullFlavor)">
+    <!-- 20260824 Claude (B1): guard value-bearing elements so an absent/empty source attribute
+         can never emit value="" (or, for typed functions like lcg:dateFromcdaTS, a runtime type
+         error). Guards sit at the ELEMENT level so no bare element is left behind (ele-1).
+         Same pattern applied at the other B1 sites in this file. -->
+    <xsl:if test="not(@nullFlavor) and @value">
       <xsl:element name="{$pElementName}">
         <xsl:attribute name="value" select="lcg:dateFromcdaTS(@value)" />
       </xsl:element>
@@ -295,7 +395,9 @@
       <xsl:otherwise />
     </xsl:choose>
   </xsl:template>
-  <xsl:template match="cda:effectiveTime[@value or cda:low or cda:high] | cda:time[@value or cda:low or cda:high]" mode="period">
+  <!-- 20260821 Claude (item 058): cda:phase added - a PIVL_TS effectiveTime's phase carries the
+       low/high boundary and reuses this template via the dispatcher's new PIVL branch -->
+  <xsl:template match="cda:effectiveTime[@value or cda:low or cda:high] | cda:time[@value or cda:low or cda:high] | cda:phase[@value or cda:low or cda:high]" mode="period">
     <xsl:param name="pElementName">period</xsl:param>
     <xsl:element name="{$pElementName}">
       <xsl:call-template name="effectiveTimeInner" />
@@ -401,7 +503,7 @@
     <xsl:if test="cda:low[@value]">
       <start value="{lcg:cdaTS2date(cda:low/@value)}" />
     </xsl:if>
-    <xsl:if test="cda:high[@value] and ((cda:high/@value > cda:low/@value) or not(cda:low/@value))">
+    <xsl:if test="cda:high[@value] and lcg:highIsAfterLow(cda:high/@value, cda:low/@value)">
       <end value="{lcg:cdaTS2date(cda:high/@value)}" />
     </xsl:if>
     <xsl:if test="@value and not(cda:low/@value)">
@@ -426,92 +528,7 @@
       </start>
     </xsl:if>
   </xsl:template>
-  <!-- Helper templates -->
-  <xsl:template match="cda:effectiveTime" mode="extension-effectiveTime">
-    <extension url="http://lantana.com/fhir/Profile/organizer#effectiveTime">
-      <valuePeriod>
-        <xsl:if test="cda:low">
-          <start>
-            <xsl:attribute name="value">
-              <xsl:value-of select="lcg:cdaTS2date(cda:low/@value)" />
-            </xsl:attribute>
-          </start>
-        </xsl:if>
-        <xsl:if test="cda:high and ((cda:high/@value > cda:low/@value) or not(cda:low/@value))">
-          <end>
-            <xsl:attribute name="value">
-              <xsl:value-of select="lcg:cdaTS2date(cda:high/@value)" />
-            </xsl:attribute>
-          </end>
-        </xsl:if>
-      </valuePeriod>
-    </extension>
-  </xsl:template>
-  <xsl:template match="cda:effectiveTime" mode="applies">
-    <xsl:choose>
-      <xsl:when test="@value and @value != ''">
-        <appliesDateTime>
-          <xsl:attribute name="value">
-            <xsl:value-of select="lcg:cdaTS2date(@value)" />
-          </xsl:attribute>
-        </appliesDateTime>
-      </xsl:when>
-      <xsl:when test="(cda:low/@value and not(cda:high/@value)) or cda:low/@value = cda:high/@value">
-        <appliesDateTime>
-          <xsl:attribute name="value">
-            <xsl:value-of select="lcg:cdaTS2date(cda:low/@value)" />
-          </xsl:attribute>
-        </appliesDateTime>
-      </xsl:when>
-      <xsl:otherwise>
-        <appliesPeriod>
-          <xsl:if test="cda:low">
-            <start>
-              <xsl:attribute name="value">
-                <xsl:value-of select="lcg:cdaTS2date(cda:low/@value)" />
-              </xsl:attribute>
-            </start>
-          </xsl:if>
-          <xsl:if test="cda:high and ((cda:high/@value > cda:low/@value) or not(cda:low/@value))">
-            <end>
-              <xsl:attribute name="value">
-                <xsl:value-of select="lcg:cdaTS2date(cda:high/@value)" />
-              </xsl:attribute>
-            </end>
-          </xsl:if>
-        </appliesPeriod>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-  <xsl:template match="cda:effectiveTime" mode="appliesPeriod">
-    <appliesPeriod>
-      <xsl:choose>
-        <xsl:when test="@value and @value != ''">
-          <start>
-            <xsl:attribute name="value">
-              <xsl:value-of select="lcg:cdaTS2date(@value)" />
-            </xsl:attribute>
-          </start>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:if test="cda:low">
-            <start>
-              <xsl:attribute name="value">
-                <xsl:value-of select="lcg:cdaTS2date(cda:low/@value)" />
-              </xsl:attribute>
-            </start>
-          </xsl:if>
-          <xsl:if test="cda:high and ((cda:high/@value > cda:low/@value) or not(cda:low/@value))">
-            <end>
-              <xsl:attribute name="value">
-                <xsl:value-of select="lcg:cdaTS2date(cda:high/@value)" />
-              </xsl:attribute>
-            </end>
-          </xsl:if>
-        </xsl:otherwise>
-      </xsl:choose>
-    </appliesPeriod>
-  </xsl:template>
+  
   <!-- TEMPLATE: If effectiveTime has no mode figure out what mode it's supposed to have -->
   <xsl:template match="cda:effectiveTime | cda:time" priority="-1">
     <xsl:param name="pStartElementName" />
@@ -535,6 +552,20 @@
         <xsl:apply-templates select="." mode="instant">
           <xsl:with-param name="pElementName" select="concat($pStartElementName, 'DateTime')" />
         </xsl:apply-templates>
+      </xsl:when>
+      <!-- 20260821 Claude (item 058): PIVL_TS (periodic interval) previously matched NOTHING here and
+           emitted only a warning comment - a travel-history act with "period 3 wk / phase ending
+           20251021" produced no effective[x] at all, violating us-ph-travel-history's 1..1 (live in
+           the Pertussis corpus eICR). The phase boundary is the only part a dateTime/Period can carry,
+           so the phase's low/high map to a Period; the repetition frequency has no representation in
+           effective[x] and is noted in a comment rather than silently dropped. -->
+      <xsl:when test="@xsi:type = 'PIVL_TS' and cda:phase[cda:low/@value or cda:high/@value]">
+        <xsl:apply-templates select="cda:phase" mode="period">
+          <xsl:with-param name="pElementName" select="concat($pStartElementName, 'Period')" />
+        </xsl:apply-templates>
+        <xsl:if test="cda:period/@value">
+          <xsl:comment>INFO: PIVL_TS repetition (every <xsl:value-of select="cda:period/@value" /> <xsl:value-of select="cda:period/@unit" />) is not representable in effective[x]</xsl:comment>
+        </xsl:if>
       </xsl:when>
       <xsl:when test="@nullFlavor">
         <xsl:comment>INFO: CDA effectiveTime/time was null</xsl:comment>
@@ -1413,11 +1444,13 @@
   <xsl:template match="cda:value[@xsi:type = 'INT']" mode="scale">
     <xsl:param name="pElementName" select="'valueQuantity'" />
     <xsl:element name="{$pElementName}">
-      <value>
-        <xsl:attribute name="value">
-          <xsl:value-of select="@value" />
-        </xsl:attribute>
-      </value>
+      <xsl:if test="@value">
+        <value>
+          <xsl:attribute name="value">
+            <xsl:value-of select="@value" />
+          </xsl:attribute>
+        </value>
+      </xsl:if>
       <system value="http://unitsofmeasure.org" />
       <code>
         <xsl:attribute name="value">{score}</xsl:attribute>
@@ -1426,19 +1459,23 @@
   </xsl:template>
   <xsl:template match="cda:value[@xsi:type = 'TS']">
     <xsl:param name="pElementName" select="'valueDateTime'" />
-    <xsl:element name="{$pElementName}">
-      <xsl:attribute name="value">
-        <xsl:value-of select="lcg:cdaTS2date(@value)" />
-      </xsl:attribute>
-    </xsl:element>
+    <xsl:if test="@value">
+      <xsl:element name="{$pElementName}">
+        <xsl:attribute name="value">
+          <xsl:value-of select="lcg:cdaTS2date(@value)" />
+        </xsl:attribute>
+      </xsl:element>
+    </xsl:if>
   </xsl:template>
   <xsl:template match="cda:value[@xsi:type = 'BL']">
     <xsl:param name="pElementName" select="'valueBoolean'" />
-    <xsl:element name="{$pElementName}">
-      <xsl:attribute name="value">
-        <xsl:value-of select="@value" />
-      </xsl:attribute>
-    </xsl:element>
+    <xsl:if test="@value">
+      <xsl:element name="{$pElementName}">
+        <xsl:attribute name="value">
+          <xsl:value-of select="@value" />
+        </xsl:attribute>
+      </xsl:element>
+    </xsl:if>
   </xsl:template>
   <xsl:template match="cda:value[@xsi:type = 'ST' or @xsi:type = 'ED']">
     <xsl:param name="pElementName" select="'valueString'" />
@@ -1457,19 +1494,23 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:element name="{$pElementName}">
-      <xsl:attribute name="value">
-        <xsl:value-of select="$content" />
-      </xsl:attribute>
-    </xsl:element>
+    <xsl:if test="normalize-space($content)">
+      <xsl:element name="{$pElementName}">
+        <xsl:attribute name="value">
+          <xsl:value-of select="$content" />
+        </xsl:attribute>
+      </xsl:element>
+    </xsl:if>
   </xsl:template>
   <xsl:template match="cda:value[@xsi:type = 'INT'] | cda:sequenceNumber">
     <xsl:param name="pElementName" select="'valueInteger'" />
-    <xsl:element name="{$pElementName}">
-      <xsl:attribute name="value">
-        <xsl:value-of select="@value" />
-      </xsl:attribute>
-    </xsl:element>
+    <xsl:if test="@value">
+      <xsl:element name="{$pElementName}">
+        <xsl:attribute name="value">
+          <xsl:value-of select="@value" />
+        </xsl:attribute>
+      </xsl:element>
+    </xsl:if>
   </xsl:template>
   <xsl:template match="cda:value[@xsi:type = 'PQ'][not(@nullFlavor)]">
     <xsl:param name="pElementName" select="'valueQuantity'" />
@@ -1529,6 +1570,7 @@
   </xsl:template>
   <xsl:template match="cda:value[@xsi:type = 'REAL'][not(@nullFlavor)]">
     <xsl:param name="pElementName" select="'valueQuantity'" />
+    <xsl:if test="@value">
     <xsl:element name="{$pElementName}">
       <value>
         <xsl:attribute name="value">
@@ -1554,6 +1596,7 @@
                 </xsl:when>
             </xsl:choose>-->
     </xsl:element>
+    </xsl:if>
   </xsl:template>
   <xsl:template match="cda:value[@xsi:type = 'CD' or @xsi:type = 'CE']">
     <xsl:param name="pElementName" select="'valueCodeableConcept'" />
