@@ -339,86 +339,86 @@ public class CDA2FHIRConverterLambdaFunctionHandler implements RequestHandler<Ma
 
 //		System.out.println("requestBody :::::"+requestBody);
 		if (httpPostUrl == null) {
-			throw new RuntimeException("VALIDATION_URL Environment variable not configured");
-		}
-		context.getLogger().log("HTTP Post URL : " + httpPostUrl);
-		// Create a instance of httpClient and forward the request
-//		DefaultHttpClient httpClient = new DefaultHttpClient();
+			context.getLogger().log("VALIDATION_URL Environment variable not configured. Skip Validation.");
+		}else{
+			context.getLogger().log("HTTP Post URL : " + httpPostUrl);
+			// Create a instance of httpClient and forward the request
+	//		DefaultHttpClient httpClient = new DefaultHttpClient();
 
-		int timeout = 15;
-		RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-				.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
-		CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-		try {
-			// Add content type as application / json
-			HttpPost postRequest = new HttpPost(httpPostUrl);
-			postRequest.addHeader("accept", "application/xml");
-			
-//			JSONObject json = XML.toJSONObject(requestBody);
-//			String jsonString = json.toString();
-			StringEntity input = new StringEntity(requestBody);
-//			context.getLogger().log("Forwarding the jsonString : "+jsonString);
-			
-			input.setContentType("application/xml");
-			postRequest.setEntity(input);
-
-			context.getLogger().log("Forwarding the request to FHIR Validator ");
-			context.getLogger().log("Request Body Content Size " + input.getContentLength());
-
-			// logger.log(inputStrBuilder.toString());
-
-			HttpResponse response = null;
+			int timeout = 300;
+			RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+					.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+			CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 			try {
-				context.getLogger().log("Making the HTTP Post to " + httpPostUrl);
-				response = httpClient.execute(postRequest);
-				context.getLogger().log("HTTP Post completed ");
-			} catch (Exception e) {
-				context.getLogger().log(" In HTTP Post Exception " + e.getLocalizedMessage());
-				e.printStackTrace();
-			}
+				// Add content type as application / json
+				HttpPost postRequest = new HttpPost(httpPostUrl);
+				postRequest.addHeader("accept", "application/xml");
+				
+	//			JSONObject json = XML.toJSONObject(requestBody);
+	//			String jsonString = json.toString();
+				StringEntity input = new StringEntity(requestBody);
+	//			context.getLogger().log("Forwarding the jsonString : "+jsonString);
+				
+				input.setContentType("application/xml");
+				postRequest.setEntity(input);
 
-			// Check return status and throw Runtime exception for return code != 200
-			if (response != null && response.getStatusLine().getStatusCode() != 200) {
-				context.getLogger().log("Post Message failed with Code: " + response.getStatusLine().getStatusCode());
-				context.getLogger().log("Post Message failed reason: " + response.getStatusLine().getReasonPhrase());
-				context.getLogger().log("Post Message response body: " + response.toString());
-				throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-			}
-			StringBuilder outputStr = new StringBuilder();
-			
-			context.getLogger().log("Response status code: "+response.getStatusLine().getStatusCode());
+				context.getLogger().log("Forwarding the request to FHIR Validator ");
+				context.getLogger().log("Request Body Content Size " + input.getContentLength());
 
-			if (response != null) {
-				BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-				String output;
-				context.getLogger().log("Response from FHIR Validator .... ");
-				// Write the response back to invoking program
-				while ((output = br.readLine()) != null) {
-					outputStr.append(output);
+				// logger.log(inputStrBuilder.toString());
+
+				HttpResponse response = null;
+				try {
+					context.getLogger().log("Making the HTTP Post to " + httpPostUrl);
+					response = httpClient.execute(postRequest);
+					context.getLogger().log("HTTP Post completed ");
+				} catch (Exception e) {
+					context.getLogger().log(" In HTTP Post Exception " + e.getLocalizedMessage());
+					e.printStackTrace();
 				}
-				br.close();
-			}
-			context.getLogger().log("Validation Output : " + outputStr.toString());
-			
-			context.getLogger().log("Write output to bucket : " + theBucketName);
-			context.getLogger().log("Write output to filename : " + theKeyPrefix);
-			this.writeFhirFile(outputStr.toString(), theBucketName, theKeyPrefix, context);
-			
-		} catch (ClientProtocolException e) {
-			context.getLogger().log("Failed with ClientProtocolException " + e.getMessage());
-			throw new RuntimeException("Failed with ClientProtocolException: " + e.getMessage());
-		} catch (IOException e) {
-			context.getLogger().log("Failed with IOException " + e.getMessage());
-			throw new RuntimeException("Failed with IOException: " + e.getMessage());
-		} finally {
-			context.getLogger().log("Closing HTTP Connection to " + httpPostUrl);
-			try {
-				httpClient.close();
+
+				// Check return status and throw Runtime exception for return code != 200
+				if (response != null && response.getStatusLine().getStatusCode() != 200) {
+					context.getLogger().log("Post Message failed with Code: " + response.getStatusLine().getStatusCode());
+					context.getLogger().log("Post Message failed reason: " + response.getStatusLine().getReasonPhrase());
+					context.getLogger().log("Post Message response body: " + response.toString());
+					throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
+				}
+				StringBuilder outputStr = new StringBuilder();
+				
+				context.getLogger().log("Response status code: "+response.getStatusLine().getStatusCode());
+
+				if (response != null) {
+					BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
+					String output;
+					context.getLogger().log("Response from FHIR Validator .... ");
+					// Write the response back to invoking program
+					while ((output = br.readLine()) != null) {
+						outputStr.append(output);
+					}
+					br.close();
+				}
+				context.getLogger().log("Validation Output : " + outputStr.toString());
+				
+				context.getLogger().log("Write output to bucket : " + theBucketName);
+				context.getLogger().log("Write output to filename : " + theKeyPrefix);
+				this.writeFhirFile(outputStr.toString(), theBucketName, theKeyPrefix, context);
+				
+			} catch (ClientProtocolException e) {
+				context.getLogger().log("Failed with ClientProtocolException " + e.getMessage());
+				throw new RuntimeException("Failed with ClientProtocolException: " + e.getMessage());
 			} catch (IOException e) {
-				context.getLogger().log("Failed with close connection " + e.getMessage());
+				context.getLogger().log("Failed with IOException " + e.getMessage());
+				throw new RuntimeException("Failed with IOException: " + e.getMessage());
+			} finally {
+				context.getLogger().log("Closing HTTP Connection to " + httpPostUrl);
+				try {
+					httpClient.close();
+				} catch (IOException e) {
+					context.getLogger().log("Failed with close connection " + e.getMessage());
+				}
+
 			}
-
 		}
-
 	}
 }
